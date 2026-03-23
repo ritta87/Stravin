@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+
+  <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  body {
+      background-color: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+    }
+
+    a { text-decoration: none; }
+
+    /* HEADER */
+    header {
+      background-color: #198754;
+      padding: 15px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header .brand { font-weight:700; font-size:1.7rem; color:#fff; }
+    header nav a { color:#fff; font-weight:500; margin-left:25px; transition:color 0.2s;}
+    header nav a:hover { color:#e0e0e0; }
+    header nav {gap: 28px;}
+    /* BACK LINK */
+    .back-link { display:inline-block; margin-bottom:20px; font-weight:500; color:#198754; }
+    .back-link:hover { text-decoration:underline; }
+.disabled-variant{
+  opacity:0.5;
+  pointer-events:none;
+}
+
+    .profile-wrapper {
+      padding: 40px 0;
+    }
+
+    .profile-card,
+    .info-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #e9ecef;
+    }
+
+.section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #555;
+    }
+
+    .order-badge {
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 20px;
+    }
+
+    .btn-action {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  list-style: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+  right: 0;
+  min-width: 120px;
+}
+
+.dropdown-menu li {
+  padding: 5px 0;
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}  .wishlist-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.cart-icon{
+  font-size: 22px;
+  color: #000;   /* black icon */
+}
+.cart-count{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:#000;
+  color:#fff;
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:10px;
+  font-weight:600;
+}
+.wishlist-nav i {
+  font-size: 18px;
+}
+
+.wishlist-badge {
+  position: absolute;
+  top: -4px;
+  left: 12px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 50px;
+  background: red;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+ .wishlist-section {
+      padding: 50px 0;
+    }
+
+    .wishlist-title {
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .wishlist-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: 0.3s ease;
+      height: 100%;
+    }
+
+    .wishlist-card:hover {
+      transform: translateY(-4px);
+    }
+
+   .wishlist-img-box {
+  min-width: 200px;
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wishlist-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+  .product-card{
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+  transition:0.2s;
+  height:100%;
+}
+.product-img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.logout-btn{
+  display:none;
+}
+.product-details{
+  margin-top:10px;
+  text-align:center;
+}
+.product-details span{
+  display:block;
+}
+
+.discount-price{
+  font-size:18px;
+  font-weight:700;
+  color:#d32f2f;
+}
+.product-info{
+  padding:10px;
+  text-align:center;
+}
+
+.wishlist-btn{
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 8px 0;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.wishlist-btn i {
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.wishlist-active i {
+  color: red;
+  transform: scale(1.2);
+}
+#profileImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+/* Container for edit form */
+.edit-profile-container {
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Form heading */
+.edit-profile-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Input fields */
+.edit-profile-container input[type="text"],
+.edit-profile-container input[type="email"],
+.edit-profile-container input[type="tel"],
+.edit-profile-container input[type="file"],
+.edit-profile-container input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.edit-profile-container input:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+/* Labels */
+.edit-profile-container label {
+  font-weight: 500;
+  color: #555;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Profile image preview */
+#profilePreview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 2px solid #ddd;
+}
+
+/* Buttons */
+
+/* OTP section */
+#otpSection {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  display: none; /* Show after sending OTP */
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+/* Small info text */
+.edit-profile-container .info-text {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 10px;
+}
+/* Update button (primary action) */
+.update-btn {
+  width: 100%;
+  padding: 10px 0;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.update-btn:hover {
+  background-color: #45a049;
+}
+#preview {
+  width: 120px;        /* fixed width */
+  height: 120px;       
+  border-radius: 50%;  
+  object-fit: cover;   
+  border: 2px solid #ccc;
+}
+/* Remove button (danger action) */
+.remove-btn {
+  width: 100%;
+  padding: 10px 0;
+  background-color: #f44336; /* Red */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 5px;
+}
+
+.remove-btn:hover {
+  background-color: #da190b;
+}
+.edit-profile-container {
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.edit-profile-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.edit-profile-container input[type="text"],
+.edit-profile-container input[type="email"],
+.edit-profile-container input[type="tel"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.file-input-wrapper img#preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+.choose-btn {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.choose-btn:hover { background-color: #45a049; }
+
+.remove-btn {
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.remove-btn:hover { background-color: #da190b; }
+
+.update-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.update-btn:hover { background-color: #45a049; }
+/* OTP section container */
+/* Container for Email Change */
+.email-otp-container {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Heading */
+.email-otp-container h3 {
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+/* Input fields */
+.email-otp-container input[type="email"],
+.email-otp-container input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.email-otp-container input:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+/* Buttons */
+.email-otp-container button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Send OTP button */
+.email-otp-container button.send-btn {
+  background-color: #2196F3; /* Blue */
+  color: #fff;
+}
+
+.email-otp-container button.send-btn:hover {
+  background-color: #0b7dda;
+}
+
+/* Verify OTP button */
+.email-otp-container button.verify-btn {
+  background-color: #4CAF50; /* Green */
+  color: #fff;
+}
+
+.email-otp-container button.verify-btn:hover {
+  background-color: #45a049;
+}
+
+/* OTP Section (hidden initially) */
+#otpSection {
+  display: none; /* Show only after sending OTP */
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+/* Small info text */
+.email-otp-container .info-text {
+  font-size: 12px;
+  color: #777;
+  text-align: center;
+}
+
+/* Responsive: mobile-friendly */
+@media (max-width: 600px) {
+  .email-otp-container {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .email-otp-container button {
+    width: 100%;
+  }
+}
+
+
+
+</style>
+<header class="d-flex justify-content-between align-items-center px-4">
+  <div class="brand">Stravin</div>
+ <nav class="nav-bar">
+    <div class="nav-left">
+
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+    <a href="/cart" class="cart-link">
+     <i class="bi bi-cart3 cart-icon"></i>
+     <span id="cartCount" class="cart-count">0</span>
+      </a>
+
+      <% if (isLoggedIn) { %>
+
+        <div class="dropdown">
+          <button class="dropdown-toggle">
+            Hi, <%= user.name %>
+          </button>
+
+          <ul class="dropdown-menu">
+            <li> <a href ='/profile' class="dropdown-item">Profile</a></li>
+            <li><a href="/logout" class="dropdown-item">Logout</a></li>
+          </ul>
+        </div>
+
+      <% } else { %>
+    <a href="/login">Login</a>
+<% } %>
+</div></nav>
+<script>
+  //cart count
+async function loadCartCount(){
+  try{
+    const res = await fetch('/cart/count')
+    const data = await res.json()
+    const cartEl = document.getElementById('cartCount')
+    if(cartEl){
+      cartEl.innerText = data.count
+    }
+  }catch(err){
+    console.log("Error fetching cart count",err)
+  }
+}
+document.addEventListener("DOMContentLoaded", loadCartCount)
+</script>
+</header>
+
+
+<body>
+<div class="edit-profile-container">
+
+<h2>Edit Profile</h2>
+
+<!-- Form for basic info & profile pic -->
+<form id="editProfileForm" enctype="multipart/form-data">
+  <div>
+    <label>Name:</label>
+    <input type="text" name="name" value="<%= user.name %>" required>
+  </div>
+
+  <div>
+    <label>Mobile:</label>
+    <input type="text" name="mobile" value="<%= user.mobile %>" pattern="\d{10}" placeholder="10-digit mobile">
+  </div>
+
+  <div class="file-input-wrapper">
+  <label>Profile Picture:</label>
+  
+  <img id="preview" src="<%= user.profileImage || '/images/default-avatar.png' %>">
+  
+  <!-- Hidden file input -->
+  <input type="file" id="profileImage" name="profileImage" accept="image/*" onchange="previewImage(event)">
+  
+  <!-- Custom choose file button -->
+  <button type="button" class="choose-btn" onclick="document.getElementById('profileImage').click();">Choose File</button>
+  
+  <!-- Remove button -->
+  <button type="button" class="remove-btn" onclick="removeImage()">Remove</button>
+  
+  <input type="hidden" name="removePic" id="removePic" value="">
+</div>
+    <button type="submit" class="update-btn">Update Profile</button>
+
+</form>
+
+<hr>
+
+<!-- Email change with OTP -->
+<h3>Change Email</h3>
+<div>
+  <input type="email" id="newEmail" placeholder="Enter new email">
+  <button type="button" onclick="sendOTP()">Send OTP</button>
+</div>
+
+<div id="otpSection" style="display:none;">
+  <input type="text" id="emailOTP" placeholder="Enter OTP">
+  <button type="button" onclick="verifyEmailOTP()">Verify OTP</button>
+<div class="info-text">Email change requires OTP verification</div>
+
+</div>
+</div>
+<script>
+document.getElementById('editProfileForm').
+addEventListener('submit', async (event) => {
+  event.preventDefault()
+  const formData = new FormData(event.target);
+
+  const res = await fetch('/profile/edit', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if(data.success) {
+    Swal.fire('Profile Updated!', 'Your profile has been updated successfully.', 'success')
+      .then(() => window.location.href = '/profile');
+  } else {
+    Swal.fire('Error', data.message || 'Failed to update profile.', 'error');
+  }
+});
+async function sendOTP() {
+  const email = document.getElementById('newEmail').value.trim();
+
+  // Validate email first
+  if (!email) {
+    Swal.fire("Validation", "Enter an email", "error");
+    return; // Stop function
+  }
+
+  // Optional: simple email format check
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    Swal.fire("Validation", "Enter a valid email", "error");
+    return;
+  }
+
+  try {
+    const res = await fetch('/profile/send-email-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+  if(data.success) {
+  Swal.fire('Updated!', 'Your profile has been updated successfully.', 'success')
+    .then(() => {
+      // Update the profile preview if needed
+      if(data.profileImage) {
+        document.getElementById('preview').src = data.profileImage;
+      } else {
+        document.getElementById('preview').src = '/images/default-avatar.png';
+      }
+      // Redirect after 1s
+      setTimeout(() => window.location.href = '/profile', 1000);
+    });
+}
+  } catch (err) {
+    console.error(err);
+    Swal.fire('Error', 'Something went wrong', 'error');
+  }
+}
+
+async function verifyEmailOTP() {
+  const email = document.getElementById('newEmail').value.trim();
+  const otp = document.getElementById('emailOTP').value.trim();
+
+  if (!otp) {
+    Swal.fire('Validation', 'Enter the OTP', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/profile/verify-email-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire('Verified!', data.message, 'success');
+      // Optional: reload to show updated email in profile
+      setTimeout(() => location.href('/profile'), 1500);
+    } else {
+      Swal.fire('Oops!', data.message || 'OTP verification failed', 'error');
+    }
+
+  } catch (err) {
+    console.error(err);
+    Swal.fire('Error', 'Something went wrong', 'error');
+  }
+}
+function previewImage(event) {
+  const preview = document.getElementById('preview');
+  preview.src = URL.createObjectURL(event.target.files[0]);
+  document.getElementById('removePic').value = ''; // reset remove flag
+}
+
+function removeImage() {
+  const preview = document.getElementById('preview');
+  preview.src = '/images/default-avatar.png'; // default image
+  document.getElementById('profileImage').value = ''; // clear file input
+  document.getElementById('removePic').value = 'true'; // flag to remove pic on server
+}
+</script>
+</body>
+
+</html>

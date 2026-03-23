@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/css/adminDashboard.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Stravin Admin</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <ul>
+          <li><a href="/admin/customers">Customers</a></li>
+          <li><a href="/admin/products">Products</a></li>
+          <li><a href="/admin/categories">Categories</a></li>
+          <li><a href="/admin/coupons">Coupons</a></li>
+          <li><a href="/admin/banners">Banners</a></li>
+          <li><a href="/admin/orders">Orders</a></li>
+          <li><a href="#" id="logoutbtn" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header>
+        <h1>Welcome, Admin</h1>
+      </header>
+      <section class="content">
+        <p>This is your dashboard. Click menu items to manage different sections.</p>
+      </section>
+    </main>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    document.getElementById('logoutbtn').addEventListener('click',async(e)=>{
+    e.preventDefault();
+     Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of the admin panel",
+      icon: "warning",
+      showCancelButton: true,
+      
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel"
+     }).then((result) => {
+      if(result.isConfirmed) {
+        window.location.href = "/admin/logout"
+      }
+    })
+  })
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+

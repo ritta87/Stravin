@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Address</title>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+    .wishlist-active i {
+  color: red;
+  transform: scale(1.2);
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  list-style: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+  right: 0;
+  min-width: 120px;
+}
+
+.dropdown-menu li {
+  padding: 5px 0;
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+.original-price{
+  font-size:14px;
+  color:#777;
+  text-decoration:line-through;
+}
+.cart-link{
+  position: relative;
+  display: inline-block;
+}
+
+
+.cart-icon{
+  font-size: 22px;
+  color: #000;   /* black icon */
+}
+    /* NAVBAR */
+
+header{
+  background:#198754;   /* Bootstrap green */
+  padding:12px 0;
+}
+
+header .brand{
+  font-weight:700;
+  font-size:1.6rem;
+  color:#fff;
+}
+
+header nav{
+  display:flex;
+  align-items:center;
+}
+
+header nav a{
+  color:#fff;
+  font-weight:500;
+  margin-left:22px;
+}
+
+header nav a:hover{
+  color:#e6e6e6;
+}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+    }
+
+    .container {
+      width: 400px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 15px;
+      text-align: center;
+      text-decoration: none;
+      color: #555;
+    }
+
+    .back-link:hover {
+      color: #000;
+    }
+
+.nav-icons{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+/* CART + WISHLIST WRAPPER */
+
+.icon-box{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ICON STYLE */
+
+.icon-box i{
+  font-size:20px;
+  color:#000;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.icon-box i:hover{
+  transform:scale(1.1);
+}
+
+/* BADGE (cart + wishlist) */
+
+.icon-badge{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:#000;
+  color:#fff;
+  font-size:10px;
+  font-weight:600;
+  padding:2px 6px;
+  border-radius:20px;
+  min-width:18px;
+  text-align:center;
+}
+
+/* wishlist active */
+
+.wishlist-active i{
+  color:red;
+}
+  .container {
+      width: 420px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn-update {
+      width: 100%;
+      background-color: #3498db;
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .btn-update:hover {
+      background-color: #2980b9;
+    }
+
+    .btn-back {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      text-decoration: none;
+      background-color: #95a5a6;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .btn-back:hover {
+      background-color: #7f8c8d;
+    }
+  </style>
+</head>
+<header class="d-flex justify-content-between align-items-center px-4">
+  <div class="brand">Stravin</div>
+ <nav class="nav-bar">
+    <div class="nav-left">
+
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+    <a href="/cart" class="cart-link">
+     <i class="bi bi-cart3 cart-icon"></i>
+     <span id="cartCount" class="cart-count">0</span>
+      </a>
+
+      <% if (isLoggedIn) { %>
+
+        <div class="dropdown">
+          <button class="dropdown-toggle">
+            Hi, <%= user.name %>
+          </button>
+
+          <ul class="dropdown-menu">
+            <li> <a href ='/profile' class="dropdown-item">Profile</a></li>
+            <li><a href="/logout" class="dropdown-item">Logout</a></li>
+          </ul>
+        </div>
+
+      <% } else { %>
+    <a href="/login">Login</a>
+<% } %>
+</div></nav>
+<script>
+  //cart count
+async function loadCartCount(){
+  try{
+    const res = await fetch('/cart/count')
+    const data = await res.json()
+    const cartEl = document.getElementById('cartCount')
+    if(cartEl){
+      cartEl.innerText = data.count
+    }
+  }catch(err){
+    console.log("Error fetching cart count",err)
+  }
+}
+document.addEventListener("DOMContentLoaded", loadCartCount)
+</script>
+</header>
+
+<body>
+
+<div class="container">
+  <h3>Edit Address</h3>
+
+  <form action="/profile/address/edit/<%= address._id %>" method="POST">
+    
+    <input type="text" name="name" value="<%= address.name %>" placeholder="Full Name" />
+
+    <input type="text" name="phone" value="<%= address.mobile %>" placeholder="Phone Number" />
+   <input type="text" name="area" value="<%= address.area %>" placeholder="Area" />
+    
+    <input type="text" name="city" value="<%= address.city %>" placeholder="City" />
+
+    <input type="text" name="state" value="<%= address.state %>" placeholder="State" />
+
+    <input type="text" name="pincode" value="<%= address.pincode %>" placeholder="Pincode"  />
+  <select name="addressType" id="addressType">
+  <option value="Home" <%= address.addressType === "Home" ? "selected" : "" %>>Home</option>
+  <option value="Work" <%= address.addressType === "Work" ? "selected" : "" %>>Work</option>
+  <option value="Other" <%= address.addressType === "Other" ? "selected" : "" %>>Other</option>
+  </select>
+
+
+    <button type="submit">Update Address</button>
+
+  </form>
+
+  <a href="/profile/address" class="back-link">← Back to Address List</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+<link  href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+
+  <title>Admin Dashboard - Edit Category</title>
+  <link rel="stylesheet" href="/css/adminDashboard.css">
+  <link rel="stylesheet" href="/css/adminDashboard.css">
+  <style>
+  /* ===== Layout ===== */
+
+body{
+  margin:0;
+  background:#f4f6f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-container{
+  display:flex;
+  min-height:100vh;
+}
+
+/* ===== Sidebar ===== */
+
+.sidebar{
+  width:230px;
+  background:#1f2937;
+  color:white;
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar-header{
+  padding:20px;
+  font-size:20px;
+  font-weight:600;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-menu ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.sidebar-menu li a{
+  display:block;
+  padding:14px 20px;
+  color:#cbd5e1;
+  text-decoration:none;
+  transition:0.25s;
+}
+
+.sidebar-menu li a:hover{
+  background:#374151;
+  color:white;
+}
+
+.sidebar-menu .logout{
+  color:#ff6b6b;
+}
+
+/* ===== Main Content ===== */
+
+.main-content{
+  flex:1;
+  padding:40px;
+}
+
+.main-content h2{
+  font-weight:600;
+  margin-bottom:25px;
+}
+
+/* ===== Form Card ===== */
+
+#editProductForm{
+  background:white;
+  padding:30px;
+  border-radius:10px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+  max-width:800px;
+}
+
+/* ===== Form Fields ===== */
+
+.form-group{
+  margin-bottom:20px;
+}
+
+label{
+  font-weight:600;
+  margin-bottom:6px;
+  display:block;
+}
+
+input,
+textarea,
+select{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid #d1d5db;
+  border-radius:6px;
+  font-size:14px;
+  transition:0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none;
+  border-color:#3b82f6;
+  box-shadow:0 0 0 2px rgba(59,130,246,0.2);
+}
+
+/* ===== Buttons ===== */
+
+.btn-primary{
+  background:#2563eb;
+  border:none;
+  padding:10px 22px;
+  font-weight:500;
+  border-radius:6px;
+  transition:0.2s;
+}
+
+.btn-primary:hover{
+  background:#1d4ed8;
+}
+
+/* ===== Image Preview ===== */
+
+.preview-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:10px;
+}
+
+.image-box{
+  position:relative;
+}
+
+.image-box img{
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:8px;
+  border:2px solid #e5e7eb;
+  box-shadow:0 3px 8px rgba(0,0,0,0.08);
+}
+
+/* remove button */
+
+.remove-btn{
+  position:absolute;
+  top:-8px;
+  right:-8px;
+  border:none;
+  background:#ef4444;
+  color:white;
+  border-radius:50%;
+  width:22px;
+  height:22px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* ===== File Input ===== */
+
+input[type="file"]{
+  background:#f9fafb;
+  padding:8px;
+}
+
+/* ===== Back Link ===== */
+
+.main-content ul{
+  list-style:none;
+  padding:0;
+}
+
+.main-content ul a{
+  text-decoration:none;
+  color:#2563eb;
+  font-weight:500;
+}
+
+.main-content ul a:hover{
+  text-decoration:underline;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width:768px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .main-content{
+    padding:20px;
+  }
+
+  #editProductForm{
+    padding:20px;
+  }
+}
+
+</style>
+
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Stravin Admin</h2>
+        
+      </div>
+      <nav class="sidebar-menu">
+        <ul>
+          <li><a href="/admin/customers">Customers</a></li>
+          <li><a href="/admin/products">Products</a></li>
+          <li><a href="/admin/categories">Categories</a></li>
+          <li><a href="/admin/coupons">Coupons</a></li>
+          <li><a href="/admin/banners">Banners</a></li>
+          <li><a href="/admin/orders">Orders</a></li>
+          <li><a href="/admin/logout" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+     <ul>
+        <li><a href="/admin/products">← Back to Products</a></li>
+      </ul>
+      <h2> Edit Product</h2>
+      <form id="editProductForm"   enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" name="productname" value="<%= product.productname %>" >
+      </div>
+       
+      <div class="col-md-6">
+  <label class="form-label fw-semibold">Category</label>
+  <select name="category" class="form-select" >
+    <option value="">-- Select Category --</option>
+
+    <% category.forEach(cat => { %>
+      <option 
+        value="<%= cat._id %>" 
+        <%= (product.category&& product.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>
+      >
+        <%= cat.name %>
+      </option>
+    <% }) %>
+  </select>
+</div>
+       <div class="form-group">
+        <label>Product Description</label>
+          <textarea name="description" rows="3"><%= product.description %></textarea>
+      </div>
+    <div class="form-group">
+        <label>Price</label>
+        <input type="number" name="price" value="<%= product.price %>" >
+        </div>
+
+        
+    <div class="form-group">
+    <label>OfferPercentage</label>
+      <input type="number" name="offerPercentage"
+      value="<%= product.offerPercentage %>"></div>
+
+    
+<!--image update and replace-->
+<div class="form-group">
+  <label>Current Images (click to remove):</label>
+  <div class="preview-container" id="existingImages">
+    <% if (product.images && product.images.length > 0) { %>
+      <% product.images.forEach(function(img, index) { %>
+        <div class="image-box">
+          <img src="<%= img %>" alt="product image">
+          <input type="hidden" name="existingImages[]" value="<%= img %>">
+          <button type="button" class="remove-btn" onclick="removeImage(this)">❌</button>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p>No images available</p>
+    <% } %>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>Add New Images (maximum 4 images)</label>
+  <input type="file" name="newImages" id="newImages" multiple accept="image/*">
+  <div id="newPreview" class="preview-container"></div>
+</div>
+
+<script>
+function removeImage(btn) {
+  const box = btn.parentElement;
+  box.remove();
+}
+   const newImagesInput = document.getElementById('newImages');
+     newPreview = document.getElementById('newPreview');
+
+    newImagesInput.addEventListener('change', () => {
+         const files = Array.from(newImagesInput.files);
+  const existingCount = document.querySelectorAll('input[name="existingImages"]').length;
+  
+
+    if (existingCount + files.length > 4) {
+      alert(`You can upload max ${4 - existingCount} more image(s).`)
+      newImagesInput.value = ""
+      return
+    }
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          newPreview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+</script>
+
+        <button type="submit" class="btn btn-primary">Update Product</button>
+      </form>
+   
+    </main>
+  </div>
+  <script>
+    const imageInput = document.getElementById("imageInput")
+    const newPreview = document.getElementById("newPreview")
+
+    imageInput.addEventListener("change", () => {
+      newPreview.innerHTML = "";
+      const files = Array.from(imageInput.files);
+
+      if (files.length > 4) {
+        alert("You can upload only 4 images!");
+        imageInput.value = "";
+        return
+      }
+
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.createElement("img")
+          img.src = e.target.result
+          newPreview.appendChild(img)
+        };
+        reader.readAsDataURL(file)
+      })
+    })
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+const form = document.getElementById("editProductForm");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+
+  const res = await fetch("/admin/products/<%= product._id %>", {
+    method: "PUT",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    Swal.fire({
+      icon: "success",
+      title: "Updated!",
+      text: data.message,
+      timer: 1500,
+      showConfirmButton: false
+    }).then(() => {
+      window.location.href = "/admin/products";
+    });
+  } else {
+    Swal.fire("Error", data.message, "error");
+  }
+});
+</script>
+
+</body>
+</html>

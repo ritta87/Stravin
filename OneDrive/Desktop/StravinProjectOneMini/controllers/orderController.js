@@ -1,0 +1,217 @@
+import Cart from '../models/cartModel.js'
+import Address from '../models/addressModel.js'
+import Order from '../models/orderModel.js'
+import Product from '../models/productModel.js'
+import Variant from '../models/variantModel.js'
+
+function generateOrderId() {
+  const date = new Date();
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `ORD${y}${m}${d}-${random}`;
+}
+
+
+export const placeOrder = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const orderId = generateOrderId()
+    console.log("Generated orderId:", orderId);
+    if (!userId) {
+      return res.status(401).json({success: false,message: "Please login"})
+    }
+    const {addressId} = req.body;
+
+    if (!addressId) {
+      return res.json({success: false,message: "Address not selected"
+      });
+    }
+   // get cart
+    const cart = await Cart.findOne({ userId });
+    if (!cart || cart.items.length === 0) {
+      return res.json({success: false,message:"Cart is empty"})
+    }
+    const address = await Address.findById(addressId);
+    if (!address) {
+      return res.json({success: false,message: "Address not found"})
+    }
+    const subTotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity,0 );
+
+    const tax = Math.round(subTotal * 0.05);
+    const shipping = 50;
+    const totalAmount = subTotal + tax + shipping;
+
+    const newOrder = await Order.create({
+      orderId,userId,subTotal,
+      tax,shipping,totalAmount,paymentMethod:"COD",
+      address: {
+      name: address.name,
+      mobile: address.mobile,
+      address: address.address,
+      area: address.area,
+      house: address.house,
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode,
+      landmark: address.landmark
+    },
+      items: await Promise.all(
+        cart.items.map(async(item)=>{
+         const product=await Product.findById(item.product)
+         const variant=await Variant.findById(item.variant)
+      if (!product||!variant) {
+      throw new Error("Product or variant not found");
+    }
+    //decrease stockqty from product leve.
+    variant.stockQuantity-=item.quantity
+    await variant.save();
+    return{
+      product:item.product,variant:item.variant,
+      quantity:item.quantity,
+      price:item.price,
+      name:product.productname,
+      image:variant.images[0],
+      color:variant.color
+    }
+        })
+      )
+    })
+ 
+    // clear cart
+    cart.items = [];
+    cart.grandTotal = 0;
+    await cart.save();
+    return res.json({success: true,orderId:newOrder.orderId})
+
+  } 
+  catch (error) {
+    return res.status(500).json({success:false,message:"Server error at order creation"})
+  }
+}
+export const getOrderSuccess=async(req,res)=>{
+    try {  
+    const orderId = req.params.orderId;
+    const order = await Order.findOne({orderId}).populate('items.product')
+
+    if(!order){
+      return res.status(404).json({success:false,message:"Order not found!"})
+    }
+    res.render('user/orderSuccess',{order})
+  } catch (error) {
+    console.log(error);
+   return  res.redirect('/');
+  }
+}
+//get users order page..
+export const getUserOrder=async(req,res)=>{
+    try{
+        const userId=req.session.userId;
+        if(!userId){
+            return res.redirect('/login')
+        }
+        const orders=await Order.find({userId}).sort({createdAt:-1}).populate("items.product")
+        res.render('user/orders',{orders});
+    }catch(error){
+        console.log(error)
+        res.redirect('/')
+    }
+}
+
+//view order tracking-details.
+export const getOrderDetails=async(req,res)=>{
+  const userId=req.session.userId;
+  const orderId=req.params.orderId;
+  const order=await Order.findOne({orderId})
+  if(!order){
+    return res.status(404).json({success:false,message:"Order not found!!"});
+
+  }
+  res.render('user/viewOrderDetails',{order})
+}
+export const cancelOrder = async(req,res)=>{
+  try {
+    const orderId = req.params.orderId;
+    const {index} = req.body;
+
+    const order = await Order.findOne({orderId});
+    if (!order) {
+      return res.status(404).json({ success:false, message:"Order not found" });
+    }
+ const idx = Number(index);
+    if (isNaN(idx) || idx < 0 || idx >= order.items.length) {
+      return res.status(400).json({success:false,message:"Invalid item index" });
+    }
+
+    const item = order.items[idx];
+
+    if (!item) {
+      return res.status(400).json({success:false,message:"Invalid item index" });
+    }
+
+    if (order.status === "Delivered") {
+      return res.status(400).json({success:false,message:"Cannot cancel after delivery" });
+    }
+
+    item.itemStatus = "Cancelled";
+    
+    //restore item qty at product area
+   if(item.variant){
+      const variant = await Variant.findById(item.variant);
+      if(variant){
+        variant.stockQuantity += item.quantity;
+        await variant.save();
+      }
+    }
+
+    const allCancelled = order.items.every(i=>i.itemStatus === "Cancelled")
+    if (allCancelled)
+   {
+      order.status = "Cancelled"
+    }
+
+    await order.save();
+    return res.json({success:true})
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({success:false,message:"Server error"})
+  }
+};
+//item return if edilvered.
+export const returnItem=async (req, res) => {
+  const {reason } = req.body;
+  const {orderId,itemId} = req.params;
+
+  if (!reason || reason.trim() === "")
+    return res.status(400).json({ success: false, message: "Return reason is required." });
+
+  const order = await Order.findOne({_id:orderId, userId: req.session.userId });
+  if (!order){ 
+    return res.status(404).json({success:false,message:"Order not found."});
+  }
+  if (order.status !== "Delivered"){
+  return res.status(400).json({success:false,message:"Order must be delivered to request a return." })
+  }
+  const deliveryDate = new Date(order.deliveryDate)
+  const now = new Date()
+  const diffDays = Math.floor((now - deliveryDate) / (1000 * 60 * 60 * 24));
+  if (diffDays > 10){ 
+    return res.status(400).json({ success: false, message: "Return period expired (10 days)."})
+  }
+  const item = order.items.id(itemId);
+  if (!item) {
+    return res.status(404).json({success:false, message: "Item not found in order."})
+  }
+  if (item.return.isRequested){
+     return res.status(400).json({ success: false, message: "Return already requested for this item."})
+  }
+
+  item.return = {
+    isRequested: true,reason,
+    requestDate: now,status: "Pending"
+  }
+  await order.save();
+  return res.json({success:true,message:"Return request submitted for this item."})
+}

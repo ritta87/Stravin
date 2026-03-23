@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Address</title>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+
+body{
+background:#f5f5f5;
+font-family:'Segoe UI',sans-serif;
+}
+ 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  list-style: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+  right: 0;
+  min-width: 120px;
+}
+
+.dropdown-menu li {
+  padding: 5px 0;
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+.original-price{
+  font-size:14px;
+  color:#777;
+  text-decoration:line-through;
+}
+.cart-link{
+  position: relative;
+  display: inline-block;
+}
+
+
+.cart-icon{
+  font-size: 22px;
+  color: #000;   /* black icon */
+}
+    /* NAVBAR */
+
+header{
+  background:#198754;   /* Bootstrap green */
+  padding:12px 0;
+}
+
+header .brand{
+  font-weight:700;
+  font-size:1.6rem;
+  color:#fff;
+}
+
+header nav{
+  display:flex;
+  align-items:center;
+}
+
+header nav a{
+  color:#fff;
+  font-weight:500;
+  margin-left:22px;
+}
+
+header nav a:hover{
+  color:#e6e6e6;
+}
+.address-card{
+  background:#fff;
+  border-radius:14px;
+  padding:22px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+  position:relative;
+  transition:0.2s;
+  height:100%;
+}
+
+.address-card:hover{
+  transform:translateY(-3px);
+}
+.address-actions{
+  margin-top:15px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+/* NAV ICONS WRAPPER */
+
+.nav-icons{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+/* CART + WISHLIST WRAPPER */
+
+.icon-box{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ICON STYLE */
+
+.icon-box i{
+  font-size:20px;
+  color:#000;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.icon-box i:hover{
+  transform:scale(1.1);
+}
+
+/* BADGE (cart + wishlist) */
+
+.icon-badge{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:#000;
+  color:#fff;
+  font-size:10px;
+  font-weight:600;
+  padding:2px 6px;
+  border-radius:20px;
+  min-width:18px;
+  text-align:center;
+}
+
+/* wishlist active */
+
+.wishlist-active i{
+  color:red;
+}
+/* wrapper */
+
+.address-wrapper{
+padding:50px 0;
+}
+
+/* card */
+
+.address-card{
+background:#fff;
+border-radius:16px;
+padding:30px;
+box-shadow:0 4px 14px rgba(0,0,0,0.08);
+max-width:700px;
+margin:auto;
+}
+
+/* title */
+
+.page-title{
+font-weight:700;
+margin-bottom:25px;
+}
+
+/* inputs */
+
+.form-control{
+border-radius:10px;
+padding:10px;
+}
+
+.form-select{
+border-radius:10px;
+padding:10px;
+}
+
+/* buttons */
+
+.btn-save{
+background:#198754;
+border:none;
+padding:10px 25px;
+border-radius:10px;
+}
+
+.btn-save:hover{
+background:#157347;
+}
+
+.back-link{
+display:inline-block;
+margin-bottom:20px;
+color:#198754;
+font-weight:500;
+}
+
+.back-link:hover{
+text-decoration:underline;
+}
+
+</style>
+</head>
+<header class="d-flex justify-content-between align-items-center px-4">
+  <div class="brand">Stravin</div>
+ <nav class="nav-bar">
+    <div class="nav-left">
+
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+    <a href="/cart" class="cart-link">
+     <i class="bi bi-cart3 cart-icon"></i>
+     <span id="cartCount" class="cart-count">0</span>
+      </a>
+
+      <% if (isLoggedIn) { %>
+
+        <div class="dropdown">
+          <button class="dropdown-toggle">
+            Hi, <%= user.name %>
+          </button>
+
+          <ul class="dropdown-menu">
+            <li> <a href ='/profile' class="dropdown-item">Profile</a></li>
+            <li><a href="/logout" class="dropdown-item">Logout</a></li>
+          </ul>
+        </div>
+
+      <% } else { %>
+    <a href="/login">Login</a>
+<% } %>
+</div></nav>
+<script>
+  //cart count
+async function loadCartCount(){
+  try{
+    const res = await fetch('/cart/count')
+    const data = await res.json()
+    const cartEl = document.getElementById('cartCount')
+    if(cartEl){
+      cartEl.innerText = data.count
+    }
+  }catch(err){
+    console.log("Error fetching cart count",err)
+  }
+}
+document.addEventListener("DOMContentLoaded", loadCartCount)
+</script>
+</header>
+
+<body>
+
+<div class="container address-wrapper">
+
+<a href="/profile/address" class="back-link">
+← Back to Address
+</a>
+
+<div class="address-card">
+
+<h4 class="page-title">Add New Address</h4>
+
+<form id="addressForm" action="/profile/address/add" method="POST">
+
+<div class="row g-3">
+
+<!-- Full Name -->
+
+<div class="col-md-6">
+<label class="form-label">Full Name</label>
+<input type="text"name="name" id="name" class="form-control"
+placeholder="Enter your name">
+</div>
+
+
+<!-- Phone -->
+
+<div class="col-md-6">
+<label class="form-label">Phone</label>
+<input type="tel"name="mobile"  id="mobile" class="form-control" maxlength="10"
+placeholder="Enter Mobile number">
+</div>
+
+<!-- Address -->
+
+<div class="col-12">
+<label class="form-label">Address</label>
+<textarea name="house" id="house"
+class="form-control"rows="3"placeholder="Flat / House / Street"></textarea>
+</div>
+<div class="col-12">
+<label class="form-label">Area</label>
+<textarea name="area" id="area"
+class="form-control"rows="3"placeholder="Area"></textarea>
+</div>
+<!-- City -->
+
+<div class="col-md-4">
+<label class="form-label">City</label>
+<input type="text"name="city"class="form-control" id="city">
+</div>
+
+<!-- State -->
+<div class="col-md-4">
+<label class="form-label">State</label>
+<input type="text"name="state"  id="state" class="form-control">
+</div>
+<!-- Pincode -->
+
+<div class="col-md-4">
+<label class="form-label">Pincode</label>
+<input type="number"name="pincode" id="pincode" class="form-control">
+</div>
+<!-- Landmark -->
+
+<div class="col-12">
+<label class="form-label">Landmark</label>
+<input type="text"name="landmark" id="landmark"  class="form-control"placeholder="Nearby landmark">
+</div>
+
+<!-- Address Type -->
+
+<div class="col-md-6">
+<label class="form-label">Address Type</label>
+
+<select name="addressType" class="form-select">
+
+<option value="Home">Home</option>
+<option value="Work">Work</option>
+<option value="Other">Other</option>
+
+</select>
+</div>
+</div>
+<div class="mt-4">
+    <button type="submit" class="btn btn-save">
+Save Address
+</button>
+
+</div></form>
+</div></div>
+<script>
+const form = document.getElementById("addressForm");
+form.addEventListener("submit", function(e){
+  const name = document.getElementById("name").value.trim();
+  const mobile = document.getElementById("mobile").value.trim();
+  const house = document.getElementById("house").value.trim();
+  const area = document.getElementById("area").value.trim();
+  const city = document.getElementById("city").value.trim();
+  const state = document.getElementById("state").value.trim();
+  const pincode = document.getElementById("pincode").value.trim();
+
+  if(!name || !mobile || !house || !area || !city || !state || !pincode){
+    e.preventDefault();
+
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Fields",
+      text: "Please fill all address fields"
+    });
+
+    return
+  }
+
+  if(!/^[0-9]{10}$/.test(mobile)){
+    e.preventDefault()
+
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Mobile",
+      text: "Mobile number must be 10 digits"
+    });
+
+    return
+  }
+
+  if(!/^[0-9]{6}$/.test(pincode)){
+    e.preventDefault();
+
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Pincode",
+      text: "Pincode must be 6 digits"
+    });
+
+    return
+  }
+
+
+
+
+})
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>

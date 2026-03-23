@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Address</title>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+    .wishlist-active i {
+  color: red;
+  transform: scale(1.2);
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  list-style: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+  right: 0;
+  min-width: 120px;
+}
+
+.dropdown-menu li {
+  padding: 5px 0;
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+.original-price{
+  font-size:14px;
+  color:#777;
+  text-decoration:line-through;
+}
+.cart-link{
+  position: relative;
+  display: inline-block;
+}
+
+
+.cart-icon{
+  font-size: 22px;
+  color: #000;   /* black icon */
+}
+    /* NAVBAR */
+
+header{
+  background:#198754;   /* Bootstrap green */
+  padding:12px 0;
+}
+
+header .brand{
+  font-weight:700;
+  font-size:1.6rem;
+  color:#fff;
+}
+
+header nav{
+  display:flex;
+  align-items:center;
+}
+
+header nav a{
+  color:#fff;
+  font-weight:500;
+  margin-left:22px;
+}
+
+header nav a:hover{
+  color:#e6e6e6;
+}
+.address-card{
+  background:#fff;
+  border-radius:14px;
+  padding:22px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+  position:relative;
+  transition:0.2s;
+  height:100%;
+}
+
+.address-card:hover{
+  transform:translateY(-3px);
+}
+.address-actions{
+  margin-top:15px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+/* NAV ICONS WRAPPER */
+
+.nav-icons{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+/* CART + WISHLIST WRAPPER */
+
+.icon-box{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ICON STYLE */
+
+.icon-box i{
+  font-size:20px;
+  color:#000;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.icon-box i:hover{
+  transform:scale(1.1);
+}
+
+/* BADGE (cart + wishlist) */
+
+.icon-badge{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:#000;
+  color:#fff;
+  font-size:10px;
+  font-weight:600;
+  padding:2px 6px;
+  border-radius:20px;
+  min-width:18px;
+  text-align:center;
+}
+
+/* wishlist active */
+
+.wishlist-active i{
+  color:red;
+}
+.address-card button,
+.address-card a.add-btn,
+.address-card a.edit-btn {
+  padding: 8px 16px;
+  margin: 5px 5px 0 0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Edit Button */
+.address-card a.edit-btn {
+  background-color: #3498db;
+  color: #fff;
+}
+.address-card a.edit-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Delete Button */
+.address-card .delete-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+.address-card .delete-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Default / Set Default Button */
+.address-card .default-btn {
+  background-color: #2ecc71;
+  color: #fff;
+}
+.address-card .default-btn:hover {
+  background-color: #27ae60;
+}
+
+/* Disabled / Default Active Button */
+.address-card.default .default-btn {
+  background-color: #27ae60;
+  color: #fff;
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* Add New Address Button */
+.add-btn {
+  background-color: #f39c12;
+  color: #fff;
+  margin-bottom: 15px;
+}
+.add-btn:hover {
+  background-color: #d35400;
+}
+.address-card.default {
+  border: 2px solid green;      
+  background-color: #f0fff0;     
+}
+</style>
+</head>
+<header class="d-flex justify-content-between align-items-center px-4">
+  <div class="brand">Stravin</div>
+ <nav class="nav-bar">
+    <div class="nav-left">
+
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+    <a href="/cart" class="cart-link">
+     <i class="bi bi-cart3 cart-icon"></i>
+     <span id="cartCount" class="cart-count">0</span>
+      </a>
+
+      <% if (isLoggedIn) { %>
+
+        <div class="dropdown">
+          <button class="dropdown-toggle">
+            Hi, <%= user.name %>
+          </button>
+
+          <ul class="dropdown-menu">
+            <li> <a href ='/profile' class="dropdown-item">Profile</a></li>
+            <li><a href="/logout" class="dropdown-item">Logout</a></li>
+          </ul>
+        </div>
+
+      <% } else { %>
+    <a href="/login">Login</a>
+<% } %>
+</div></nav>
+<script>
+  //cart count
+async function loadCartCount(){
+  try{
+    const res = await fetch('/cart/count')
+    const data = await res.json()
+    const cartEl = document.getElementById('cartCount')
+    if(cartEl){
+      cartEl.innerText = data.count
+    }
+  }catch(err){
+    console.log("Error fetching cart count",err)
+  }
+}
+document.addEventListener("DOMContentLoaded", loadCartCount)
+</script>
+</header>
+
+<body>
+
+<div class="container address-wrapper">
+<h3 class="page-title">Manage Addresses</h3>
+
+<a href="/profile/address/add">Add new Address</a>
+
+<div class="row">
+
+<% if(addresses.length > 0){ %>
+<% addresses.forEach(address => { %>
+<div class="col-md-6">
+<div class="address-card" data-id="<%= address._id %>">
+
+
+
+<h6><%= address.addressType %></h6>
+<p class="mb-1"><strong><%= address.name %></strong></p>
+
+<p class="mb-1">
+<%= address.house %>, <%= address.area %>
+</p>
+
+<p class="mb-1">
+<%= address.city %>, <%= address.state %>
+</p>
+
+<p class="mb-1">
+<%= address.pincode %>
+</p>
+
+<p>
+Phone: <%= address.mobile %>
+</p>
+
+<a href="/profile/address/edit/<%=address._id%>" class="edit-btn" 
+  data-id="<%=address._id%>">
+  Edit</a>
+
+ <button class="delete-btn" data-id="<%=address._id%>">Delete</button> 
+
+
+<button class="default-btn" data-id="<%=address._id%>">
+  <% if(address.isDefault){%>
+Set As Default
+ <% }else{%>
+Default
+ <%}%>
+</button>
+</div></div>
+<% }) %>
+<% } else { %>
+<p>No address added yet.</p>
+<% } %>
+</div>
+
+<script>
+ //delete btn
+ document.querySelectorAll('.delete-btn').forEach(btn=>{
+  btn.addEventListener('click',async()=>{
+    const addressId = btn.dataset.id;
+
+    const result=await Swal.fire({
+      title: 'Are you sure?',
+      text: "This address will be deleted permanently!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!'
+    })
+    if(result.isConfirmed){
+   try{
+      const res = await fetch(`/profile/address/delete/${addressId}`,{
+        method:"DELETE"
+      })
+      const data=await res.json()
+
+      if(data.success){
+      btn.closest('.address-card').remove()
+      Swal.fire("Deleted","Address deleted successfully","success")
+      }else{
+        Swal.fire("error","Cant delete Address","error")
+      }
+
+
+    }catch(error){
+      console.log(error)
+      res.json({success:false,message:"Error while deleting address"})
+    }
+  }
+  })
+ })
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".default-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const addressId = btn.dataset.id;
+
+      const result = await Swal.fire({
+        title: 'Set as default?',
+        text: "This address will become your default address!",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, set default!'
+      });
+
+      if (!result.isConfirmed) return;
+      try {
+        const res = await fetch(`/profile/address/default/${addressId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" }
+        })
+        const data = await res.json()
+
+       if (data.success) {
+          // remove default class and reset button text for other address
+          document.querySelectorAll(".address-card").forEach(card => {
+            card.classList.remove("default");
+            const btn = card.querySelector(".default-btn");
+            if (btn) btn.innerText = "Set as Default";
+          });
+
+         // add default class
+          const selectedCard = document.querySelector(`.address-card[data-id='${addressId}']`);
+          selectedCard.classList.add("default");
+          selectedCard.querySelector(".default-btn").innerText = "Default";
+
+          Swal.fire('Success','Default address updated!','success');
+        } else {
+          Swal.fire('Error','Failed to set default','error');
+        }
+      } catch (err) {
+        console.log(err);
+        Swal.fire('Error','Something went wrong','error');
+      }
+    });
+  });
+});
+
+
+
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll('edit-btn').addEventListener('click',async(e)=>{
+    e.preventDefault()
+    const addressId=req.dataset.id;
+    window.location.href=`/profile/address/edit/${addressId}`,{
+    method:"POST",
+    "Content-Type":"application/json"
+    }
+  })
+})
+
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search)
+  const success = params.get("success")
+  if (success === "updated") {
+    Swal.fire({
+      icon:'success',
+      title:'Updated!',
+      text:'Address updated successfully',
+      timer:2000,
+      showConfirmButton:false
+    }).then(() => {
+    window.history.replaceState({},document.title,"/profile/address")
+    })
+  }
+})
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>
