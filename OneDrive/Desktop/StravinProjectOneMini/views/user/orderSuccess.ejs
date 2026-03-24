@@ -13,49 +13,58 @@
 .success-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 80vh;
+  margin-top: 40px;
 }
 
 .success-box {
-  text-align: center;
+  width: 420px;
   background: #fff;
-  padding: 40px;
+  padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.success-box h1 {
-  color: #28a745;
-  margin-bottom: 10px;
+/* 👇 Payment box now below */
+.payment-box {
+  width: 420px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  background: #f8f9fa;
 }
 
-.order-id {
-  margin: 15px 0;
-  font-size: 14px;
-  color: #555;
+/* buttons */
+.view-orders-btn {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
 }
 
-.btn-group {
-  margin-top: 20px;
-}
-
-.btn {
-  padding: 10px 20px;
+.view-orders-btn a {
+  padding: 8px 15px;
   border-radius: 6px;
   text-decoration: none;
-  margin: 0 10px;
-  display: inline-block;
+  font-size: 14px;
 }
 
-.view-order {
+/* primary button */
+.view-orders-btn a:first-child {
+  background: #28a745;
+  color: white;
+}
+
+/* secondary */
+.view-orders-btn .continue {
   background: #007bff;
   color: white;
 }
 
-.continue {
-  background: #6c757d;
-  color: white;
+/* note text */
+.note {
+  font-size: 14px;
+  color: #555;
 }
 </style></head>
 <body>
@@ -70,16 +79,32 @@
       Order ID: <strong><%= order.orderId %></strong>
     </p>
 
-    <div class="btn-group">
-    <a href="/orders"> View Order
-      </a>
+    <div class="view-orders-btn">
+      <a href="/orders">View Orders</a>
 
-      <a href="/" class="btn continue">
+      <a href="/" class="continue">
         Continue Shopping
       </a>
     </div>
 
   </div>
 
-</div></body>
+</div>
+
+<!-- ✅ MOVE OUTSIDE -->
+<div class="payment-box">
+  <h5>Payment Information</h5>
+
+  <p><strong>Payment Method:</strong> Cash on Delivery (COD)</p>
+
+  <p>
+    <strong>Status:</strong> 
+    <span class="badge bg-warning text-dark">Pay on Delivery</span>
+  </p>
+
+  <p class="note">
+    Please keep ₹<%= order.totalAmount %> ready at the time of delivery.
+  </p>
+</div>
+</body>
 </html>

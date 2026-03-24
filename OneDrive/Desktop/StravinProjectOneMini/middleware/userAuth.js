@@ -1,11 +1,17 @@
+import User from "../models/userModel.js";
+const userAuth = async (req, res, next) => {
+  if (req.session && req.session.userId) {
+    const user = await User.findById(req.session.userId);
+    if (!user || user.isBlocked) {
+      req.session.destroy();
+      return res.redirect('/login');
+    }
 
-
-const userAuth = (req, res, next) => {
-  if (req.session&&req.session.userId) {
-    next();
-  }else{
-  return res.status(401).json({success:false,message:"Please Login first!"})
+    next()
+  } 
+  else {
+    return res.redirect('/login');
+  }
 }
-};
 
 export default userAuth;

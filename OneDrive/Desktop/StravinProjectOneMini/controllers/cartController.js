@@ -8,7 +8,7 @@ export const addToCart = async (req, res) => {
   try{
   const userId = req.session.userId;
   const {variantId} = req.body;
-  console.log(userId)
+  
   const quantity=Number(req.body.quantity)||1
   let grandTotal=0;
   const variant = await Variant.findById(variantId)
@@ -111,9 +111,12 @@ export const getCartCount=async(req,res)=>{
 //update + - quantity
 export const updateCartQty = async (req,res)=>{
   const {variantId, change} = req.body
-  const userId = req.session.user.id
+  const userId = req.session.userId;
 let variant = await Variant.findById(variantId)
   const cart = await Cart.findOne({userId})
+  if (!cart) {
+    return res.json({ success: false, message: "Cart not found" });
+}
   const item = cart.items.find(
     i => i.variant.toString() === variantId)
 
@@ -146,7 +149,6 @@ return res.json({success:true,message:"Quantity updated"})
 }
 
 //remove cart item-Remove btn
-
 export const removeCartItem = async (req,res)=>{
   const {variantId} = req.body
   const userId = req.session.userId
@@ -155,9 +157,7 @@ export const removeCartItem = async (req,res)=>{
   if(!cart){
     return res.json({success:false})
   }
-cart.items = cart.items.filter(
-    i => i.variant.toString() !== variantId)
+cart.items = cart.items.filter(i => i.variant.toString() !== variantId)
   await cart.save()
-
 res.json({success:true,message:"Item removed from cart"})
 }

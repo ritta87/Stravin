@@ -24,7 +24,7 @@ import {getUserAddress , getAddAddress , addUserAddress,getEditAddress,postEditA
  from '../controllers/addressController.js'
 
  import {getCheckoutPage} from '../controllers/checkoutController.js'
-import {placeOrder, getOrderSuccess,getUserOrder,getOrderDetails, cancelOrder,returnItem}
+import {placeOrder, getOrderSuccess,getUserOrder,getOrderDetails, cancelOrder,returnItem,downloadInvoice}
  from '../controllers/orderController.js'
 import { noCache } from "../middleware/no-cache.js";
 router.use(noCache)
@@ -81,6 +81,7 @@ router.get('/orders',userAuth,getUserOrder)
 router.get('/viewOrder/:orderId',userAuth,getOrderDetails)
 router.post('/cancelOrder/:orderId',userAuth,cancelOrder);
 router.post('/returnItem/:orderId/:itemId',userAuth,returnItem)
+router.get('/orders/:orderId/invoice',userAuth,downloadInvoice)
 
 
 

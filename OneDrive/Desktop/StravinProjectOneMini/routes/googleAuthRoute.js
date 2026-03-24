@@ -9,16 +9,12 @@ router.get("/google",
 );
 
 //callback after Google login
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    
-    failureRedirect: "/login",
-    
+router.get("/google/callback",passport.authenticate("google", { 
+    failureRedirect: "/login?error=access_denied",
   }),
   (req, res) => {
-    // user is available as req.user,create session,redirect to homepage
-    req.session.user = req.user._id;
+    // user is available as req.user,create session,redirect to home
+    req.session.userId = req.user._id;
     res.redirect("/");
   }
 );

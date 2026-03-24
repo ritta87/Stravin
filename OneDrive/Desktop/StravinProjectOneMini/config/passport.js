@@ -18,14 +18,18 @@ passport.use(
 
         let user = await User.findOne({ email });
 
+  if(user&&user.isBlocked){
+    return done(null,false,{message:"Account is Denied!"})
+  }
+
         if (!user) {
-          // New user from Google
+          // new user from google
           user = await User.create({
             name: profile.displayName,
             email,
             googleId: profile.id,
             isVerified: true,
-          });
+          })
         } else if (!user.googleId) {
           // existing local user,attach googleId
           user.googleId = profile.id;
@@ -34,6 +38,7 @@ passport.use(
         }
 
         return done(null, user);
+      
       } catch (err) {
         return done(err, null);
       }

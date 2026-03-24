@@ -29,9 +29,10 @@ const orderSchema = new mongoose.Schema({
           enum:[ "Placed","Shipped","Out for Delivery","Delivered","Cancelled","Returned"],
           default:"Placed"
         },
-    return: {
-    isRequested: { 
-      type:Boolean,default:false 
+
+    return:
+    {
+    isRequested: { type:Boolean,default:false 
     },
     reason: { 
       type:String,default: "" 
@@ -65,16 +66,15 @@ paymentMethod: {
   totalAmount: Number,
 status: {
   type: String,
-  enum: [
-    "Placed",
-    "Shipped",
-    "Out for Delivery",
-    "Delivered",
-    "Cancelled",
-    "Returned"
-  ],
+  enum: ["Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned"
+    , "Partially Returned"],
   default:"Placed"
-},  
+},
+paymentStatus: {
+  type: String,
+  enum: ["Pending", "Paid", "Refunded"],
+  default: "Pending"
+}  ,
 createdAt:{
     type:Date,
     default:Date.now

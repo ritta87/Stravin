@@ -17,7 +17,7 @@ import {addVariant , getVariantByProduct ,restoreVariant,unlistVariant,updateVar
 
 import {getAllCustomers , blockCustomer , unblockcustomer } from '../controllers/customerController.js'
 
-import { getAllOrders,viewOrderDetails,updateStatus } from '../controllers/adminOrderController.js';
+import { getAllOrders,viewOrderDetails,updateStatus, adminHandleReturn } from '../controllers/adminOrderController.js';
 
 import { noCache } from '../middleware/no-cache.js'
 router.use(noCache)
@@ -73,7 +73,6 @@ router.post('/customers/unblock/:id',adminAuth,unblockcustomer)
 router.get('/orders',adminAuth,getAllOrders);
 router.get('/orderDetails/:orderId',adminAuth,viewOrderDetails)
 router.put('/orderDetails/:orderId/item/:itemId/updateStatus',adminAuth,updateStatus)
-
-
+router.post('/return/:orderId/:itemId', adminAuth, adminHandleReturn);
 
 export default router;

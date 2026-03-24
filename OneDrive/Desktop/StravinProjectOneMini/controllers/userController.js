@@ -138,7 +138,8 @@ console.log('Otp Resent :',newOtp)
 
 //get login page
 export const getLoginPage = async (req, res) => {
-  res.render('user/login');
+  const error=req.query.error
+  res.render('user/login',{error});
 }
 
 export const userLogin = async (req, res) => {

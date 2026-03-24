@@ -1,5 +1,6 @@
 import Order from '../models/orderModel.js'
 import Address from '../models/addressModel.js'
+import Variant from '../models/variantModel.js'
 import UserModel from '../models/userModel.js'
 
 export const getAllOrders=async(req,res)=>{
@@ -87,34 +88,90 @@ if (
 }
 
 item.itemStatus = nextStatus;
-
+if (nextStatus === "Delivered") {
+  order.paymentStatus = "Paid";
+}
     const statuses = order.items.map(i => i.itemStatus);
 
-    if (statuses.every(s => s === "Cancelled")) {
-      order.status = "Cancelled";
-    } 
-    else if (statuses.every(s => s === "Delivered")) {
-      order.status = "Delivered";
-    } 
-    else if (statuses.some(s => s === "Out for Delivery")) {
-      order.status = "Out for Delivery";
-    } 
-    else if (statuses.every(s => s === "Returned")) {
+ if (statuses.every(s => s === "Cancelled")) {
+  order.status = "Cancelled";
+} 
+else if (statuses.every(s => s === "Returned")) {
   order.status = "Returned";
-    }
-    else if (statuses.some(s => s === "Shipped")) {
-      order.status = "Shipped";
-    } 
-    else {
-      order.status = "Placed";
-    }
+} 
+else if (statuses.every(s => s === "Delivered")) {
+  order.status = "Delivered";
+} 
+else if (statuses.some(s => s === "Out for Delivery")) {
+  order.status = "Out for Delivery";
+} 
+else if (statuses.some(s => s === "Shipped")) {
+  order.status = "Shipped";
+} 
+else {
+  order.status = "Placed";
+}
 
     await order.save();
 
     res.json({ success: true });
 
   } catch (error) {
-    console.log("Error:", error);
-    res.json({ success: false });
+    console.log("Error:",error);
+    res.json({ success:false});
+  }
+}
+//return request handling
+export const adminHandleReturn = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.params;
+    const { action } = req.body; // "Approved" or "Rejected"
+
+    const order = await Order.findOne({ orderId: orderId })
+    if(!order) return res.status(404).json({success:false,message:"Order not found"});
+
+    const item = order.items.id(itemId);
+    if(!item) return res.status(404).json({success:false,message:"Item not found"});
+
+    if(!item.return?.isRequested || item.return.status !== "Pending") {
+      return res.status(400).json({success:false,message:"Return not pending for this item."});
+    }
+
+    // Handle action
+    if(action === "Approved"){
+      item.return.status = "Approved";
+      item.itemStatus = "Returned";
+
+      order.paymentStatus = "Refunded";
+      order.refundDate = new Date();
+
+      // Update stock
+      const variant = await Variant.findById(item.variant);
+      if(variant){
+        variant.stockQty += item.quantity; // make sure your variant field is correct
+        await variant.save();
+      }
+
+    } else if(action === "Rejected"){
+      item.return.status = "Rejected"; // correct
+      // keep item.itemStatus as Delivered
+    } else {
+      return res.status(400).json({success:false,message:"Invalid action"});
+    }
+
+    // Update overall order status
+    const allReturned = order.items.every(i => i.itemStatus === "Returned");
+    const someReturned = order.items.some(i => i.itemStatus === "Returned");
+
+    if(allReturned) order.status = "Returned";
+    else if(someReturned) order.status = "Partially Returned";
+    else order.status = "Delivered"; // if all other items delivered
+
+    await order.save();
+
+    return res.json({success:true,message:`Return ${action} successfully`});
+  } catch(err){
+    console.error(err);
+    return res.status(500).json({success:false,message:"Server error while handling return"});
   }
 }

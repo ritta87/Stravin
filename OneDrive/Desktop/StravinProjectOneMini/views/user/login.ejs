@@ -61,6 +61,9 @@
       <button type="button">Continue With Google</button>
      
     </a>
+<% if (error === "access_denied") { %>
+  <p style="color:red;">Account is Denied!</p>
+<% } %>
 
     <p class="text-center mt-3">
       Don't have an account? 
