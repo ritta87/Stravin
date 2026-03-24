@@ -364,41 +364,117 @@ background:#000;
   color: #28a745;
   font-size: 18px;
 }
+.add-address-btn {
+  display: inline-block;
+  padding: 8px 16px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  border-radius: 6px;
+  text-decoration: none;
+
+  border: 2px solid #198754;
+  color: #198754;
+
+  transition: all 0.25s ease;
+}
+
+/* hover */
+.add-address-btn:hover {
+  background: #198754;
+  color: #fff;
+}
+.edit-btn {
+  display: inline-block;
+  padding: 6px 14px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  border-radius: 6px;
+  text-decoration: none;
+
+  border: 1.5px solid #0d6efd; /* blue for edit */
+  color: #0d6efd;
+
+  transition: all 0.25s ease;
+}
+
+/* hover */
+.edit-btn:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+/* ===== NAV ALIGNMENT  ===== */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 18px; 
+}
+
+.nav-left a,
+.nav-left .dropdown {
+  display: flex;
+  align-items: center;
+}
+
+/* ===== DROPDOWN POSITION  ===== */
 
 .dropdown {
   position: relative;
-  display: inline-block;
 }
 
-.dropdown-toggle {
-  background: none;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-}
 
 .dropdown-menu {
-  display: none;
   position: absolute;
-  background: white;
-  list-style: none;
-  padding: 10px;
-  border: 1px solid #ddd;
+  top: 100%;   
   right: 0;
-  min-width: 120px;
+
+  display: none;
+  z-index: 999;
 }
 
-.dropdown-menu li {
-  padding: 5px 0;
-}
 
-.dropdown-menu a {
-  text-decoration: none;
-  color: black;
-}
-
-.dropdown:hover .dropdown-menu {
+.dropdown:hover .dropdown-menu,
+.dropdown-menu:hover {
   display: block;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 14px;
+  transition: 0.2s ease;
+}
+/* Go to Cart button */
+/* spacing fix */
+/* Checkout heading */
+h2 {
+  margin-bottom: 10px;
+}
+
+/* Go to Cart button */
+.go-cart-btn {
+  display: inline-block;
+
+  margin: 10px 0 20px 0;  
+
+  padding: 10px 18px;
+  background-color: #198754;
+  color: #fff;
+
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+/* address box */
+.address-box {
+  margin-top: 10px;
+}
+/* hover */
+.go-cart-btn:hover {
+  background-color: #157347;
+  color: #fff;
 }
 </style>
 <header class="d-flex justify-content-between align-items-center px-4">
@@ -422,6 +498,12 @@ background:#000;
 
           <ul class="dropdown-menu">
             <li>
+              <a href="/profile" class="dropdown-item">Profile</a>
+            </li>
+             <li>
+              <a href="/orders" class="dropdown-item">My Orders</a>
+            </li>
+             <li>
               <a href="/logout" class="dropdown-item">Logout</a>
             </li>
           </ul>
@@ -451,7 +533,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
 <body>
 <h2>Checkout</h2>
-
+<a href="/cart" class="go-cart-btn">Go to cart</a>
 <div class="container">
 
   <!-- LEFT SIDE -->
@@ -474,11 +556,11 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
         <p><%=addr.pincode%></p><p><%=addr.landmark%></p>
         <p><%= addr.mobile %></p>
 
-        <a href="/profile/address/edit/<%= addr._id %>">Edit</a>
+        <a href="/profile/address/edit/<%= addr._id %>" class="edit-btn">Edit</a>
       </div>
     <% }) %>
 
-    <a href="/profile/address/add">+ Add New Address</a>
+    <a href="/profile/address/add" class="add-address-btn">+ Add New Address</a>
 
     <hr>
 
@@ -539,7 +621,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   Payment: Cash on Delivery (COD)
 </p>
      <form id="placeOrderForm">
-    <button type="submit">Place Order (COD)</button>
+    <button type="submit" class="place-order-btn">Place Order (COD)</button>
   </form>
 
   </div>

@@ -10,6 +10,19 @@
   href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
   <style>
+   /* ===== NAV ALIGNMENT FIX ONLY ===== */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* spacing between items */
+}
+
+.nav-left a,
+.nav-left .dropdown {
+  display: flex;
+  align-items: center;
+}
+ 
   header {
   background-color: #198754;
   padding: 15px 0;
@@ -72,7 +85,35 @@ header nav a:hover {
   justify-content: center;
   border: 2px solid #198754;
 }
+.btn-checkout {
+  display: inline-block;
+  padding: 12px 22px;
 
+  font-size: 15px;
+  font-weight: 600;
+
+  border-radius: 8px;
+  text-decoration: none;
+
+  background: linear-gradient(135deg, #198754, #157347);
+  color: #fff;
+
+  border: none;
+  transition: all 0.25s ease;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* hover effect */
+.btn-checkout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+/* click feel */
+.btn-checkout:active {
+  transform: scale(0.97);
+}
 .user-btn {
   background: #fff;
   color: #198754;
@@ -87,39 +128,32 @@ header nav a:hover {
 .user-btn:hover {
   background: #f1f1f1;
 }
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 110%;
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px 0;
-  min-width: 180px;
-  border: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+/* ===== DROPDOWN POSITION FIX ONLY ===== */
+/* FIX hover gap issue */
+.dropdown {
+  position: relative;
 }
 
-.dropdown:hover .dropdown-menu {
+/* KEEP dropdown attached */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;   /* remove extra gap */
+  right: 0;
+
+  display: none;
+  z-index: 999;
+}
+
+/* IMPORTANT: keep menu visible when hovering menu itself */
+.dropdown:hover .dropdown-menu,
+.dropdown-menu:hover {
   display: block;
 }
-
-.dropdown-menu li {
-  list-style: none;
-}
-
+/* ===== DROPDOWN ITEM FEEL ONLY ===== */
 .dropdown-item {
   display: block;
-  padding: 10px 18px;
-  font-size: 14px;
-  color: #333;
-  text-decoration: none;
-}
-
-.dropdown-item:hover {
-  background: #f5f5f5;
-  color: #000;
+  padding: 8px 14px;
+  transition: 0.2s ease;
 }
 </style>
 </head>
@@ -148,6 +182,12 @@ header nav a:hover {
 
           <ul class="dropdown-menu">
             <li>
+              <a href="/profile" class="dropdown-item">Profile</a>
+            </li>
+             <li>
+              <a href="/orders" class="dropdown-item">My Orders</a>
+            </li>
+             <li>
               <a href="/logout" class="dropdown-item">Logout</a>
             </li>
           </ul>

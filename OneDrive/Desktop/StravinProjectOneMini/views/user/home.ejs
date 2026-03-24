@@ -1,321 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-<link rel="stylesheet" href="/css/home.css">
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages/home.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-  .wishlist-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-}
-
-.wishlist-nav i {
-  font-size: 18px;
-}
-
-.wishlist-badge {
-  position: absolute;
-  top: -4px;
-  left: 12px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 50px;
-  background: red;
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
+  .pagination-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  margin-top: 30px;
 }
-  .product-card{
-  background:#fff;
-  border-radius:10px;
-  padding:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
-  transition:0.2s;
-  height:100%;
-}
-.product-img{
-  width:100%;
-  height:200px;
-  object-fit:cover;
-  border-radius:8px;
-}
-.logout-btn{
-  display:none;
-}
-.product-details{
-  margin-top:10px;
-  text-align:center;
-}
-.product-details span{
-  display:block;
+ .pagination .page-link {
+  border-radius: 6px !important;
+  margin: 0 4px !important;
+  color: #000 !important;
 }
 
-.discount-price{
-  font-size:18px;
-  font-weight:700;
-  color:#d32f2f;
+.pagination .active .page-link {
+  background: #000 !important;
+  border-color: #000 !important;
+  color: #fff !important;
 }
-.product-info{
-  padding:10px;
-  text-align:center;
-}
-
-.wishlist-btn{
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 8px 0;
-  cursor: pointer;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.wishlist-btn i {
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.wishlist-active i {
-  color: red;
-  transform: scale(1.2);
-}
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-toggle {
-  background: none;
-  border: none;
+.pagination .page-link {
+  border-radius: 6px !important;
+  margin: 0 4px !important;
+  padding: 8px 14px !important;
   font-weight: 500;
-  cursor: pointer;
+}
+.filter-bar {
+  background: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background: white;
-  list-style: none;
-  padding: 10px;
-  border: 1px solid #ddd;
-  right: 0;
-  min-width: 120px;
-}
-
-.dropdown-menu li {
-  padding: 5px 0;
-}
-
-.dropdown-menu a {
-  text-decoration: none;
-  color: black;
-}
-
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-.original-price{
-  font-size:14px;
-  color:#777;
-  text-decoration:line-through;
-}
-.cart-link{
-  position: relative;
-  display: inline-block;
-}
-
-
-.cart-icon{
-  font-size: 22px;
-  color: #000;   /* black icon */
-}
-.cart-count{
-  position:absolute;
-  top:-6px;
-  right:-8px;
-  background:#000;
-  color:#fff;
-  font-size:10px;
-  padding:2px 6px;
-  border-radius:10px;
-  font-weight:600;
-}
-.col-md-4{
-  display:flex;
-}
-.filter-box{
-  background:#fff;
-  padding:18px;
-  border-radius:10px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
-}
-.filter-box h5{
-  font-weight:600;
-  margin-bottom:12px;
-  border-bottom:1px solid #eee;
-  padding-bottom:6px;
-}
-.filter-bar{
+.filter-right {
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 20px 0;
-}
-
-.filter-right{
-  display: flex;
   gap: 10px;
-  align-items: center;
-}#categories{
-  max-height:260px;
-  overflow-y:auto;
-  margin-bottom:12px;
-}
-#categories div{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:4px 0;
-  font-size:14px;
-}.catCheck{
-  width:16px;
-  height:16px;
-  cursor:pointer;
-}.filter-box .btn{
-  width:100%;
-  background:#ff9800;
-  border:none;
-  color:white;
-  font-weight:600;
-  padding:8px;
-  border-radius:6px;
 }
 
-.filter-box .btn:hover{
-  background:#e68900;
-}
-/* USER BUTTON */
-.user-btn{
-background:#222;
-color:#fff;
-border:none;
-padding:6px 12px;
-border-radius:6px;
-font-size:14px;
-cursor:pointer;
-}
-
-.user-btn:hover{
-background:#000;
-}
-
-.dropdown-item{
-  display: block;
-  padding: 8px 16px;
-  font-size: 14px;
-  color: #d32f2f;
-  text-decoration: none;
+.filter-bar select {
+  padding: 6px 10px;
   border-radius: 6px;
-  transition: background 0.2s ease;
+  border: 1px solid #ccc;
 }
 
-.dropdown-item:hover{
-  background-color: #f8f9fa;
-  color: #b71c1c;
+.filter-bar button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #000;
+  color: #fff;
 }
-.carousel-item img{
-    height: 450px;
-    object-fit: cover;
+.wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  border: none;
+  background: transparent; /* NO white circle */
+  padding: 4px;
+
+  font-size: 20px;
+  cursor: pointer;
+
+  color: #e63946; /* red outline by default */
+
+  transition: color 0.2s ease;
 }
 
-.carousel-caption{
-    background: rgba(0,0,0,0.4);
-    padding: 15px;
-    border-radius: 10px;
+/* Default = outline heart */
+.wishlist-btn i {
+  color: #e63946;
 }
 
-.carousel-caption h3{
-    font-weight: bold;
+/* Selected = filled heart */
+.wishlist-btn.active i {
+  color: #e63946;
 }
 
-.carousel-caption p{
-    font-size: 18px;
-}
-.carousel-item{
-  height: 450px;
-}
-
-.carousel-item img{
-  width:100%;
-  height:500px;
-  object-fit:cover;
+/* Remove ALL annoying effects */
+.wishlist-btn:hover {
+  color: #e63946;
+  background: transparent;
+  transform: none;
 }
 </style>
 </head>
-
-<body>
-
-<header class="header">
-  <div class="logo">Stravin</div>
-
-  <!-- SEARCH FORM -->
-  <form class="navbar-search d-flex" method="GET" action="/">
-    <input
-      class="form-control me-2"
-      type="search"
-      name="search"
-      placeholder="Search smartwatches..."
-      value="<%= typeof search !== 'undefined' ? search : '' %>">
-    <button class="btn btn-dark">Search</button>
-  </form>
-
-  <nav class="nav-bar">
-    <div class="nav-left">
-
-      <a href="/">Home</a>
-      <a href="/shop">Shop</a>
-    <a href="/cart" class="cart-link">
-     <i class="bi bi-cart3 cart-icon"></i>
-      <span id="cartCount" class="cart-count">0</span>
-      </a>
-  
-    <a href="/wishlist" class="nav-link wishlist-nav position-relative">
-      <i class="bi bi-heart"></i>
-      <span class="ms-1"></span>
-    </a>
-  
-      <% if (isLoggedIn) { %>
-
-        <div class="dropdown">
-          <button class="dropdown-toggle">
-            Hi, <%= user.name %>
-          </button>
-
-          <ul class="dropdown-menu">
-            <li><a href="/profile" class="dropdown-item>">Profile</a></li>
-            <li><a href="/logout" class="dropdown-item">Logout</a></li>
-            <li><a href="/orders" class="dropdown-item">My Orders</a></li>
-          </ul>
-        </div>
-
-      <% } else { %>
-        <a href="/login">Login</a>
-      <% } %>
-
-    </div>
-  </nav>
 <script>
   //cart count
 async function loadCartCount(){
@@ -333,9 +117,17 @@ async function loadCartCount(){
 
 document.addEventListener("DOMContentLoaded", loadCartCount)
 </script>
+<body>
 
-</header>
+  <!--  NAVBAR -->
+  <%- include('../partials/navbar') %>
 
+  <!--  PAGE CONTENT -->
+  <main class="container mt-4">
+
+    <h2>Welcome to Stravin</h2>
+
+    <!--  home page content  -->
   <!-- HERO -->
 <div id="stravinCarousel" class="carousel slide" data-bs-ride="carousel">
 
@@ -388,10 +180,10 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
 
 
-<form method="GET" action="/" class="filter-bar">
+<form method="GET" action="/" class="filter-bar d-flex justify-content-between align-items-center flex-wrap">
 
-   <div class="filter-right">
-    <select name="sort">
+   <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+    <select name="sort" class="form-select-sm w-auto">
       <option value="">Sort</option>
       <option value="priceLow" <%= sort === 'priceLow' ? 'selected' : '' %>>
         Price: Low → High
@@ -403,17 +195,15 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
         Name A–Z
       </option>
     </select>
-<button type="submit">Apply</button>
+<button type="submit" class="btn btn-dark btn-sm">Apply</button>
 <a href="/" class="btn btn-light border">Clear</a>
 </div>
 <input type="hidden" name="search" value="<%= search %>">
 </form>
 
-<!-- PRODUCTS -->
-<!-- PRODUCTS SECTION -->
-<div class="container mt-4">
 
-  <div class="row">
+
+  <div class="row g-3">
 
     <!-- LEFT SIDEBAR -->
     <div class="col-md-3">
@@ -449,7 +239,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
                 <a href="/product/<%= p._id %>">
                   <img src="<%= p.images[0] %>" class="product-img">
                 </a>           
-<div class="product-info">
+<div class="product-info" class="product-card position-relative">
   <h6><%= p.productname %></h6>
 
 <button class="wishlist-btn <%= wishlistProducts.includes(p._id.toString()) ? 'wishlist-active' : '' %>"
@@ -498,7 +288,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
   </div>
 
-</div>
+
       <!-- Products pagination -->
 <div class="pagination-wrapper">
   <ul class="pagination">
@@ -513,13 +303,17 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   </ul>
 </div>
 
-
-
-
   <!-- FOOTER -->
-  <footer class="footer">
-    <p>© 2026 Stravin Smartwatch Store</p>
-  </footer>
+ <%-include('../partials/footer')%>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
+
 
 <script>
   function swapImage(productId, thumbEl) {

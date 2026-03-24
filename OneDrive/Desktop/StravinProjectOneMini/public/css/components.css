@@ -1,0 +1,43 @@
+/* PRODUCT CARD */
+.product-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+.product-img {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* PRICE */
+.discount-price {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #777;
+}
+
+/* BUTTON */
+.primary-btn {
+  background: #000;
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+/* DROPDOWN FIX */
+.dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}

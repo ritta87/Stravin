@@ -1,0 +1,59 @@
+.navbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb;
+}
+.navbar .nav-link,
+.navbar .navbar-brand {
+  color: #111827 !important;
+}
+
+.navbar .nav-link:hover {
+  color: #e63946 !important; /* your red theme */
+}
+.header {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.nav-bar a {
+  margin: 0 10px;
+  font-weight: 500;
+}
+
+.cart-link {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.wishlist-nav {
+  position: relative;
+}
+
+.wishlist-badge {
+  position: absolute;
+  top: -5px;
+  left: 12px;
+  background: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}

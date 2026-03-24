@@ -52,15 +52,38 @@
   color:#777;
   text-decoration:line-through;
 }
-.cart-link{
+
+.cart-link,
+.wishlist-nav {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
 }
 
+.cart-link i,
+.wishlist-nav i {
+  font-size: 18px;
+}
 
-.cart-icon{
-  font-size: 22px;
-  color: #000;   /* black icon */
+.cart-count,
+.wishlist-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 50px;
+  background: red;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #198754;
 }
     /* NAVBAR */
 
@@ -244,6 +267,7 @@ header nav a:hover{
 
           <ul class="dropdown-menu">
             <li> <a href ='/profile' class="dropdown-item">Profile</a></li>
+            <li> <a href ='/orders' class="dropdown-item">My Orders</a></li>
             <li><a href="/logout" class="dropdown-item">Logout</a></li>
           </ul>
         </div>
