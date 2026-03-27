@@ -44,6 +44,26 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"));
 app.use(cookieParser())
 app.use(methodOverride('_method'))
+//breadcrumbs middleware.
+app.use((req, res, next) => {
+  const pathParts = req.originalUrl.split('?')[0].split('/').filter(Boolean)
+
+  let breadcrumbs = [{ name: "Home", url: "/" }];
+  let currentPath = "";
+
+  pathParts.forEach((part) => {
+    currentPath += `/${part}`;
+    let name = part.charAt(0).toUpperCase() + part.slice(1);
+
+    breadcrumbs.push({
+      name,
+      url: currentPath
+    });
+  });
+
+  res.locals.breadcrumbs = breadcrumbs;
+  next();
+});
 //session
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -61,6 +81,9 @@ store: MongoStore.create({
     sameSite: "lax"
   }
 }))
+
+
+
 app.use(async (req, res, next) => {
   res.locals.isLoggedIn = !!req.session.userId;
   if (req.session.userId) {

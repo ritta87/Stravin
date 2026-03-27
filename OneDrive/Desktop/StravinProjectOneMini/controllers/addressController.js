@@ -1,5 +1,7 @@
 import User from '../models/userModel.js'
 import Address from '../models/addressModel.js'
+import nodemailer from 'nodemailer'
+import { sendOtpEmail } from '../utils/sendOtp.js'
 
 export const getUserAddress = async(req,res)=>{
     const userId = req.session.userId;
@@ -43,10 +45,25 @@ export const getEditAddress=async(req,res)=>{
 //edit
 export const postEditAddress=async(req,res)=>{
   try{
-  const addressId=req.params.id;
-  const {name,mobile,address,house,city,area,state,pincode,addressType}=req.body;
-  await Address.findByIdAndUpdate(addressId,req.body,{new:true})
-  res.redirect('/profile/address?success=updated')
+  const addressId=req.params.id
+  const {name,mobile,address,house,city,area,state,pincode,landmark,addressType}=req.body;
+
+    if (!name || !mobile || !pincode || !city || !state || !address||!area||!landmark||!addressType) {
+      return res.json({ success: false, message: "All fields required" });
+    }
+
+    if (!/^[0-9]{10}$/.test(mobile)) {
+      return res.json({ success: false, message: "Invalid mobile number" });
+    }
+
+    if (!/^[0-9]{6}$/.test(pincode)) {
+      return res.json({ success: false, message: "Invalid pincode" });
+    }
+  await Address.findByIdAndUpdate(addressId,{name,mobile,house,area,pincode,landmark,
+    city,state,address,addressType},
+    {new:true})
+    
+  res.json({success:true,message:"Address updated successfully"})
   }catch(error){
     console.log(error)
     res.status(500).json({success:false,message:"Error while editing address"})

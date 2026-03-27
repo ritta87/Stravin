@@ -221,7 +221,10 @@ font-weight:500;
 .back-link:hover{
 text-decoration:underline;
 }
-
+.error {
+  color: red;
+  font-size: 13px;
+}
 </style>
 </head>
 <header class="d-flex justify-content-between align-items-center px-4">
@@ -283,65 +286,65 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
 <h4 class="page-title">Add New Address</h4>
 
-<form id="addressForm" action="/profile/address/add" method="POST">
+<form id="addressForm" method="POST">
 
 <div class="row g-3">
 
-<!-- Full Name -->
 
 <div class="col-md-6">
 <label class="form-label">Full Name</label>
 <input type="text"name="name" id="name" class="form-control"
-placeholder="Enter your name">
+placeholder="Enter your name">  <small class="error" id="nameError"></small>
+
 </div>
-
-
-<!-- Phone -->
 
 <div class="col-md-6">
 <label class="form-label">Phone</label>
 <input type="tel"name="mobile"  id="mobile" class="form-control" maxlength="10"
-placeholder="Enter Mobile number">
+placeholder="Enter Mobile number">  <small class="error" id="mobileError"></small>
+
 </div>
 
-<!-- Address -->
 
 <div class="col-12">
 <label class="form-label">Address</label>
 <textarea name="house" id="house"
 class="form-control"rows="3"placeholder="Flat / House / Street"></textarea>
+  <small class="error" id="houseError"></small>
+
 </div>
 <div class="col-12">
 <label class="form-label">Area</label>
 <textarea name="area" id="area"
 class="form-control"rows="3"placeholder="Area"></textarea>
-</div>
-<!-- City -->
+  <small class="error" id="areaError"></small>
 
+</div>
 <div class="col-md-4">
 <label class="form-label">City</label>
 <input type="text"name="city"class="form-control" id="city">
+  <small class="error" id="cityError"></small>
+
 </div>
 
-<!-- State -->
 <div class="col-md-4">
 <label class="form-label">State</label>
 <input type="text"name="state"  id="state" class="form-control">
-</div>
-<!-- Pincode -->
+  <small class="error" id="stateError"></small>
 
+</div>
 <div class="col-md-4">
 <label class="form-label">Pincode</label>
 <input type="number"name="pincode" id="pincode" class="form-control">
-</div>
-<!-- Landmark -->
+  <small class="error" id="pincodeError"></small>
 
+</div>
 <div class="col-12">
 <label class="form-label">Landmark</label>
 <input type="text"name="landmark" id="landmark"  class="form-control"placeholder="Nearby landmark">
-</div>
+  <small class="error" id="landmarkError"></small>
 
-<!-- Address Type -->
+</div>
 
 <div class="col-md-6">
 <label class="form-label">Address Type</label>
@@ -363,8 +366,12 @@ Save Address
 </div></form>
 </div></div>
 <script>
-const form = document.getElementById("addressForm");
-form.addEventListener("submit", function(e){
+ document.getElementById("addressForm").addEventListener("submit", async(e)=>{
+e.preventDefault()
+  let isValid=true;
+  document.querySelectorAll(".error").forEach(er=>er.innerText="")
+
+
   const name = document.getElementById("name").value.trim();
   const mobile = document.getElementById("mobile").value.trim();
   const house = document.getElementById("house").value.trim();
@@ -373,45 +380,68 @@ form.addEventListener("submit", function(e){
   const state = document.getElementById("state").value.trim();
   const pincode = document.getElementById("pincode").value.trim();
 
-  if(!name || !mobile || !house || !area || !city || !state || !pincode){
-    e.preventDefault();
 
-    Swal.fire({
-      icon: "warning",
-      title: "Missing Fields",
-      text: "Please fill all address fields"
-    });
-
-    return
+  if(name===""||name.length<3){
+    document.getElementById("nameError").innerText="Enter a valid name(minimum 3 caharacters)"
+    isValid=false
   }
 
   if(!/^[0-9]{10}$/.test(mobile)){
-    e.preventDefault()
-
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Mobile",
-      text: "Mobile number must be 10 digits"
-    });
-
-    return
+    document.getElementById("mobileError").innerText="Mobile number must be 10 digit."
+    isValid=false
   }
-
+if(house===""){
+  document.getElementById("houseError").innerText="Enter your house name or number"
+  isValid=false
+}
+if(area===""){
+  document.getElementById("areaError").innerText="Enter your area info"
+}
   if(!/^[0-9]{6}$/.test(pincode)){
-    e.preventDefault();
-
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Pincode",
-      text: "Pincode must be 6 digits"
-    });
-
-    return
+   document.getElementById("pincodeError").innerText="Enter 6 digit pincode"
+   isValid=false
   }
-
-
-
-
+  if(city===""){
+    document.getElementById("cityError").innerText="Enter Your City"
+    isValid=false
+  }
+  if(state===""){
+    document.getElementById("stateError").innerText="Enter your State"
+    isValid=false
+  }
+if(isValid){
+  const data={
+  name,
+  mobile,
+  house,
+  area,
+  city,
+  state,
+  pincode,
+  landmark: document.getElementById("landmark").value.trim(),
+  addressType: document.querySelector("select[name='addressType']").value
+};
+  const res=await fetch('/profile/address/add',{
+    method:"POST",
+    headers: {
+    "Content-Type": "application/json"},
+    body:JSON.stringify(data)
+  })
+if(res.ok){
+  Swal.fire({
+    icon: "success",
+    title: "Success",
+    text: "Address added successfully",
+    timer: 1500,
+    showConfirmButton: false
+  })
+  setTimeout(()=>{
+    window.location.href ="/profile/address";
+  },1500)
+}else {
+      console.log("Failed to save address");
+    }
+}
 })
 
 </script>

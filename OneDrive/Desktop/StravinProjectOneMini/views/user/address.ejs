@@ -293,6 +293,7 @@ async function loadCartCount(){
 document.addEventListener("DOMContentLoaded", loadCartCount)
 </script>
 </header>
+<%- include('../partials/breadcrumbs') %>
 
 <body>
 
@@ -446,21 +447,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   })
 })
 
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search)
-  const success = params.get("success")
-  if (success === "updated") {
-    Swal.fire({
-      icon:'success',
-      title:'Updated!',
-      text:'Address updated successfully',
-      timer:2000,
-      showConfirmButton:false
-    }).then(() => {
-    window.history.replaceState({},document.title,"/profile/address")
-    })
-  }
-})
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>

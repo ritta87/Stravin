@@ -14,7 +14,7 @@ import { getSignupPage , userSignup , verifyOtp , getVerifyOtp ,
     getForgotPassword , forgotPassword ,
 getResetPassword , resetPassword } from "../controllers/userController.js";
 
-import {loadHome , getAllProductsForHome , loadSingleProduct , listedCategories , userLogout } from '../controllers/homeController.js';
+import {loadHome ,loadShop, getAllProductsForHome , loadSingleProduct , listedCategories , userLogout } from '../controllers/homeController.js';
 import { addToCart  ,getCartItems , getCartCount , updateCartQty , removeCartItem}
  from '../controllers/cartController.js';
 import {getWishlistPage , addToWishlist, moveToCartFromWishlist, removeFromWishlist } from '../controllers/wishlistController.js'
@@ -47,6 +47,8 @@ router.get("/products",userAuth,getAllProductsForHome);
 router.get('/product/:id',userAuth,loadSingleProduct)
 router.get('/listedCategories',userAuth,listedCategories)
 
+router.get('/shop',userAuth,loadShop)
+
 router.post('/addtocart',userAuth,addToCart)
 router.get('/cart',userAuth,getCartItems)
 router.get('/cart/count',userAuth,getCartCount)
@@ -63,7 +65,7 @@ router.get('/profile/address',userAuth,getUserAddress)
 router.get('/profile/address/add',userAuth,getAddAddress)
 router.post('/profile/address/add',userAuth,addUserAddress)
 router.get('/profile/address/edit/:id',userAuth,getEditAddress)
-router.post('/profile/address/edit/:id',userAuth,postEditAddress)
+router.put('/profile/address/edit/:id',userAuth,postEditAddress)
 router.delete('/profile/address/delete/:id',userAuth,deleteAddress)
 router.put('/profile/address/default/:id',userAuth,setDefaultAddress)
 router.get('/profile/edit',userAuth,getEditProfile)

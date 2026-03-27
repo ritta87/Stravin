@@ -68,9 +68,73 @@ export const loadHome = async (req, res) => {
     console.error("Load Home Error:", error);
     res.status(500).send("Server Error");
   }
+}
+//load shop 
+export const loadShop = async (req, res) => {
+  try {
+
+    const search = req.query.search || '';
+    const category = req.query.category || '';
+    const sort = req.query.sort || '';
+    const page = parseInt(req.query.page) || 1;
+
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    let filter = { isDeleted: false };
+
+    if (category) {
+      const categoryArray = category.split(",");
+      filter.category = { $in: categoryArray };
+    }
+
+    if (search) {
+      filter.productname = { $regex: search, $options: "i" };
+    }
+
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "priceLow") sortOption = { price: 1 };
+    if (sort === "priceHigh") sortOption = { price: -1 };
+    if (sort === "name") sortOption = { productname: 1 };
+
+    const products = await Product.find(filter)
+      .populate({
+        path: "category",
+        match: { isListed: true }
+      })
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+
+    const validProducts = products.filter(p => p.category);
+    const totalProducts = await Product.countDocuments(filter);
+    const totalPages = Math.ceil(totalProducts / limit);
+  let wishlistProducts = [];
+  if (req.session.userId) 
+  {
+  let wishlist = await Wishlist.findOne({userId:req.session.userId});
+  if (wishlist) {
+    wishlistProducts = wishlist.products.map(p =>p.toString())
+  }
+  }
+    res.render("user/shop", {
+      products: validProducts,
+      wishlistProducts,
+      search,
+      category,
+      sort,
+      currentPage: page,
+      totalPages
+    });
+
+  } catch (error) {
+    console.error("Load Home Error:", error);
+    res.status(500).send("Server Error");
+  }
 };
 
-//load a single product  with variant..
+//load a single product  with variant..review/rating static
 
 export const loadSingleProduct = async (req, res) => {
   try {
@@ -81,10 +145,21 @@ export const loadSingleProduct = async (req, res) => {
 const variants = await Variant.find({ product: product._id,isListedVariant:true})
 .sort({ createdAt: -1 })
 
+
 //total stock for mmultiple variants..
 const totalStock=variants.reduce((sum,v)=>{
   return sum+v.stockQuantity
 },0)
+
+//static revw data.
+const staticReviews={
+  rating:4.5,
+  totalReviews:120,
+  reviews:[
+    {name:"Vijay",comment:"Amazing product!",stars:5},
+    {name:"Balu",comment:"Good quality.",stars:4}
+  ]
+}
 
 
 // calculated price - product offer and V-additionalprice.
@@ -101,11 +176,11 @@ return {
       product,
       variants: updatedVariants,
       totalStock
-    });
+    })
 
   } catch (error) {
     console.error(error)
-    res.status(500).render("user/505");
+    res.status(500).render("user/500");
   }
 }
 

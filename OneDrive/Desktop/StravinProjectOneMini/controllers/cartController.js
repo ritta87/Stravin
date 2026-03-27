@@ -77,6 +77,8 @@ cart.grandTotal = grandTotal
   }
 
 }
+
+
 //cart page-cart items loading
 export const getCartItems=async(req,res)=>{
   try{
@@ -87,6 +89,7 @@ export const getCartItems=async(req,res)=>{
   }
   
   res.render("user/cart",{cart})
+
   }catch(error){
     console.log(error)
   }

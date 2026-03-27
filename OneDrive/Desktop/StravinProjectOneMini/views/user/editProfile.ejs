@@ -557,8 +557,24 @@
     width: 100%;
   }
 }
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+}
 
+input.error-input {
+  border: 1px solid red;
+}
 
+#preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
 
 </style>
 <header class="d-flex justify-content-between align-items-center px-4">
@@ -607,7 +623,7 @@ async function loadCartCount(){
 document.addEventListener("DOMContentLoaded", loadCartCount)
 </script>
 </header>
-
+<%- include('../partials/breadcrumbs') %>
 
 <body>
 <div class="edit-profile-container">
@@ -618,32 +634,30 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <form id="editProfileForm" enctype="multipart/form-data">
   <div>
     <label>Name:</label>
-    <input type="text" name="name" value="<%= user.name %>" required>
-  </div>
+    <input type="text" name="name" id="name" value="<%= user.name %>" >
+     </div>
 
   <div>
     <label>Mobile:</label>
-    <input type="text" name="mobile" value="<%= user.mobile %>" pattern="\d{10}" placeholder="10-digit mobile">
+    <input type="text" name="mobile" id="mobile" 
+    value="<%= user.mobile %>" placeholder="mobile">
   </div>
 
   <div class="file-input-wrapper">
   <label>Profile Picture:</label>
   
-  <img id="preview" src="<%= user.profileImage || '/images/default-avatar.png' %>">
+  <img id="preview" src="<%= user.profileImage || '/images/default-profile.png' %>">
   
-  <!-- Hidden file input -->
-  <input type="file" id="profileImage" name="profileImage" accept="image/*" onchange="previewImage(event)">
-  
-  <!-- Custom choose file button -->
-  <button type="button" class="choose-btn" onclick="document.getElementById('profileImage').click();">Choose File</button>
-  
-  <!-- Remove button -->
+  <input type="file" id="profileImage" name="profileImage"
+   accept="image/*" onchange="previewImage(event)">
+   <button type="button" class="choose-btn" onclick=
+  "document.getElementById('profileImage').click();">
+  Choose File</button>
   <button type="button" class="remove-btn" onclick="removeImage()">Remove</button>
-  
   <input type="hidden" name="removePic" id="removePic" value="">
 </div>
-    <button type="submit" class="update-btn">Update Profile</button>
 
+<button type="submit" class="update-btn">Update Profile</button>
 </form>
 
 <hr>
@@ -662,68 +676,160 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
 </div>
 </div>
+
 <script>
-document.getElementById('editProfileForm').
-addEventListener('submit', async (event) => {
-  event.preventDefault()
-  const formData = new FormData(event.target);
+ document.getElementById("editProfileForm").addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-  const res = await fetch('/profile/edit', {
-    method: 'POST',
-    body: formData
-  });
+  const name = document.getElementById("name").value.trim();
+  const mobile = document.getElementById("mobile").value.trim();
+  const file = document.getElementById("profileImage").files[0];
 
-  const data = await res.json();
-
-  if(data.success) {
-    Swal.fire('Profile Updated!', 'Your profile has been updated successfully.', 'success')
-      .then(() => window.location.href = '/profile');
-  } else {
-    Swal.fire('Error', data.message || 'Failed to update profile.', 'error');
-  }
-});
-async function sendOTP() {
-  const email = document.getElementById('newEmail').value.trim();
-
-  // Validate email first
-  if (!email) {
-    Swal.fire("Validation", "Enter an email", "error");
-    return; // Stop function
+  if (name === "" || name.length < 3) {
+    return Swal.fire({
+      icon: "error",
+      title: "Invalid Name",
+      text: "Name must be at least 3 characters"
+    });
   }
 
-  // Optional: simple email format check
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    Swal.fire("Validation", "Enter a valid email", "error");
-    return;
+  const mobileRegex = /^[0-9]{10}$/;
+  if (!mobileRegex.test(mobile)) {
+    return Swal.fire({
+      icon: "error",
+      title: "Invalid Mobile",
+      text: "Enter 10 digit number"
+    });
   }
 
+  if (file) {
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    const maxSize = 2 * 1024 * 1024;
+
+    if (!allowedTypes.includes(file.type)) {
+      return Swal.fire({
+        icon: "error",
+        title: "Invalid Image",
+        text: "Only JPG, PNG, WEBP allowed"
+      });
+    }
+
+    if (file.size > maxSize) {
+      return Swal.fire({
+        icon: "error",
+        title: "Image Too Large",
+        text: "Max size is 2MB"
+      });
+    }
+  }
+
+  const formData = new FormData(e.target);
   try {
-    const res = await fetch('/profile/send-email-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+    const res = await fetch("/profile/edit", {
+      method: "POST",
+      body: formData
     });
 
     const data = await res.json();
 
-  if(data.success) {
-  Swal.fire('Updated!', 'Your profile has been updated successfully.', 'success')
-    .then(() => {
-      // Update the profile preview if needed
-      if(data.profileImage) {
-        document.getElementById('preview').src = data.profileImage;
-      } else {
-        document.getElementById('preview').src = '/images/default-avatar.png';
-      }
-      // Redirect after 1s
-      setTimeout(() => window.location.href = '/profile', 1000);
-    });
-}
-  } catch (err) {
-    console.error(err);
-    Swal.fire('Error', 'Something went wrong', 'error');
+    if (data.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Profile updated successfully",
+        timer: 1500,
+        showConfirmButton: false
+      });
+
+      setTimeout(() => {
+        window.location.href = "/profile";
+      }, 1500);
+
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
+
+  } catch (error) {
+    Swal.fire("Error", "Something went wrong", "error");
   }
+});
+  function previewImage(event) {
+  const file = event.target.files[0];
+  const preview = document.getElementById("preview");
+const originalImage=document.getElementById("preview").src;
+  if (!file) return;
+
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+  const maxSize = 2 * 1024 * 1024; // 2MB
+
+  
+  if (!allowedTypes.includes(file.type)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Image",
+      text: "Only JPG, PNG, WEBP allowed"
+    });
+
+    event.target.value = ""; // reset input
+    preview.src = originalImage
+    return;
+  }
+
+  // large
+  if (file.size > maxSize) {
+    Swal.fire({
+      icon: "error",
+      title: "Image Too Large",
+      text: "Max size is 2MB"
+    });
+
+    event.target.value = "";
+    preview.src =originalImage
+    return;
+  }
+
+  //Show preview
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    preview.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function removeImage() {
+  const preview = document.getElementById('preview');
+  preview.src = '/images/default-profile.png'; 
+  document.getElementById('profileImage').value = ''; 
+  document.getElementById('removePic').value = 'true'; 
+}
+//otp verification--------------------------------------------
+async function sendOTP(){
+const email = document.getElementById("newEmail").value.trim()
+if(!email){
+  return Swal.fire("error","Enter email id","error")
+}
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if(!emailRegex.test(email)){
+ return Swal.fire("error","Invalid email format.","error")
+}
+try{
+
+  const res=await fetch('/profile/send-email-otp',{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email})
+  })
+  const data=await res.json()
+  if(data.success){
+    Swal.fire("success","OTP sent to your Email!","success")
+  }
+  document.getElementById("otpSection").style.display = "block";
+
+}
+
+catch(error){
+console.log(error)
+Swal.fire("error","Errro while sending otp","error")
+}
 }
 
 async function verifyEmailOTP() {
@@ -740,35 +846,29 @@ async function verifyEmailOTP() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, otp })
-    });
+    })
 
-    const data = await res.json();
-
-    if (data.success) {
-      Swal.fire('Verified!', data.message, 'success');
-      // Optional: reload to show updated email in profile
-      setTimeout(() => location.href('/profile'), 1500);
-    } else {
-      Swal.fire('Oops!', data.message || 'OTP verification failed', 'error');
+const data = await res.json();
+if (data.success) {
+  Swal.fire({
+    icon:'success',
+    title:'Verified!',
+    text: data.message
+  })
+  .then(() => {
+    window.location.href = "/profile";
+  })
+} else {
+      Swal.fire('Oops!', data.message || 'OTP verification failed','error')
     }
 
   } catch (err) {
     console.error(err);
-    Swal.fire('Error', 'Something went wrong', 'error');
+    Swal.fire('Error','Something went wrong','error');
   }
 }
-function previewImage(event) {
-  const preview = document.getElementById('preview');
-  preview.src = URL.createObjectURL(event.target.files[0]);
-  document.getElementById('removePic').value = ''; // reset remove flag
-}
 
-function removeImage() {
-  const preview = document.getElementById('preview');
-  preview.src = '/images/default-avatar.png'; // default image
-  document.getElementById('profileImage').value = ''; // clear file input
-  document.getElementById('removePic').value = 'true'; // flag to remove pic on server
-}
+
 </script>
 </body>
 

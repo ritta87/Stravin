@@ -55,54 +55,73 @@ export const editprofile = async (req, res) => {
   }
 };
 // POST send OTP -changeemail
-export const sendEmailOtp=async(req,res) => {
-  const { email } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  console.log('OTP to change Email: ', otp);
-
-  const user = await User.findById(req.session.userId);
-  user.otp = otp;
-  user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 min
-  await user.save();
-
-  await sendOtpEmail(email, `Your OTP is ${otp}`);
   
-  res.json({success:true,message:'OTP sent to new email'});
-}
 
-// verify OTP-update email
-export const verifyEmailOtp = async (req, res) => {
+
+export const sendEmailOtp = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ success: false, message: "Enter a valid email!" });
+      return res.json({ success: false, message: "Email required" });
     }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+console.log('OTP to change Email : ',otp)
+    req.session.emailOTP = otp;
+    req.session.newEmail = email;
+    req.session.otpExpiry = Date.now() + 5 * 60 * 1000; // 5 mins
+
+  await sendOtpEmail(email,otp)  
+    res.json({ success: true, message: "OTP sent successfully" });
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error sending OTP" });
+  }
+};
+
+
+export const verifyEmailOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const userId = req.session.userId;
+
     if (!otp) {
-      return res.status(400).json({ success: false, message: "Enter the OTP!" });
+      return res.json({ success: false, message: "OTP required" });
     }
 
-    const user = await User.findById(req.session.userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found!" });
+   
+    if (Date.now() > req.session.otpExpiry) {
+      return res.json({ success: false, message: "OTP expired" });
     }
-    if (String(user.otp) !== String(otp) || !user.otpExpires || user.otpExpires < Date.now()) {
-      return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+    if (otp !== req.session.emailOTP) {
+      return res.json({ success: false, message: "Invalid OTP" });
     }
-
-    user.email = email;
-    user.isVerified = true;
-    user.otp = null;
-    user.otpExpires = null;
-    await user.save();
+    await User.findByIdAndUpdate(userId, {
+      email: req.session.newEmail
+    })
+    req.session.emailOTP = null;
+    req.session.newEmail = null;
+    req.session.otpExpiry = null;
 
     res.json({ success: true, message: "Email updated successfully" });
 
   } catch (error) {
-    console.error("OTP verification error:", error);
-    res.status(500).json({ success: false, message: "OTP verification failed" });
+    console.log(error);
+    res.json({ success: false, message: "Error verifying OTP" });
   }
-}
+};
+
+
+
+
+
+
+
+
+
+
+
 export const getChangePassword=async(req,res)=>{
  try {
     const user = await User.findById(req.session.userId);

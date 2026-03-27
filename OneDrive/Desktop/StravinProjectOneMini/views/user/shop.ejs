@@ -10,21 +10,28 @@
 
 <link rel="stylesheet" href="/css/home.css">
 <style>
-  .breadcrumb {
-  background: none;
-  padding: 10px 0;
-  margin: 10px 0 20px;
-  font-size: 14px;
-}
 
-.breadcrumb-item a {
+    .nav-bar {
+  background-color: #222;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-bar {
+  background-color:#fff;
+}
+/* links inside navbar */
+.nav-bar a {
+  color: #fff;
   text-decoration: none;
-  color: #6c757d;
+  margin-right: 15px;
+  font-weight: 500;
 }
 
-.breadcrumb-item.active {
-  color: #000;
-  font-weight: 500;
+/* hover effect */
+.nav-bar a:hover {
+  color: #ff9800;
 }
   .wishlist-nav {
   display: inline-flex;
@@ -297,15 +304,23 @@ background:#000;
     <button class="btn btn-dark">Search</button>
   </form>
 
-  <nav class="nav-bar">
-    <div class="nav-left">
+ <nav class="nav-bar">
+  <div class="nav-left">
+    <a href="/">Home</a>
+    <a href="/shop">Shop</a>
+  </div>
 
-      <a href="/">Home</a>
-      <a href="/shop">Shop</a>
+  <div class="nav-right">
     <a href="/cart" class="cart-link">
-     <i class="bi bi-cart3 cart-icon"></i>
+      <i class="bi bi-cart3 cart-icon"></i>
       <span id="cartCount" class="cart-count">0</span>
-      </a>
+    </a>
+
+    <a href="/wishlist" class="wishlist-nav">
+      <i class="bi bi-heart"></i>
+    </a>
+  
+
   
     <a href="/wishlist" class="nav-link wishlist-nav position-relative">
       <i class="bi bi-heart"></i>
@@ -351,8 +366,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 </script>
 
 </header>
-  <%-include ('../partials/breadcrumbs')%>
-
+<%-include ('../partials/breadcrumbs')%>
   <!-- HERO -->
 <div id="stravinCarousel" class="carousel slide" data-bs-ride="carousel">
 

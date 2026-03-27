@@ -128,6 +128,57 @@ outline:none;
   border-radius:10px;
   font-weight:600;
 }/* USER BUTTON */
+.user-btn{
+background:#222;
+color:#fff;
+border:none;
+padding:6px 12px;
+border-radius:6px;
+font-size:14px;
+cursor:pointer;
+}
+
+.user-btn:hover{
+background:#000;
+}
+.dropdown-menu{
+  display: none;
+  position: absolute;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 0;
+  min-width: 180px;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.dropdown-menu li{
+  list-style: none;
+}
+
+.dropdown-item{
+  display:block;
+  padding:10px 18px;
+  font-size:14px;
+  color:#333;
+  text-decoration:none;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover{
+  background:#f5f5f5;
+  color:#000;
+}
+
+.dropdown:hover .dropdown-menu{
+  display:block;
+}
+.wishlist-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
 
 .wishlist-nav i {
   font-size: 18px;
@@ -150,48 +201,6 @@ outline:none;
   justify-content: center;
   border: 2px solid white;
 }
-/* ===== NAV ALIGNMENT FIX ONLY ===== */
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 18px; /* spacing between items */
-}
-
-.nav-left a,
-.nav-left .dropdown {
-  display: flex;
-  align-items: center;
-}
-
-/* ===== DROPDOWN  ===== */
-
-.dropdown {
-  position: relative;
-}
-
-/* KEEP dropdown attached */
-.dropdown-menu {
-  position: absolute;
-  top: 100%;   /* remove extra gap */
-  right: 0;
-
-  display: none;
-  z-index: 999;
-}
-
-/* IMPORTANT: keep menu visible when hovering menu itself */
-.dropdown:hover .dropdown-menu,
-.dropdown-menu:hover {
-  display: block;
-}
-/* ===== DROPDOWN ITEM FEEL ONLY ===== */
-.dropdown-item {
-  display: block;
-  padding: 8px 14px;
-  transition: 0.2s ease;
-}
-
-
 @media(max-width:768px) {
       .product-card { flex-direction:column; padding:20px; }
       .product-img-wrapper, .product-info { flex:1 1 100%; }
@@ -227,12 +236,6 @@ outline:none;
 
           <ul class="dropdown-menu">
             <li>
-              <a href="/profile" class="dropdown-item">Profile</a>
-            </li>
-             <li>
-              <a href="/orders" class="dropdown-item">My Orders</a>
-            </li>
-             <li>
               <a href="/logout" class="dropdown-item">Logout</a>
             </li>
           </ul>
@@ -262,7 +265,7 @@ async function loadCartCount(){
 document.addEventListener("DOMContentLoaded", loadCartCount)
 </script>
 </header>
-
+<%- include('../partials/breadcrumbs') %>
 <div class="container my-5">
 
   <a href="/" class="mb-3 d-inline-block">⬅ Back</a>
