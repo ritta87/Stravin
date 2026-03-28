@@ -24,27 +24,24 @@ const orderSchema = new mongoose.Schema({
         color:String,
         quantity: Number,
         price: Number,
+
         itemStatus:{
           type:String,
-          enum:[ "Placed","Shipped","Out for Delivery","Delivered","Cancelled","Returned"],
-          default:"Placed"
+          enum:[ "Pending","Placed","Shipped","Out for Delivery","Delivered","Cancelled","Returned"],
+          default:"Pending"
         },
 
-    return:
-    {
-    isRequested: { type:Boolean,default:false 
-    },
-    reason: { 
-      type:String,default: "" 
-    },
+    return:{
+    isRequested: { type:Boolean,default:false},
+    reason: {type:String,default: ""},
     requestDate:Date,
     status: { 
       type:String,
-     default:"Pending"
-     } 
+     default:"Pending"} 
   },
  } 
 ],
+failureReason:{type:String},
 address: {
     name: String,
     mobile: String,
@@ -56,23 +53,30 @@ address: {
     pincode: String,
     landmark:String
   },
+
 paymentMethod: {
-    type: String,
-    default: "COD"
+    type:String,
+    enum:["COD","ONLINE"],
+    required:true
   },
+
   subTotal: Number,
   tax: Number,
   shipping: Number,
   totalAmount: Number,
+
+razorpayOrderId: {type: String, default: null },
+razorpayPaymentId: {type: String, default: null },
+razorpaySignature: {type: String, default: null },
+
 status: {
   type: String,
-  enum: ["Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned"
-    , "Partially Returned"],
-  default:"Placed"
+  enum: ["Pending","Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned","Partially Returned"],
+  default:"Pending"
 },
 paymentStatus: {
   type: String,
-  enum: ["Pending", "Paid", "Refunded"],
+  enum: ["Pending","Success","Paid","Failed","Refunded"],
   default: "Pending"
 }  ,
 createdAt:{

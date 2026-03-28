@@ -32,7 +32,7 @@ const totalUsers=await User.countDocuments(filter)
 
  const totalPages=Math.ceil(totalUsers/limit)
 
- res.render("customers", { customers, search,status,currentPage:page,totalPages })
+ res.render("admin/customers", { customers, search,status,currentPage:page,totalPages })
 
   } catch (error) {
     console.error(error)

@@ -13,10 +13,17 @@ export const addToCart = async (req, res) => {
   let grandTotal=0;
   const variant = await Variant.findById(variantId)
   const productId= variant.product
-  const product = await Product.findById(productId);
+  const product = await Product.findById(productId).populate("category")
 
-const basePrice = Number(product.price) + Number(variant.additionalPrice || 0);
-const finalPrice = basePrice - (basePrice * (product.offerPercentage || 0) / 100);
+
+const basePrice = product.price + (variant.additionalPrice || 0);
+
+const productOffer = product.offerPercentage 
+const categoryOffer = product.category?.catOfferPercentage;
+
+const finalOffer = Math.max(productOffer, categoryOffer);
+
+const finalPrice = Math.round(basePrice - (basePrice * finalOffer / 100))
 
    if(!userId){
     return res.json({success:false,message:"LOGIN_REQUIRED"})
@@ -57,13 +64,12 @@ if(quantity > MAX_PER_USER){
         price:Math.round(finalPrice)
       })
   }
-for (const item of cart.items) {
+for (const item of cart.items)
+{
  const v = await Variant.findById(item.variant);
   if (!v) continue;
  const product = await Product.findById(v.product);
- const basePrice = Number(product.price) + Number(v.additionalPrice || 0);
-const finalPrice =
-    basePrice - (basePrice * (product.offerPercentage || 0) / 100);
+ 
 grandTotal += finalPrice * item.quantity;
 }
 

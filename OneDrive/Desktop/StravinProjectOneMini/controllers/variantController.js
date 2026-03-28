@@ -12,7 +12,7 @@ export const getVariantByProduct = async (req, res) => {
 
     const variants = await Variant.find({ product: productId }).sort({createdAt:-1})
   
-    res.render('variants',{product,variants});
+    res.render('admin/variants',{product,variants});
 
   } catch (error) {
     console.error(error);
@@ -56,7 +56,7 @@ export const addVariant = async (req,res)=>{
     })
 
   }catch(error){
-    console.error("VARIANT ERROR:",error)
+    console.error(error)
     res.status(500).json({
       success:false,
       message:error.message

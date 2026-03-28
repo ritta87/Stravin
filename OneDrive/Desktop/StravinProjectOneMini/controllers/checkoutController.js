@@ -11,15 +11,23 @@ export const getCheckoutPage=async(req,res)=>{
             return res.redirect('/user/cart')
         }
     let subTotal=0;
-    const tax = Math.round(subTotal * 0.05);
+    
     const shipping = 50;
     const discount = 0;
+    
         cart.items.forEach(item=>{
-            subTotal+=item.price*item.quantity
+            const price = item.price                 // final price
+            const basePrice = item.basePrice || price  // original price
+            const qty = item.quantity
+            subTotal += price*qty
+           
         })
-        const finalTotal=subTotal+tax+shipping-discount;
+        
+         let tax = Math.round(subTotal * 0.05);
+        const finalTotal= subTotal+tax+shipping-discount;
         res.render('user/checkout',{
-            cart,addresses,subTotal,tax,shipping,discount,finalTotal})
+            cart,addresses,subTotal,tax,shipping,discount,finalTotal,
+        razorpayKey: process.env.RAZORPAY_KEY_ID})
 
     }catch(error){
         console.log(error)

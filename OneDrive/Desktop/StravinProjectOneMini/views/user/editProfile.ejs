@@ -859,7 +859,7 @@ if (data.success) {
     window.location.href = "/profile";
   })
 } else {
-      Swal.fire('Oops!', data.message || 'OTP verification failed','error')
+      Swal.fire('Oops!',data.message||'OTP verification failed','error')
     }
 
   } catch (err) {

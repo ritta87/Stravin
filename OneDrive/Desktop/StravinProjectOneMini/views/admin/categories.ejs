@@ -239,8 +239,7 @@ select {
     type="text"
     name="name"
     class="form-control mb-2"
-    placeholder="Category name"
-  >
+    placeholder="Category name">
 
   <textarea
     name="description"
@@ -248,11 +247,13 @@ select {
     placeholder="Description"
   ></textarea>
 
-  <button type="submit" class="btn btn-primary">
-    Add Category
-  </button>
+<input type="number" name="catOfferPercentage" placeholder="Offer %" 
+min="0" max="90">
+<button type="submit" class="btn btn-primary">
+ Add Category
+</button>
 </form>
-  </div>
+</div>
 
 <div>
 
@@ -277,6 +278,8 @@ select {
             <tr>
               <th style="width: 20%;">Name</th>
               <th style="width: 35%;">Description</th>
+              <th style="width: 35%;">Offer %</th>
+
               <th style="width: 15%;">Created At</th>
               <th style="width: 10%;"></th>
               <th></th>
@@ -290,6 +293,7 @@ select {
                 <tr>
                   <td><%= cat.name %></td>
                   <td><%= cat.description || '-' %></td>
+                  <td><%= cat.catOfferPercentage %></td>
                   <td><%= cat.createdAt.toDateString() %></td>
                 
                   <td>
@@ -346,7 +350,8 @@ select {
     e.preventDefault()
 const name=categoryForm.name.value.trim()
 const description=categoryForm.description.value.trim()
-    
+const catOfferPercentage = document.querySelector('[name="catOfferPercentage"]').value;
+   
 if(!name){
   Swal.fire('warning',"Name is required!","warning")
   return
@@ -362,7 +367,7 @@ if(!name){
       headers:{
         'Content-Type':'application/json'
       },
-      body:JSON.stringify({name,description})
+      body:JSON.stringify({name,description,catOfferPercentage})
       
     });
 

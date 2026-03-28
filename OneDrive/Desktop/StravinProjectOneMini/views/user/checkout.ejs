@@ -8,6 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -571,7 +572,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
     <% cart.items.forEach(item => { %>
       <div class="product-row">
 
-        <img src="<%= item.product.images %>" width="60">
+        <img src="<%= item.product.images[0] %>" width="60">
 
         <div>
           <p><%= item.product.productname %></p>
@@ -618,58 +619,119 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
     <hr>
 
     <h3>Total: ₹ <%= finalTotal %></h3>
-<p style="font-size: 14px; color: #555;">
-  Payment: Cash on Delivery (COD)
-</p>
-     <form id="placeOrderForm">
-    <button type="submit" class="place-order-btn">Place Order (COD)</button>
-  </form>
+
+<form id="checkoutForm">
+   <h5>Payment Method</h5>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
+    <label class="form-check-label" for="cod">Cash on Delivery</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="paymentMethod" id="online" value="ONLINE">
+    <label class="form-check-label" for="online">Pay Online</label>
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-3">Place Order</button>
+</form>
 
   </div>
 
 </div>
-
- <script>
+<script>
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("placeOrderForm");
- if (!form) {
-    console.log("placeOrderForm not found");
-    return;
-  }
- form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-   const selected = document.querySelector('input[name="address"]:checked');
 
-    if (!selected) {
-      Swal.fire("Error","Please select address","Error");
-      return;
+  const form = document.getElementById("checkoutForm");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const selectedAddress = document.querySelector('input[name="address"]:checked');
+    if (!selectedAddress) {
+      return Swal.fire("Error", "Please select an address", "error");
     }
 
-  const addressId = selected.value;
+    const addressId = selectedAddress.value;
+
+    const paymentInput = document.querySelector('input[name="paymentMethod"]:checked');
+    if (!paymentInput) {
+      return Swal.fire("Error", "Please select payment method", "error");
+    }
+
+    const paymentMethod = paymentInput.value;
+
     try {
       const res = await fetch('/placeOrder', {
         method: 'POST',
-        headers: {'Content-Type':'application/json' },
-        body: JSON.stringify({ addressId }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addressId, paymentMethod }),
         credentials: 'include'
       });
 
       const data = await res.json();
+      console.log("PlaceOrder Response:", data);
 
-      if (data.success) {
-        window.location.href = `/orderSuccess/${data.orderId}`;
-      } else {
-        Swal.fire("Error",data.message||"OOps!Order not Placed!","Error")
+      if (!data.success) {
+        return Swal.fire("Error", data.message || "Order not placed", "error");
       }
 
-    } catch (err) {
-      console.log(err);
-      Swal.fire("Error","Something went wrong while placing order","error")
-    }
-  })
-})
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+      if (data.payment === "COD") {
+        window.location.href = `/orderSuccess/${data.orderId}`;
+        return;
+      }
 
+    
+      if (data.payment === "ONLINE") {
+        openRazorpayCheckout(data);
+      }
+
+    } catch (error) {
+      console.error("Order creation failed:", error);
+      Swal.fire("Error", "Something went wrong", "error");
+    }
+  });
+
+
+  function openRazorpayCheckout(data) {
+
+    const options = {
+      key: "<%= razorpayKey %>",
+      amount: data.razorpay.amount,
+      currency: "INR",
+      order_id: data.razorpay.id,
+
+      handler: async function (response) {
+
+        console.log("Payment Success:", response);
+
+        const verifyRes = await fetch("/verifyPayment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...response,
+            cartData: data.cartData,
+            addressId: data.addressId,
+            orderId: data.orderId
+          }),
+          credentials: 'include'
+        });
+
+        const verifyData = await verifyRes.json();
+        console.log("Verify Response:", verifyData);
+
+        if (verifyData.success) {
+          window.location.href = `/orderSuccess`;
+        } else {
+          window.location.href = `/orderFailure`;
+        }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+  }
+
+});
+</script>
 </body>
 </html>

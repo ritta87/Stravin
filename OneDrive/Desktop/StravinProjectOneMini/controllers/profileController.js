@@ -104,22 +104,13 @@ export const verifyEmailOtp = async (req, res) => {
     req.session.newEmail = null;
     req.session.otpExpiry = null;
 
-    res.json({ success: true, message: "Email updated successfully" });
+    res.json({success:true,message:"Email updated successfully" });
 
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error verifying OTP" });
   }
 };
-
-
-
-
-
-
-
-
-
 
 
 export const getChangePassword=async(req,res)=>{

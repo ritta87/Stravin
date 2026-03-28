@@ -54,8 +54,25 @@ export const loadHome = async (req, res) => {
     wishlistProducts = wishlist.products.map(p =>p.toString())
   }
   }
+const updatedProducts = validProducts.map(p => {
+  const productOffer = p.offerPercentage || 0;
+  const categoryOffer = p.category?.catOfferPercentage || 0;
+
+  const finalOffer = Math.max(productOffer, categoryOffer);
+
+  const finalPrice = Math.round(
+    p.price - (p.price * finalOffer / 100)
+  );
+
+  return {
+    ...p._doc,
+    finalPrice,
+    finalOffer
+  };
+});
+  
     res.render("user/home", {
-      products: validProducts,
+      products:updatedProducts,
       wishlistProducts,
       search,
       category,
@@ -138,7 +155,7 @@ export const loadShop = async (req, res) => {
 
 export const loadSingleProduct = async (req, res) => {
   try {
-     const product = await Product.findById(req.params.id)
+     const product = await Product.findById(req.params.id).populate("category")
  if (!product) {
       return res.status(404).send("Product not found")
     }
@@ -162,20 +179,30 @@ const staticReviews={
 }
 
 
-// calculated price - product offer and V-additionalprice.
+// calculated price - product offer/cat offer-  V-additionalprice.
 const updatedVariants = variants.map(v => {
-const basePrice = Number(product.price) + Number(v.additionalPrice||0)
-const finalPrice = basePrice -(basePrice * (product.offerPercentage||0)/100);
+  const basePrice = Number(product.price) + Number(v.additionalPrice || 0);
 
-return {
-  ...v._doc,
-  basePrice:Math.round(basePrice),finalPrice: Math.round(finalPrice)}
-    });
+  const productOffer = product.offerPercentage 
+  const categoryOffer = product.category?.catOfferPercentage 
+
+  const finalOffer = Math.max(productOffer, categoryOffer)
+
+  const finalPrice = basePrice - (basePrice * finalOffer / 100)
+
+  return {
+    ...v._doc,
+    basePrice: Math.round(basePrice),
+    finalPrice: Math.round(finalPrice),
+    finalOffer
+  }
+})
 
     res.render("user/singleProduct", {
       product,
       variants: updatedVariants,
-      totalStock
+      totalStock,
+      staticReviews
     })
 
   } catch (error) {

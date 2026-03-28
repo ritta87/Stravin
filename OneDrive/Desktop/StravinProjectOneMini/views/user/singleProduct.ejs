@@ -301,25 +301,39 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <div class="col-md-7">
 
   <h2><%= product.productname %></h2>
+<div class="mb-1">
 
+  <span style="color: gold;">★★★★☆</span>
+
+  <small class="text-muted">(120)</small>
+
+</div>
   <!-- PRICE SECTION -->
-<p class="fs-4">
-<span id="finalPrice" class="fw-bold text-danger">
-₹ <%= variants.length ? variants[0].finalPrice.toLocaleString("en-IN") : product.price.toLocaleString("en-IN") %>
-</span>
 
-<span id="originalPrice" class="text-muted text-decoration-line-through ms-2">
-₹ <%= variants.length ? variants[0].basePrice.toLocaleString("en-IN") : '' %>
-</span>
-<span class="badge bg-danger">
-<%= product.offerPercentage %>% OFF
-</span>
-  <% if(product.offerPercentage > 0) { %>
-    <span class="badge bg-danger ms-2">
-      <%= product.offerPercentage %>% OFF
+<% const v = variants && variants.length ? variants[0] : null; %>
+
+<p class="fs-4">
+
+  <!-- FINAL PRICE -->
+  <span id="finalPrice" class="fw-bold text-danger">
+    ₹ <%= v ? v.finalPrice.toLocaleString("en-IN") : product.price.toLocaleString("en-IN") %>
+  </span>
+
+  <!-- ORIGINAL PRICE -->
+  <% if (v && Number(v.finalOffer) > 0) { %>
+    <span id="originalPrice" class="text-muted text-decoration-line-through ms-2">
+      ₹ <%= v.basePrice.toLocaleString("en-IN") %>
     </span>
   <% } %>
 
+  <!-- OFFER BADGE -->
+  <% if (v && Number(v.finalOffer) > 0) { %>
+    <span id="offerBadge" class="badge bg-danger ms-2">
+      <%= v.finalOffer %>% OFF
+    </span>
+  <% } %>
+
+</p>
 </p>
 
 <p>
@@ -370,7 +384,43 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
 
 </div></div></div>
-  
+ <hr>
+
+<h4>Customer Reviews</h4>
+
+<!-- Overall Rating -->
+<div class="mb-3">
+  <strong>⭐ <%= staticReviews.rating %> / 5</strong>
+  <span class="text-muted">(<%= staticReviews.totalReviews %> reviews)</span>
+</div>
+
+<!-- Individual Reviews -->
+<div>
+
+  <% staticReviews.reviews.forEach(r => { %>
+
+    <div class="border p-3 mb-2 rounded">
+
+      <strong><%= r.name %></strong>
+
+      <!-- Stars -->
+      <div>
+        <% for(let i = 1; i <= 5; i++) { %>
+          <% if(i <= r.stars) { %>
+            <span style="color: gold;">★</span>
+          <% } else { %>
+            <span style="color: #ccc;">★</span>
+          <% } %>
+        <% } %>
+      </div>
+
+      <p class="mb-0"><%= r.comment %></p>
+
+    </div>
+
+  <% }) %>
+
+</div> 
 <footer class="text-center">
   &copy; 2026 Stravin. All Rights Reserved.
 </footer>

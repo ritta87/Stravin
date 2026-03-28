@@ -29,7 +29,7 @@ res.redirect('/admin/dashboard')
 }
 
 export const getAdminDashboard = async(req,res)=>{
-    res.render('dashboard',{admin:req.admin})
+    res.render('admin/dashboard',{admin:req.admin})
 }
 
 export const adminLogout=async(req,res)=>{

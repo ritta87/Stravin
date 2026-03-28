@@ -4,20 +4,24 @@ import Category from "../models/categoryModel.js";
 
 export const AddCategories = async(req,res)=>{
     try{
-         let {name,description}=req.body;
+         let {name,description,catOfferPercentage}=req.body;
+         catOfferPercentage = Number(catOfferPercentage) || 0;
          if(!name||!name.trim()){
             return res.status(400).json({success:false,message:'Category name is required!'})
          }
          if(!description||!description.trim()){
             return res.status(400).json({success:false,message:'Description is required!'})
          }
+         if (catOfferPercentage < 0 || catOfferPercentage > 90) {
+           return res.status(400).json({success: false,message:"Offer must be between 0 and 90"})
+}
          name=name.trim().toLowerCase()
          description=description.trim()
         const exists=await Category.findOne({name}) 
         if(exists){
             return res.status(409).json({success:false,message:"Category name already exists."})
         }
-        await Category.create({name,description})
+        await Category.create({name,description,catOfferPercentage})
         
         res.status(201).json({success:true,message:"Category added successfully!"})
     }
@@ -45,7 +49,7 @@ export const getAllCategories = async(req,res)=>{
    if(!category){
     return res.status(400).json("No Such category Added yet!!")
    }
-   res.render('categories',{
+   res.render('admin/categories',{
         category:category||[],
     search:search||'' ,
 currentPage:Number(page),
@@ -73,7 +77,7 @@ export const getEditCategory = async(req,res)=>{
     if(!category){
         return res.status(404).json({success:false,message:"No category found!"})
     }
-    res.render('editCategory',{category})
+    res.render('admin/editCategory',{category})
 }catch(error){
     return res.redirect('/admin/categories')
 }
@@ -81,13 +85,14 @@ export const getEditCategory = async(req,res)=>{
 //update 
 export const updateCategory = async (req, res) => {
   try {
-    const { name, description, isListed } = req.body
+    const { name, description, isListed ,catOfferPercentage} = req.body
     const { id } = req.params
 
     await Category.findByIdAndUpdate(id, {
       name,
       description,
-      isListed
+      isListed,
+      catOfferPercentage
     })
 
     res.json({ success: true });
@@ -107,7 +112,7 @@ export const deleteCategory = async(req,res)=>{
          res.status(200).json({success:true,message:"Category deleted successfully"})
 
     }catch(error){
-            return res.status(500).json({success:false,message:"Server error!Cant delete category"})
+      return res.status(500).json({success:false,message:"Server error!Cant delete category"})
     }
   
 

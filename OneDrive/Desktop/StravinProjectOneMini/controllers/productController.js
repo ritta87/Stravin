@@ -49,7 +49,7 @@ export const getAllProducts = async (req, res) => {
 { $limit:limit }
 
     ]);
-res.render('products', {
+res.render('admin/products', {
       search,
       category: categories,
       selectedCategory,
@@ -130,10 +130,7 @@ export const addProduct = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      success:false,
-      message:error.message || "Failed to add product"
-    });
+    res.status(500).json({success:false,message:error.message || "Failed to add product"})
   }
 }
 //edit product
@@ -212,7 +209,6 @@ if (offerPercentage > 0) {
     });
 
   } catch (error) {
-    console.error("UPDATE ERROR:", error);
     res.json({success:false,message:"Unable to update product"})
   }
 }
@@ -226,7 +222,7 @@ export const getEditProduct=async(req,res)=>{
     if(!product){
         return res.status(400).send("No product found!")
     }
-    res.render('editProduct',{product,category})
+    res.render('admin/editProduct',{product,category})
 
   }catch(error){
     console.log(error)

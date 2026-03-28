@@ -253,6 +253,11 @@
       <%= category.description %></textarea>
   </div>
 
+  <div class="mb-3">
+    <label class="form-label">Category Offer %</label>
+    <input type="number" name="catOfferPercentage" value="<%= category.catOfferPercentage %>"
+    >
+  </div>
 
 <div class="button-group">
   <button type="submit" class="btn-save"> Save Changes
@@ -284,6 +289,7 @@
     const data = {
       name: formData.get("name"),
       description: formData.get("description"),
+      catOfferPercentage : formData.get("catOfferPercentage"),
       isListed: formData.get("isListed") === "true"
     }
 

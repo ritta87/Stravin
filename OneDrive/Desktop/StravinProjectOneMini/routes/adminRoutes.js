@@ -24,7 +24,7 @@ router.use(noCache)
 
 
 router.get('/login',(req,res)=>{
-    res.render('adminLogin')
+    res.render('admin/adminLogin')
 })
 router.post('/login',adminLogin)
 router.get('/dashboard',adminAuth,getAdminDashboard)

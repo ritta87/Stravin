@@ -218,97 +218,129 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
 <body>
 <div class="container mt-5">
-<h2>Your Cart</h2>
 
-<% if(cart.items.length > 0){ %>
+  <h2>Your Cart</h2>
 
-<% let subtotal = 0 %>
+  <% if (cart && cart.items.length > 0) { %>
 
-<% cart.items.forEach(item => { 
+    <% let subtotal = 0 %>
+    <% let totalSavings = 0 %>
 
-  const price = item.product.price
-  const qty = item.quantity
-  const itemTotal = price * qty
-  subtotal += itemTotal
+    <% cart.items.forEach(item => { 
 
-%>
+      const price = item.price               // final price
+      const basePrice = item.basePrice
+      const qty = item.quantity
 
-<div class="cart-item d-flex align-items-center mb-4">
+      const itemTotal = price * qty
+      subtotal += itemTotal
 
-  <div class="cart-image">
-<img src="<%= item.variant.images[0] %>" width="80">  </div>
+      const saved = (basePrice - price) * qty
+      totalSavings += saved
 
-  <div class="cart-details flex-grow-1 ms-3">
+    %>
 
-    <h5><%= item.product.productname %></h5>
+    <div class="cart-item d-flex align-items-center mb-4 border-bottom pb-3">
 
-    <p class="text-muted">
-      Color: <%= item.variant.color %>
-    </p>
+      <!-- IMAGE -->
+      <div class="cart-image">
+        <img src="<%= item.variant.images[0] %>" width="80">
+      </div>
 
-    <p>
-      Price: ₹<%= price %>
-    </p>
+      <!-- DETAILS -->
+      <div class="cart-details flex-grow-1 ms-3">
 
-    <p>
-     <div class="qty-control">
+ <h5><%= item.product.productname %></h5>
+<span class="badge bg-success">
+  ⭐ 4.5
+</span>
+<small>(120 reviews)</small>
+        <p class="text-muted">
+          Color: <%= item.variant.color %>
+        </p>
 
-    <button class="btn btn-sm btn-outline-secondary"
-      onclick="updateQty('<%= item.variant._id %>', -1)">-</button>
+        <!-- PRICE -->
+        <p>
+          ₹ <strong><%= price %></strong>
 
-    <span class="mx-2"><%= item.quantity %></span>
-<button 
-  onclick="updateQty('<%= item.variant._id %>',1,this)"
-  <%= item.quantity >= item.variant.stockQuantity ? "disabled" : "" %> > + </button>  
- </div>
- </p>
-<p>
-    <button class="btn btn-danger btn-sm mt-2"
- onclick="removeItem('<%= item.variant._id %>')">
- Remove</button></p>
-  </div>
+          <% if (basePrice > price) { %>
+            <span class="text-muted text-decoration-line-through ms-2">
+              ₹ <%= basePrice %>
+            </span>
+          <% } %>
+        </p>
+<p class="text-success">
+  🚚 Delivery in 5-7 days
+</p>
+        <!-- QUANTITY -->
+        <div class="qty-control mb-2">
 
-  <div class="text-end">
+          <button class="btn btn-sm btn-outline-secondary"
+            onclick="updateQty('<%= item.variant._id %>', -1)">-</button>
 
-    <p>Subtotal</p>
+          <span class="mx-2"><%= qty %></span>
 
-    <strong>
-      ₹<%= itemTotal %>
-    </strong>
+          <button class="btn btn-sm btn-outline-secondary"
+            onclick="updateQty('<%= item.variant._id %>', 1, this)"
+            <%= qty >= item.variant.stockQuantity ? "disabled" : "" %>>
+            +
+          </button>
 
-  </div>
+        </div>
 
-</div>
+        <!-- REMOVE -->
+        <button class="btn btn-danger btn-sm"
+          onclick="removeItem('<%= item.variant._id %>')">
+          Remove
+        </button>
 
-<% }) %>
+      </div>
 
-<hr>
+      <!-- ITEM TOTAL -->
+      <div class="text-end">
+        <p>Subtotal</p>
+        <strong>₹ <%= itemTotal %></strong>
+      </div>
 
-<div class="text-end">
+    </div>
 
-<h4>
-Total: ₹<%= subtotal %>
-</h4>
-<% if(cart && cart.items.length > 0){ %>
-  <a href="/checkout" class="btn-checkout">Proceed to Checkout</a>
-<% } else { %>
-  <button disabled class="btn-checkout" style="background: gray;">
-    Cart is Empty
-  </button>
-<% } %>
+    <% }) %>
 
-</div>
+    <hr>
 
-<% } else { %>
+    <!-- TOTAL SECTION -->
+    <div class="text-end">
 
-<div class="text-center mt-5">
-  <h4>Your cart is empty</h4>
-  <a href="/" class="btn btn-dark mt-3">
-  Continue Shopping
-  </a>
-</div>
+      <% if (totalSavings > 0) { %>
+        <p class="text-success">
+          You saved ₹ <%= totalSavings %> 🎉
+        </p>
+      <% } %>
 
-<% } %>
+      <h4>Total: ₹ <%= subtotal %></h4>
+<p class="text-muted small">
+  🔒 100% Secure Payments
+</p>
+<p class="text-muted small">
+  🔄 7-day easy returns
+</p>
+ <a href="/checkout" class="btn-checkout">
+        Proceed to Checkout
+      </a>
+
+    </div>
+
+  <% } else { %>
+
+    <!-- EMPTY CART -->
+    <div class="text-center mt-5">
+      <h4>Your cart is empty</h4>
+      <a href="/" class="btn btn-dark mt-3">
+        Continue Shopping
+      </a>
+    </div>
+
+  <% } %>
 
 </div>
 <script>

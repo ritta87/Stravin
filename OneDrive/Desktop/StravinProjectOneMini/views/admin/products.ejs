@@ -327,10 +327,11 @@
           </div>
           <div class="mb-3">
          <label>Offer Percentage</label>
-         <input type="number" name="offerPercentage" class="form-control" min="0" max="100">
+         <input type="number" name="offerPercentage" class="form-control" min="0" max="90">
               </div>
           <div class="col-md-6 ">
             <label class="form-label">Category</label>
+
             <select name="category" class="form-control">
               <option value="">-- Select Category --</option>
               <% category.forEach(cat => { %>
@@ -487,7 +488,7 @@ function renderPreview() {
 
 <!--search area-->
 <div class="card p-3 mb-4 shadow-sm row gap-2">
-    <form id="searchForm" method="GET" action="/admin/products">
+<form id="searchForm" method="GET" action="/admin/products">
 
   <div class="row">
     <div class="col-md-4 col-sm-6 mb-2">
@@ -531,9 +532,14 @@ function renderPreview() {
   class="main-image">
       <h4><%= p.productname %></h4>
       <p>Category: <%= p.category?.name || "Not Available" %></p>
+      <p>Category Offer: 
+  <%= p.category?.catOfferPercentage > 0 
+      ? p.category.catOfferPercentage + "%" 
+      : "No Offer" %>
+</p>
       <p>Price: ₹<%= p.price %></p>
      <p>
-  Offer: 
+ Prouct Offer: 
   <% if(p.offerPercentage > 0) { %>
     <span class="text-danger">
       <%= p.offerPercentage %>% OFF

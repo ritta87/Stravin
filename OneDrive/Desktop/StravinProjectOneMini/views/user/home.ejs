@@ -468,34 +468,47 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
                 </a>           
 <div class="product-info">
   <h6><%= p.productname %></h6>
+<div class="mb-1">
 
+  <span style="color: gold;">★★★★☆</span>
+
+  <small class="text-muted">(120)</small>
+
+</div>
 <button class="wishlist-btn <%= wishlistProducts.includes(p._id.toString()) ? 'wishlist-active' : '' %>"
  onclick="toggleWishlist('<%= p._id %>', this)">
 <i class="bi <%= wishlistProducts.includes(p._id.toString()) ? 'bi-heart-fill' : 'bi-heart' %>">
 </i></button>
 
-  <p>₹<%= p.price %></p>
+  
 </div>
-                <div class="product-details">
-                  <% if(p.offerPercentage > 0){ %>
+<div class="product-details">
 
-                    <span class="discount-price">
-                      ₹ <%= p.offerPrice %>
-                    </span>
+  <% if (p.finalOffer && p.finalOffer > 0) { %>
 
-                    <span class="original-price">
-                      ₹ <%= p.price %>
-                    </span>
-               
-                  <% } else { %>
+    <span class="original-price" style="text-decoration: line-through; color: gray;">
+      ₹<%= p.price %>
+    </span>
 
-                    <span class="discount-price">
-                      ₹ <%= p.price %>
-                    </span>
+    <span class="discount-price" style="color: red; font-weight: bold; margin-left: 5px;">
+      ₹<%= p.finalPrice %>
+    </span>
 
-                  <% } %>
+    <div>
+      <span class="badge bg-success">
+        <%= p.finalOffer %>% OFF
+      </span>
+    </div>
 
-                </div>
+  <% } else { %>
+
+    <span class="discount-price">
+      ₹<%= p.price %>
+    </span>
+
+  <% } %>
+
+</div>
 
               </div>
 

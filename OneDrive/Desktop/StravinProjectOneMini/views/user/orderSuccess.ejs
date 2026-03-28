@@ -25,7 +25,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* 👇 Payment box now below */
+
 .payment-box {
   width: 420px;
   margin: 20px auto;
@@ -91,20 +91,41 @@
 
 </div>
 
-<!-- ✅ MOVE OUTSIDE -->
+
 <div class="payment-box">
   <h5>Payment Information</h5>
 
-  <p><strong>Payment Method:</strong> Cash on Delivery (COD)</p>
-
-  <p>
-    <strong>Status:</strong> 
-    <span class="badge bg-warning text-dark">Pay on Delivery</span>
+  <p><strong>Payment Method:</strong> 
+    <%= order.paymentMethod === "COD" ? "Cash on Delivery (COD)" : "Online Payment (Razorpay)" %>
   </p>
 
-  <p class="note">
-    Please keep ₹<%= order.totalAmount %> ready at the time of delivery.
+  <p><strong>Status:</strong> 
+    <% if(order.paymentMethod === "COD") { %>
+      <span class="badge bg-warning text-dark">Pay on Delivery</span>
+    <% } else { %>
+      <% if(order.paymentStatus === "Success") { %>
+        <span class="badge bg-success">Paid</span>
+      <% } else if(order.paymentStatus === "Pending") { %>
+        <span class="badge bg-info text-dark">Pending</span>
+      <% } else { %>
+        <span class="badge bg-danger">Failed</span>
+      <% } %>
+    <% } %>
   </p>
+
+  <% if(order.paymentMethod === "COD") { %>
+    <p class="note">
+      Please keep ₹<%= order.totalAmount %> ready at the time of delivery.
+    </p>
+  <% } else if(order.paymentStatus === "Success") { %>
+    <p class="note text-success">
+      Your payment of ₹<%= order.totalAmount %> has been successfully received.
+    </p>
+  <% } else { %>
+    <p class="note text-danger">
+      Payment failed. Please try again or contact support.
+    </p>
+  <% } %>
 </div>
 </body>
 </html>

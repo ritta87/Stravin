@@ -103,7 +103,7 @@ app.use('/auth',googleAuthRoute);
 app.use('/admin',adminRoutes)
 app.use('/',userRoutes)
 
-
+console.log("ENV SECRET:", process.env.RAZORPAY_KEY_SECRET);
 
 app.use((req,res)=>{
     res.status(404).render('user/404')
