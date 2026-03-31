@@ -30,10 +30,10 @@ export const placeOrder = async (req, res) => {
       return res.status(401).json({ success: false, message: "Please login" });
     }
 
-    const { addressId, paymentMethod } = req.body;
-
-    if (!addressId) {
-      return res.json({ success: false, message: "Address not selected" });
+const { addressId, paymentMethod } = req.body;
+const selectedAddress = await Address.findById(req.body.addressId)
+    if (!selectedAddress) {
+      return res.json({ success: false, message: "Address not selected" })
     }
 
     if (!["COD", "ONLINE"].includes(paymentMethod)) {
@@ -46,7 +46,7 @@ export const placeOrder = async (req, res) => {
       return res.json({ success: false, message: "Cart is empty" });
     }
 
-    // 💰 CALCULATIONS
+    
     const subTotal = cart.items.reduce((sum, item) => {
       return sum + item.price * item.quantity;
     }, 0);
@@ -55,7 +55,7 @@ export const placeOrder = async (req, res) => {
     const shipping = 50;
     const totalAmount = subTotal + tax + shipping;
 
-    // 🧱 BUILD ORDER ITEMS (COMMON FOR BOTH)
+    
     const orderItems = [];
 
     for (const item of cart.items) {
@@ -87,7 +87,7 @@ export const placeOrder = async (req, res) => {
       });
     }
 
-    // 🧾 CREATE ORDER (COMMON)
+    // order creation
     const order = await Order.create({
       orderId: generateOrderId(),
       userId,
@@ -99,12 +99,10 @@ export const placeOrder = async (req, res) => {
       paymentMethod,
       paymentStatus: paymentMethod === "COD" ? "Pending" : "Pending",
       status: paymentMethod === "COD" ? "Placed" : "Pending",
-      address: req.body.address
+      address:selectedAddress
     });
 
-    // ============================
-    // 💵 COD FLOW
-    // ============================
+  
     if (paymentMethod === "COD") {
 
       // reduce stock
@@ -126,14 +124,10 @@ export const placeOrder = async (req, res) => {
       });
     }
 
-    // ============================
-    // 💳 ONLINE FLOW (RAZORPAY)
-    // ============================
-
     const razorpayOrder = await razorpay.orders.create({
       amount: totalAmount * 100,
       currency: "INR",
-      receipt: order.orderId   // useful for tracking
+      receipt: order.orderId   
     });
 
     return res.json({
@@ -191,7 +185,8 @@ export const getUserOrder=async(req,res)=>{
 export const getOrderDetails=async(req,res)=>{
   const userId=req.session.userId;
   const orderId=req.params.orderId;
-  const order=await Order.findOne({orderId})
+  const order=await Order.findOne({orderId,userId})
+  .populate("items.product").populate("items.variant")
   if(!order){
     return res.status(404).json({success:false,message:"Order not found!!"});
 
@@ -248,7 +243,7 @@ export const cancelOrder = async(req,res)=>{
     res.status(500).json({success:false,message:"Server error"})
   }
 };
-//item return, if delivered.
+//item return req raising, if delivered.
 export const returnItem=async (req, res) => {
   const {reason } = req.body;
   const {orderId,itemId} = req.params;
@@ -377,17 +372,13 @@ export const verifyPayment = async (req, res) => {
       orderId
     } = req.body;
 
-    // 🛑 HARD VALIDATION (prevents CastError completely)
     if (!orderId) {
-      console.log("❌ Missing orderId in verifyPayment");
-      console.log("REQ BODY:", req.body);
-      return res.status(400).json({
-        success: false,
+      return res.status(400).json({success: false,
         message: "Order ID missing"
       });
     }
 
-    // 🔐 SIGNATURE VERIFY
+    // signature verification.
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -397,23 +388,21 @@ export const verifyPayment = async (req, res) => {
       return res.json({ success: false });
     }
 
-    // 🔍 FIND ORDER (using custom orderId)
+    
     const order = await Order.findOne({ orderId });
 
     if (!order) {
-      console.log("❌ Order not found:", orderId);
-      return res.status(404).json({
-        success: false,
+      return res.status(404).json({success: false,
         message: "Order not found"
       });
     }
 
-    // ✅ UPDATE ORDER
+    //update order
     order.paymentStatus = "Paid";
     order.status = "Placed";
     await order.save();
 
-    // 📦 REDUCE STOCK (important for ONLINE)
+    //stock reduce-online
     for (const item of order.items) {
       const variant = await Variant.findById(item.variant);
       if (variant) {
@@ -422,7 +411,7 @@ export const verifyPayment = async (req, res) => {
       }
     }
 
-    // 🛒 CLEAR CART
+    //  CLEAR CART
     await Cart.findOneAndUpdate(
       { userId: req.session.userId },
       { items: [], grandTotal: 0 }

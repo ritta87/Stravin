@@ -11,7 +11,7 @@ import methodOverride from 'method-override';
 import { fileURLToPath } from "url";
 import User from './models/userModel.js';
 import passport from "./config/passport.js";
-
+import { breadcrumps } from './middleware/breadcrumb.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,25 +45,8 @@ app.use(express.static("public"));
 app.use(cookieParser())
 app.use(methodOverride('_method'))
 //breadcrumbs middleware.
-app.use((req, res, next) => {
-  const pathParts = req.originalUrl.split('?')[0].split('/').filter(Boolean)
 
-  let breadcrumbs = [{ name: "Home", url: "/" }];
-  let currentPath = "";
-
-  pathParts.forEach((part) => {
-    currentPath += `/${part}`;
-    let name = part.charAt(0).toUpperCase() + part.slice(1);
-
-    breadcrumbs.push({
-      name,
-      url: currentPath
-    });
-  });
-
-  res.locals.breadcrumbs = breadcrumbs;
-  next();
-});
+app.use(breadcrumps);
 //session
 app.use(session({
   secret: process.env.SESSION_SECRET,

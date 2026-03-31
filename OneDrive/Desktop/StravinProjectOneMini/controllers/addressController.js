@@ -23,7 +23,7 @@ try {
 
     await Address.create({userId,name,mobile,house,landmark,area, city, state, pincode,addressType})
 
-    res.redirect('/profile/address');//back to address page
+    res.redirect('/profile/address')// to address page
 
   } catch (error) {
     console.log("Add address error:", error);

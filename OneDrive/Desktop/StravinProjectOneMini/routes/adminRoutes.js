@@ -10,7 +10,7 @@ import { adminLogin, adminLogout, getAdminDashboard } from "../controllers/admin
 import { AddCategories , getAllCategories , getEditCategory  , updateCategory, deleteCategory, restoreCategory} 
 from '../controllers/categoryController.js';
 
-import {getAllProducts, addProduct, getEditProduct, updateProduct, deleteProduct ,restoreProduct} 
+import {getAllProducts, addProduct,GetAddProduct, getEditProduct, updateProduct, deleteProduct ,restoreProduct} 
 from '../controllers/productController.js'
 
 import {addVariant , getVariantByProduct ,restoreVariant,unlistVariant,updateVariant } from '../controllers/variantController.js'
@@ -49,8 +49,9 @@ router.put('/categories/restoreCategory/:id',adminAuth,restoreCategory)
 //product routes..
 router.get('/products',adminAuth,getAllProducts)
 router.post('/products',adminAuth,upload.array('images',4),addProduct)
+router.get('/GetAddProduct',adminAuth,GetAddProduct)
 router.get('/products/edit/:id',adminAuth,getEditProduct)
-router.post('/products/:id',upload.array("newImages",4),updateProduct)
+router.post('/products/edit/:id',upload.array("images",4),updateProduct)
 router.delete('/products/:id',adminAuth,deleteProduct)
 router.put('/products/restoreProduct/:id',adminAuth,restoreProduct)
 

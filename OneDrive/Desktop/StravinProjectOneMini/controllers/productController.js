@@ -63,7 +63,14 @@ res.render('admin/products', {
     res.status(500).send("Error fetching products");
   }
 }
-
+export const GetAddProduct=async(req,res)=>{
+  try{
+    const category = await Category.find({isListed:true})
+    res.render("admin/GetAddProduct",{category})
+  }catch(error){
+    res.status(500).json({success:false,message:"Server error at loading page."})
+  }
+}
 
 
 export const getAllActiveProducts= async () => {
@@ -76,7 +83,7 @@ export const getAllActiveProducts= async () => {
 export const addProduct = async (req, res) => {
   try {
     const { productname, description, category, price } = req.body;
-    const offerPercentage = Number(req.body.offerPercentage) || 0;
+    const offerPercentage = parseInt(req.body.offerPercentage)||0;
 
     const activeCategory = await Category.findOne({_id: category, isListed: true});
     if(!activeCategory){
@@ -105,19 +112,19 @@ export const addProduct = async (req, res) => {
 
     const imageUrls = req.files.map(f => `/uploads/${f.filename}`);
 
-    // offer price calculation
-    let offerPrice = Number(price);
-    if(offerPercentage > 0){
-      offerPrice = price - (price * offerPercentage / 100);
-    }
+   
 
+
+
+
+    
     const product = new Product({
       productname,
       description,
       category: activeCategory._id,
       price: Number(price),
       offerPercentage,
-      offerPrice,
+    
       images: imageUrls
     });
 
@@ -137,52 +144,35 @@ export const addProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { productname, description, price, category } = req.body;
-    const offerPercentage=Number(req.body.offerPercentage)||0
-     let calculatedOfferPrice = Number(price)
-
-if (offerPercentage > 0) {
-  calculatedOfferPrice = price-(price * offerPercentage/100)
-}
+    const offerPercentage=parseInt(req.body.offerPercentage)||0;
+    const numericPrice=Number(price)
+    if(numericPrice<=0){
+      res.json({success:false,message:"Price must be positive!"})
+    }
+    if (offerPercentage < 0 || offerPercentage > 100) {
+      return res.json({ success: false, message: "Invalid offer percentage" })
+    } 
     let updateData = {
       productname,
       description,
-      price,
-      offerPercentage,
-      offerPrice:calculatedOfferPrice
-    };
-
-     if (category && category.trim() !== "") {
-      const activeCategory = await Category.findOne({
-        _id: category,
-        isListed: true
-      });
-
-      if (!activeCategory) {
-        return res.status(400).json({success: false,
-          message: "Inactive category selected!!!"})
-      }
-      if(price&&Number(price)<=0){
-        return res.json({success:false,message:"Price must be a positive value!"})
-      }
-      if(offerPercentage<0 || offerPercentage>100){
-        res.status(400).json({success:false,message:"OfferPercentage must be a positive value!"})
-      }
-    
+      price: numericPrice,
+      offerPercentage
+    }  
+   if(category && category.trim() !== "") {
+      const activeCategory = await Category.findOne({_id: category,isListed: true})
       updateData.category = activeCategory._id;
     }
     
-    let images = [];
+   let images = [];
 
-    if (req.body.existingImages) {
-      images = Array.isArray(req.body.existingImages)
-        ? req.body.existingImages
-        : [req.body.existingImages];
-    }
-
+if (req.body.existingImages) {
+  images = Array.isArray(req.body.existingImages)
+    ? req.body.existingImages
+    : [req.body.existingImages];
+}
+images = [...new Set(images)];
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(
-        (file) => "/uploads/" + file.filename
-      );
+      const newImages = req.files.map((file) => "/uploads/" + file.filename)
       images.push(...newImages);
     }
 
@@ -197,16 +187,10 @@ if (offerPercentage > 0) {
     );
 
     if (!product) {
-      return res.json({
-        success: false,
-        message: "Product not found"
-      });
+      return res.json({success: false,message: "Product not found"})
     }
 
-    return res.json({
-      success: true,
-      message: "Product updated successfully"
-    });
+    return res.json({success: true,message: "Product updated successfully"})
 
   } catch (error) {
     res.json({success:false,message:"Unable to update product"})

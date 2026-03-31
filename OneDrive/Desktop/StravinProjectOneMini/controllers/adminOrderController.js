@@ -20,7 +20,7 @@ export const getAllOrders=async(req,res)=>{
    }
         const orders = await Order.find(filter).sort({createdAt:-1})
                       .skip(skip).limit(limit).populate('userId')
-        res.render('usersOrders',{orders,
+        res.render('admin/usersOrders',{orders,
           currentPage:page,
           totalPages:Math.ceil(totalOrders/limit),
         search:search||'' })
@@ -39,7 +39,7 @@ export const viewOrderDetails=async(req,res)=>{
     if(!order){
         return res.status(404).json({success:false,message:"Order not found!"})
     }
-    res.render('adminViewOrder',{order})
+    res.render('admin/adminViewOrder',{order})
 }catch(error){
     console.log(error)
     res.status(500).json({success:false,message:"Server error at order fetching"})

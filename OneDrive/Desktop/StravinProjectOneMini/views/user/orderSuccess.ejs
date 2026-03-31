@@ -103,7 +103,7 @@
     <% if(order.paymentMethod === "COD") { %>
       <span class="badge bg-warning text-dark">Pay on Delivery</span>
     <% } else { %>
-      <% if(order.paymentStatus === "Success") { %>
+      <% if(order.paymentStatus === "Success"||order.paymentStatus === "Paid") { %>
         <span class="badge bg-success">Paid</span>
       <% } else if(order.paymentStatus === "Pending") { %>
         <span class="badge bg-info text-dark">Pending</span>
@@ -117,7 +117,7 @@
     <p class="note">
       Please keep ₹<%= order.totalAmount %> ready at the time of delivery.
     </p>
-  <% } else if(order.paymentStatus === "Success") { %>
+  <% } else if(order.paymentStatus === "Success" || order.paymentStatus === "Paid") { %>
     <p class="note text-success">
       Your payment of ₹<%= order.totalAmount %> has been successfully received.
     </p>

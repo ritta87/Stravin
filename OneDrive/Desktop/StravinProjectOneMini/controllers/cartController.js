@@ -8,7 +8,6 @@ export const addToCart = async (req, res) => {
   try{
   const userId = req.session.userId;
   const {variantId} = req.body;
-  
   const quantity=Number(req.body.quantity)||1
   let grandTotal=0;
   const variant = await Variant.findById(variantId)

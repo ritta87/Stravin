@@ -645,12 +645,12 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async e => {
     e.preventDefault();
 
-    const selectedAddress = document.querySelector('input[name="address"]:checked');
-    if (!selectedAddress) {
+const selectedAddressId = document.querySelector('input[name="address"]:checked').value;
+    if (!selectedAddressId) {
       return Swal.fire("Error", "Please select an address", "error");
     }
 
-    const addressId = selectedAddress.value;
+    
 
     const paymentInput = document.querySelector('input[name="paymentMethod"]:checked');
     if (!paymentInput) {
@@ -663,7 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch('/placeOrder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addressId, paymentMethod }),
+        body: JSON.stringify({ addressId:selectedAddressId, paymentMethod }),
         credentials: 'include'
       });
 
@@ -710,17 +710,16 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify({
             ...response,
             cartData: data.cartData,
-            addressId: data.addressId,
+            addressId: selectedAddressId,
             orderId: data.orderId
           }),
           credentials: 'include'
         });
 
         const verifyData = await verifyRes.json();
-        console.log("Verify Response:", verifyData);
 
         if (verifyData.success) {
-          window.location.href = `/orderSuccess`;
+          window.location.href = `/orderSuccess/${verifyData.orderId}`;
         } else {
           window.location.href = `/orderFailure`;
         }

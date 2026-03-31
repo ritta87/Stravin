@@ -323,10 +323,15 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   <h3>Order Details - <%= order.orderId %></h3>
   <p><strong>Order Total:</strong> ₹<%= order.totalAmount %></p>
   <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
-  <p><strong>Shipping Address:</strong> 
-    <%= order.address.name %>, <%= order.address.house %>, <%= order.address.area %>, 
-    <%= order.address.city %> - <%= order.address.pincode %>
-  </p>
+ <p><strong>Shipping Address:</strong></p>
+<p>
+  <%= order.address.name %>, <%= order.address.mobile %><br>
+  <%= order.address.house %>, <%= order.address.address %>, <%= order.address.area %><br>
+  <%= order.address.city %> - <%= order.address.pincode %>, <%= order.address.state %><br>
+  <% if(order.address.landmark) { %>
+    Landmark: <%= order.address.landmark %>
+  <% } %>
+</p>
 
   <hr>
 
