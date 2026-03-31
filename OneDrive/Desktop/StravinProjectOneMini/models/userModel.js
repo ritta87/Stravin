@@ -49,7 +49,22 @@ const userSchema=new mongoose.Schema({
       type:String,
       default:''
     },
-
+    wallet:{
+      type:Number,
+      default:0
+    },
+    walletHistory:[{
+    amount: Number,
+    type: {
+      type: String,
+    },
+    reason: String,
+    date: {
+      type: Date,
+      default: Date.now
+    }
+  }
+]
 },
   { timestamps: true }
 )

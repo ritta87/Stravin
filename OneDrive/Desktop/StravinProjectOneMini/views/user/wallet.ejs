@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+
+  <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+  padding: 30px;
+}
+
+
+.form-group {
+  max-width: 350px;
+  margin-bottom: 15px;
+}
+
+/* 🏷 Label */
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* 🔢 Input */
+#amount {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+#amount:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0,123,255,0.3);
+}
+
+
+
+/* 🔘 Button */
+button {
+  background: linear-gradient(135deg, #007bff, #0056d2);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #0056d2, #003f9a);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* 📊 Table Title */
+h3 {
+  margin-top: 40px;
+  margin-bottom: 15px;
+}
+
+/* 📋 Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Header */
+table th {
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+/* Rows */
+table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* Alternate rows */
+table tr:nth-child(even) {
+  background: #f9fbfd;
+}
+
+/* Hover effect */
+table tr:hover {
+  background: #eef4ff;
+  transition: 0.2s;
+}
+    header {
+      background-color: #198754;
+      padding: 15px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header .brand { font-weight:700; font-size:1.7rem; color:#fff; }
+    header nav a { color:#fff; font-weight:500; margin-left:25px; transition:color 0.2s;}
+    header nav a:hover { color:#e0e0e0; }
+    header nav {gap: 28px;}
+    /* BACK LINK */
+    .back-link { display:inline-block; margin-bottom:20px; font-weight:500; color:#198754; }
+    .back-link:hover { text-decoration:underline; }
+.disabled-variant{
+  opacity:0.5;
+  pointer-events:none;
+}
+   
+
+
+    .btn-action {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  list-style: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+  right: 0;
+  min-width: 120px;
+}
+
+.dropdown-menu li {
+  padding: 5px 0;
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}  .wishlist-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.cart-link,
+.wishlist-nav {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+}
+
+.cart-link i,
+.wishlist-nav i {
+  font-size: 18px;
+}
+
+.cart-count,
+.wishlist-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 50px;
+  background: red;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #198754;
+}
+
+
+
+  
+ 
+.logout-btn{
+  display:none;
+}
+
+
+.error-msg {
+  color: red;
+  font-size: 13px;
+  display: block;
+  margin-top: 4px;
+}
+
+input.error {
+  border: 1px solid red;
+}
+</style>
+<header class="d-flex justify-content-between align-items-center px-4">
+  <div class="brand">Stravin</div>
+ <nav class="nav-bar">
+    <div class="nav-left">
+
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+    <a href="/cart" class="cart-link">
+     <i class="bi bi-cart3 cart-icon"></i>
+     <span id="cartCount" class="cart-count">0</span>
+      </a>
+
+      <% if (isLoggedIn) { %>
+
+        <div class="dropdown">
+          <button class="dropdown-toggle">
+            Hi, <%= user.name %>
+          </button>
+
+          <ul class="dropdown-menu">
+             <li>
+              <a href="/profile" class="dropdown-item">Profile</a>
+            </li>
+             <li>
+              <a href="/orders" class="dropdown-item">My Orders</a>
+            </li>
+             <li>
+              <a href="/logout" class="dropdown-item">Logout</a>
+            </li>
+          </ul>
+        </div>
+
+      <% } else { %>
+    <a href="/login">Login</a>
+<% } %>
+</div></nav>
+<script>
+  //cart count
+async function loadCartCount(){
+  try{
+    const res = await fetch('/cart/count')
+    const data = await res.json()
+    const cartEl = document.getElementById('cartCount')
+    if(cartEl){
+      cartEl.innerText = data.count
+    }
+  }catch(err){
+    console.log("Error fetching cart count",err)
+  }
+}
+document.addEventListener("DOMContentLoaded", loadCartCount)
+</script>
+</header>
+<%- include('../partials/breadcrumbs') %>
+
+<body>
+
+<div class="form-group">
+  <label>Enter Amount</label>
+  <p id="msg" style="color: green;"></p>
+  <input type="number" id="amount" placeholder="Enter amount">
+
+  <small class="error-msg" id="amountError"></small>
+
+<button onclick="addMoney()">Add Money</button></div>
+
+<h3>Wallet History</h3>
+
+<table border="1">
+  <tr>
+    <th>Amount</th>
+    <th>Type</th>
+    <th>Reason</th>
+    <th>Date</th>
+  </tr>
+
+  <% user.walletHistory.forEach(item => { %>
+    <tr>
+      <td>₹<%= item.amount %></td>
+      <td><%= item.type %></td>
+      <td><%= item.reason %></td>
+      <td><%= item.date.toDateString() %></td>
+    </tr>
+  <% }) %>
+</table>
+
+
+<script>
+function openRazorpay(order, amount) {
+
+  const options = {
+    key: "<%= process.env.RAZORPAY_KEY_ID %>",
+
+    amount: order.amount,
+    currency: "INR",
+    name: "Stravin Wallet",
+
+    order_id: order.id,
+
+    handler: async function (response) {
+
+      await verifyPayment(response, amount);
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open()
+}
+
+
+async function addMoney() {
+    document.getElementById("msg").innerText = "";
+    if(!validateAmount()) return;
+  const amount = document.getElementById("amount").value;
+
+  const res = await fetch("/createWalletPayment", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({amount})
+  });
+
+  const data = await res.json();
+  console.log(data)
+  if (data.success) {
+    openRazorpay(data.order, amount);
+  }
+}
+
+
+async function verifyPayment(response, amount) {
+
+  const res = await fetch("/verifyWalletPayment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"},
+    body: JSON.stringify({
+      ...response,
+      amount
+    })
+  })
+
+  const data = await res.json();
+  const msg= document.getElementById("msg")
+  if (data.success) {
+    
+    msg.style.color="green"
+    msg.innerText="Money Added to Wallet Successfully!"
+    
+  } else {
+    msg.style.color="red"
+    msg.innerText="Failed to add money in wallet"
+  }
+}
+function validateAmount() {
+  const amountInput = document.getElementById("amount");
+  const error = document.getElementById("amountError");
+
+  const amount = Number(amountInput.value);
+
+  // reset
+  error.textContent = "";
+  amountInput.classList.remove("error");
+
+  if (!amountInput.value) {
+    error.textContent = "Amount is required";
+    amountInput.classList.add("error");
+    return false;
+  }
+
+  if (isNaN(amount) || amount <= 0) {
+    error.textContent = "Enter a valid amount";
+    amountInput.classList.add("error");
+    return false;
+  }
+
+  if (amount < 1) {
+    error.textContent = "Minimum amount is ₹1";
+    amountInput.classList.add("error");
+    return false;
+  }
+
+  if (amount > 100000) {
+    error.textContent = "Maximum allowed is ₹1,00,000";
+    amountInput.classList.add("error");
+    return false;
+  }
+
+  return true;
+}
+validateAmount()
+</script>
+</body>
+
+</html>

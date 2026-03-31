@@ -26,6 +26,9 @@ import {getUserAddress , getAddAddress , addUserAddress,getEditAddress,postEditA
  import {getCheckoutPage} from '../controllers/checkoutController.js'
 import {placeOrder, getOrderSuccess,getUserOrder,getOrderDetails, cancelOrder,returnItem,downloadInvoice,verifyPayment}
  from '../controllers/orderController.js'
+
+import { getWallet,createWalletPayment,verifyWalletPayment } from "../controllers/walletController.js";
+
 import { noCache } from "../middleware/no-cache.js";
 router.use(noCache)
 
@@ -86,7 +89,9 @@ router.post('/returnItem/:orderId/:itemId',userAuth,returnItem)
 router.get('/orders/:orderId/invoice',userAuth,downloadInvoice)
 router.post('/verifyPayment',userAuth,verifyPayment)
 
-
+router.get('/wallet',userAuth,getWallet);
+router.post('/createWalletPayment',userAuth,createWalletPayment)
+router.post('/verifyWalletPayment',userAuth,verifyWalletPayment)
 
 
 router.get('/logout',userLogout)
