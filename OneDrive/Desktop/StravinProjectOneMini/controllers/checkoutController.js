@@ -1,38 +1,92 @@
 import Address from '../models/addressModel.js'
 import Cart from '../models/cartModel.js'
+import Coupon from '../models/couponModel.js'
+export const getCheckoutPage = async (req, res) => {
+  try {
+    const userId = req.session.userId;
 
-export const getCheckoutPage=async(req,res)=>{
-    try{
-        const userId = req.session.userId;
-        const cart  =await Cart.findOne({userId}).populate('items.product').populate('items.variant')
-        const addresses=await Address.find({userId})
+    // fetch cart
+    const cart = await Cart.findOne({ userId })
+      .populate("items.product")
+      .populate("items.variant");
 
-        if(!cart||cart.length===0){
-            return res.redirect('/user/cart')
-        }
-    let subTotal=0;
-    
-    const shipping = 50;
-    const discount = 0;
-    
-        cart.items.forEach(item=>{
-            const price = item.price                 // final price
-            const basePrice = item.basePrice || price  // original price
-            const qty = item.quantity
-            subTotal += price*qty
-           
-        })
-        
-         let tax = Math.round(subTotal * 0.05);
-        const finalTotal= subTotal+tax+shipping-discount;
-        res.render('user/checkout',{
-            cart,addresses,subTotal,tax,shipping,discount,finalTotal,
-        razorpayKey: process.env.RAZORPAY_KEY_ID})
-
-    }catch(error){
-        console.log(error)
-        res.status(500).json({success:false,message:"Checkout errro!!"})
-
+    if (!cart || cart.items.length === 0) {
+      return res.redirect("/user/cart");
     }
+
+    // fetch addresses
+    const addresses = await Address.find({ userId });
+
+   // subtotal
+let appliedCoupon=null
+let subTotal = 0;
+cart.items.forEach((item) => {
+  const price = Number(item.price) || 0;
+  const qty = Number(item.quantity) || 0;
+  subTotal += price * qty;
+});
+
+const tax = Math.round(subTotal * 0.05) || 0;
+const shipping = 50;
+const cartTotal = subTotal + tax + shipping;
+
+// discount
+let discount = 0;
+
+if (cart.coupon && cart.coupon.code) {
+  const coupon = await Coupon.findOne({
+    code: cart.coupon.code.toUpperCase(),
+    isActive: true,
+  });
+
+  if (coupon) {
+    appliedCoupon=coupon.code
+    if (coupon.discountType === "percentage") {
+        
+      const percent = Number(coupon.discountValue) || 0;
+      const max = Number(coupon.maxDiscount) || Infinity;
+      discount = Math.min((cartTotal * percent) / 100, max);
+    } else {
+      discount = Number(coupon.discountValue) || 0;
+    }
+  } else {
+    cart.coupon = null;
+  }
 }
 
+// final total
+discount = isNaN(discount) ? 0 : discount;
+
+const finalTotal = Math.max(0, cartTotal - discount);
+
+// save safely
+cart.discountedAmount = finalTotal;
+
+// only update coupon if it exists
+if (cart.coupon && cart.coupon.code) {
+  cart.coupon.discount = discount;
+} else {
+  cart.coupon = null;
+}
+
+await cart.save();
+
+await cart.save(); 
+
+res.render("user/checkout", {
+  cart,
+  addresses,
+  subTotal,
+  tax,
+  shipping,
+  discount,           // discount applied
+  finalTotal,         // total after discount
+  totalAmount: cartTotal, // original total before discount
+  appliedCoupon,      // coupon code
+  razorpayKey: process.env.RAZORPAY_KEY_ID,
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Server error at checkout" });
+  }
+}

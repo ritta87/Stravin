@@ -1,8 +1,9 @@
 import User from "../models/userModel.js";
+import Coupon from '../models/couponModel.js'
 import { sendOtpEmail } from "../utils/sendOtp.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import Cart from '../models/cartModel.js'
 
 // get signup page..
 export const getSignupPage = (req, res) => {
@@ -288,10 +289,79 @@ export const getResetPassword = async(req,res)=>{
   res.render('user/resetPassword',{resetEmail:email})
 }
 
+//apply coupon------------------------------------------------
+export const applyCoupon = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { couponCode } = req.body;
 
+    console.log(req.body);
 
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.status(404).json({success: false,message: "Cart not found"})
+    }
 
+    const newCode = couponCode.toUpperCase()
 
+    if (cart.coupon && cart.coupon.code === newCode) {
+  return res.status(400).json({success: false,message: "This coupon is already applied"})
+}
+  
+    const coupon = await Coupon.findOne({
+      code: couponCode.toUpperCase(),
+      isActive: true
+    })
 
+    if (!coupon) {
+      return res.status(400).json({success: false,message: "Invalid coupon"});
+    }
 
+  
+    let subTotal = 0;
+    cart.items.forEach((item) => {
+      const price = Number(item.price) || 0;
+      const qty = Number(item.quantity) || 0;
+      subTotal += price * qty;
+    });
 
+    const tax = Math.round(subTotal * 0.05) || 0;
+    const shipping = 50;
+
+    const cartTotal = subTotal + tax + shipping;
+
+      let discount = 0;
+
+    if (coupon.discountType === "percentage") {
+      const percent = Number(coupon.discountValue) || 0;
+      const max = Number(coupon.maxDiscount) || Infinity;
+
+      discount = Math.min((cartTotal * percent) / 100, max);
+    } else {
+      discount = Number(coupon.discountValue) || 0;
+    }
+
+    const finalTotal = Math.max(0, cartTotal - discount);
+
+   
+    cart.coupon = {
+      code: coupon.code,
+      discount,
+      appliedAt: new Date()
+    };
+
+    cart.discountedAmount = finalTotal;
+
+    await cart.save();
+
+    return res.json({success: true,
+      discount: discount,
+      finalTotal: finalTotal,
+      couponCode: coupon.code
+    })
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({success: false,message: "Server error"})
+  }
+};

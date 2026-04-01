@@ -25,6 +25,11 @@ const cartSchema=new mongoose.Schema({
             type:Number
         }
     }],
+    coupon:{
+    code: String,
+    appliedAt: Date,
+  },
+  
     grandTotal:{
         type:Number,
         default:0

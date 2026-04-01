@@ -595,31 +595,49 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
     <div class="price-row">
       <span>SubTotal</span>
-      <span>₹ <%= subTotal %></span>
+      <span id="subTotal"> <%= subTotal %></span>
     </div>
 
 <div class="price-row">
     <span>Tax (5%)</span>
-    <span class="amount">₹ <%= tax %></span>
+    <span class="amount" id="tax"><%= tax %></span>
     </div>
     <p class="tax-note">(Included in total amount.)</p>
 
     <div class="price-row">
       <span>Shipping</span>
-      <span>₹ <%= shipping %></span>
+      <span id="shipping"> <%= shipping %></span>
     </div>
 
-    <hr>
+<div class="price-row">
+  <input type="text" id="couponCode" placeholder="Enter coupon code"
+    value="<%= appliedCoupon || '' %>">
+  <button onclick="applyCoupon()">Apply</button>
+</div>
 
-    <div class="price-total">
-      <span>Total</span>
-      <span>₹ <%= finalTotal %></span>
-    </div>
+<p id="appliedCouponText" style="color:green;">
+  <% if (appliedCoupon) { %>
+    Coupon <strong><%= appliedCoupon %></strong> applied 🎉  
+  <% } %>
+</p>
 
-    <hr>
+<p id="couponError" style="color:red; font-size:14px;"></p>
+<div class="price-row">
+  <span>Discount</span>
+  <span style="color:green;">₹ <span id="discount"><%= discount || 0 %></span></span>
+</div>
 
-    <h3>Total: ₹ <%= finalTotal %></h3>
+<hr>
 
+<div class="price-row">
+  <span>Subtotal</span>
+  <span>₹ <span id="grandTotal"><%= totalAmount %></span></span>
+</div>
+
+<div class="price-total">
+  <span>Total</span>
+  <span>₹ <span id="finalTotalText"><%= finalTotal %></span></span>
+</div>
 <form id="checkoutForm">
    <h5>Payment Method</h5>
   <div class="form-check">
@@ -730,7 +748,48 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
     rzp.open();
   }
 
-});
+})
+//apply coupon---------------------
+
+async function applyCoupon() {
+  const code = document.getElementById("couponCode").value.trim();
+  const errorBox = document.getElementById("couponError");
+  const appliedText = document.getElementById("appliedCouponText");
+
+  errorBox.innerText = "";
+  appliedText.innerText = "";
+
+  if (!code) {
+    errorBox.innerText = "Please enter a coupon code";
+    return;
+  }
+
+  try {
+    const res = await fetch("/applyCoupon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ couponCode: code })
+    });
+
+    const data = await res.json();
+ if (data.success) {
+    document.getElementById("discount").innerText = data.discount;
+    document.getElementById("grandTotal").innerText = data.finalTotal;
+    document.getElementById("finalTotalText").innerText = data.finalTotal;
+
+    document.getElementById("appliedCouponText").innerText =
+      `Coupon ${data.couponCode} applied`;
+
+  } else {
+    document.getElementById("couponError").innerText = data.message;
+  }
+
+
+  } catch (err) {
+    console.error(err);
+    errorBox.innerText = "Something went wrong. Try again.";
+  }
+}
 </script>
 </body>
 </html>

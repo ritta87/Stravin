@@ -9,10 +9,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 import userAuth from '../middleware/userAuth.js'
-import { getSignupPage , userSignup , verifyOtp , getVerifyOtp ,
-   resendOtp , getLoginPage , userLogin ,
-    getForgotPassword , forgotPassword ,
-getResetPassword , resetPassword } from "../controllers/userController.js";
+import { getSignupPage , userSignup , verifyOtp , getVerifyOtp ,resendOtp , getLoginPage , userLogin ,
+getForgotPassword , forgotPassword ,getResetPassword , resetPassword , applyCoupon} from "../controllers/userController.js";
 
 import {loadHome ,loadShop, getAllProductsForHome , loadSingleProduct , listedCategories , userLogout } from '../controllers/homeController.js';
 import { addToCart  ,getCartItems , getCartCount , updateCartQty , removeCartItem}
@@ -93,6 +91,7 @@ router.get('/wallet',userAuth,getWallet);
 router.post('/createWalletPayment',userAuth,createWalletPayment)
 router.post('/verifyWalletPayment',userAuth,verifyWalletPayment)
 
+router.post('/applyCoupon',userAuth,applyCoupon)
 
 router.get('/logout',userLogout)
 
