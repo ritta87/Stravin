@@ -10,122 +10,199 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-.success-container {
+.order-success-wrapper {
+  max-width: 1100px;   
+  margin: 40px auto;   
+  padding: 0 20px;     
+
   display: flex;
-  justify-content: center;
-  margin-top: 40px;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.left-section {
+  flex: 2;
+  min-width: 300px;
 }
 
-.success-box {
-  width: 420px;
+.right-section {
+  flex: 1;
+  min-width: 280px;
+}
+
+/* cards */
+.success-box,
+.payment-box,
+.price-card {
   background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-
-.payment-box {
-  width: 420px;
-  margin: 20px auto;
   padding: 20px;
-  border-radius: 10px;
-  background: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
 /* buttons */
-.view-orders-btn {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 15px;
-}
-
 .view-orders-btn a {
-  padding: 8px 15px;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 8px 14px;
   border-radius: 6px;
   text-decoration: none;
-  font-size: 14px;
+  background: #000;
+  color: #fff;
 }
 
-/* primary button */
-.view-orders-btn a:first-child {
-  background: #28a745;
-  color: white;
-}
-
-/* secondary */
 .view-orders-btn .continue {
-  background: #007bff;
-  color: white;
+  background: #eee;
+  color: #333;
 }
 
-/* note text */
+/* payment status */
+.status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status.cod { background: #fff3cd; }
+.status.success { background: #d4edda; color: green; }
+.status.pending { background: #d1ecf1; }
+
+/* notes */
 .note {
+  margin-top: 10px;
   font-size: 14px;
-  color: #555;
+}
+
+.note.success { color: green; }
+.note.warning { color: #856404; }
+
+/* price section */
+.price-card h5 {
+  margin-bottom: 15px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+.discount {
+  color: green;
+}
+
+.divider {
+  border-top: 1px dashed #ccc;
+  margin: 10px 0;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.save-msg {
+  margin-top: 10px;
+  color: green;
+  font-size: 13px;
 }
 </style></head>
 <body>
-<div class="success-container">
+<div class="order-success-wrapper">
 
-  <div class="success-box">
-    
-    <h1>🎉 Order Placed Successfully!</h1>
-    <p>Thank you for shopping with us 💖</p>
+  <!-- LEFT -->
+  <div class="left-section">
+    <!-- success box -->
+    <div class="success-box">
+      <h1>🎉 Order Placed Successfully!</h1>
+      <p>Thank you for shopping with us 💖</p>
 
-    <p class="order-id">
-      Order ID: <strong><%= order.orderId %></strong>
-    </p>
+      <p class="order-id">
+        Order ID: <strong><%= order.orderId %></strong>
+      </p>
 
-    <div class="view-orders-btn">
-      <a href="/orders">View Orders</a>
-
-      <a href="/" class="continue">
-        Continue Shopping
-      </a>
+      <div class="view-orders-btn">
+        <a href="/orders">View Orders</a>
+        <a href="/" class="continue">Continue Shopping</a>
+      </div>
     </div>
 
+    <!-- payment box -->
+    <div class="payment-box">
+      <h5>Payment Information</h5>
+
+      <p><strong>Method:</strong> 
+        <%= order.paymentMethod === "COD" ? "Cash on Delivery" : "Online Payment" %>
+      </p>
+
+      <p><strong>Status:</strong> 
+        <% if(order.paymentMethod === "COD") { %>
+          <span class="status cod">Pay on Delivery</span>
+        <% } else if(order.paymentStatus === "Paid") { %>
+          <span class="status success">Paid</span>
+        <% } else { %>
+          <span class="status pending">Pending</span>
+        <% } %>
+      </p>
+
+      <% if(order.paymentMethod === "COD") { %>
+        <p class="note warning">
+          Pay ₹<%= order.finalTotal %> on delivery
+        </p>
+      <% } else if(order.paymentStatus === "Paid") { %>
+        <p class="note success">
+          Payment received. Order processing 🚀
+        </p>
+      <% } %>
+    </div>
   </div>
 
-</div>
+  <!-- RIGHT -->
+  <div class="right-section">
+    <div class="price-card">
 
+      <h5>Price Details</h5>
 
-<div class="payment-box">
-  <h5>Payment Information</h5>
+      <div class="row">
+        <span>Subtotal</span>
+        <span>₹<%= order.subTotal %></span>
+      </div>
 
-  <p><strong>Payment Method:</strong> 
-    <%= order.paymentMethod === "COD" ? "Cash on Delivery (COD)" : "Online Payment (Razorpay)" %>
-  </p>
+      <div class="row">
+        <span>Tax</span>
+        <span>₹<%= order.tax %></span>
+      </div>
 
-  <p><strong>Status:</strong> 
-    <% if(order.paymentMethod === "COD") { %>
-      <span class="badge bg-warning text-dark">Pay on Delivery</span>
-    <% } else { %>
-      <% if(order.paymentStatus === "Success"||order.paymentStatus === "Paid") { %>
-        <span class="badge bg-success">Paid</span>
-      <% } else if(order.paymentStatus === "Pending") { %>
-        <span class="badge bg-info text-dark">Pending</span>
-      <% } else { %>
-        <span class="badge bg-danger">Failed</span>
+      <div class="row">
+        <span>Shipping</span>
+        <span>₹<%= order.shipping %></span>
+      </div>
+
+      <% if(order.coupon && order.coupon.discountAmount > 0) { %>
+      <div class="row discount">
+        <span>Discount (<%= order.coupon.code %>)</span>
+        <span>-₹<%= order.coupon.discountAmount %></span>
+      </div>
       <% } %>
-    <% } %>
-  </p>
 
-  <% if(order.paymentMethod === "COD") { %>
-    <p class="note">
-      Please keep ₹<%= order.totalAmount %> ready at the time of delivery.
-    </p>
-  <% } else if(order.paymentStatus === "Success" || order.paymentStatus === "Paid") { %>
-    <p class="note text-success">
-      Your payment of ₹<%= order.totalAmount %> has been successfully received.
-    </p>
-  <% } else { %>
-    <p class="note text-danger">
-      Payment failed. Please try again or contact support.
-    </p>
-  <% } %>
+      <div class="divider"></div>
+
+      <div class="total">
+        <span>Total</span>
+        <span>₹<%= order.finalTotal %></span>
+      </div>
+
+      <% if(order.coupon && order.coupon.discountAmount > 0) { %>
+        <p class="save-msg">
+          You saved ₹<%= order.coupon.discountAmount %> 🎉
+        </p>
+      <% } %>
+
+    </div>
+  </div>
+
 </div>
 </body>
 </html>

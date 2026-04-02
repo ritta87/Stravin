@@ -244,7 +244,10 @@ background:#000;
     margin: 8px 0;
     font-size: 14px;
   }
-
+hr {
+  margin: 8px 0;
+  border-color: #ddd;
+}
   .right h3 {
     margin-top: 0;
   }
@@ -477,6 +480,84 @@ h2 {
   background-color: #157347;
   color: #fff;
 }
+/* Coupon Section Container */
+.coupon-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* Input Field */
+#couponCode {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  width: 200px;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+#couponCode:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+}
+
+/* Apply Button */
+.apply-btn {
+  padding: 10px 16px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.apply-btn:hover {
+  background-color: #218838;
+}
+
+/* Remove Button */
+.remove-btn {
+  padding: 10px 16px;
+  border: none;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.remove-btn:hover {
+  background-color: #c82333;
+}
+
+/* Applied Coupon Text */
+#appliedCouponText {
+  color: #28a745;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* Error Message */
+#couponError {
+  color: #dc3545;
+  font-size: 13px;
+  margin-top: 5px;
+}
+.price-summary {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: #f9f9f9;
+  max-width: 400px;
+}
+
 </style>
 <header class="d-flex justify-content-between align-items-center px-4">
   <div class="brand">Stravin</div>
@@ -609,10 +690,10 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
       <span id="shipping"> <%= shipping %></span>
     </div>
 
-<div class="price-row">
+<div class="coupon-box">
   <input type="text" id="couponCode" placeholder="Enter coupon code"
     value="<%= appliedCoupon || '' %>">
-  <button onclick="applyCoupon()">Apply</button>
+  <button onclick="applyCoupon()" class="apply-btn">Apply</button>
 </div>
 
 <p id="appliedCouponText" style="color:green;">
@@ -621,29 +702,52 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   <% } %>
 </p>
 
+<button id="removeCouponBtn" onclick="removeCoupon()" class="remove-btn"
+  <% if (appliedCoupon) { %>
+    style="display: inline-block;"
+  <% } else { %>
+    style="display: none;"
+  <% } %>>
+  Remove Coupon </button>
+
 <p id="couponError" style="color:red; font-size:14px;"></p>
 <div class="price-row">
-  <span>Discount</span>
-  <span style="color:green;">₹ <span id="discount"><%= discount || 0 %></span></span>
+  <span>Coupon Discount</span>
+  <span style="color:green;">- ₹ <span id="discount"><%= discount || 0 %></span></span>
 </div>
 
-<hr>
 
+
+<hr>
 <div class="price-row">
-  <span>Subtotal</span>
+  <span>Total</span>
   <span>₹ <span id="grandTotal"><%= totalAmount %></span></span>
 </div>
 
-<div class="price-total">
-  <span>Total</span>
+
+
+
+
+
+
+<div class="price-summary">
+  <span>Amount to Pay</span>
   <span>₹ <span id="finalTotalText"><%= finalTotal %></span></span>
 </div>
+
+
 <form id="checkoutForm">
    <h5>Payment Method</h5>
   <div class="form-check">
     <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
     <label class="form-check-label" for="cod">Cash on Delivery</label>
   </div>
+
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="WALLET" checked>
+    <label class="form-check-label" for="wallet">Wallet Payment</label>
+  </div>
+
   <div class="form-check">
     <input class="form-check-input" type="radio" name="paymentMethod" id="online" value="ONLINE">
     <label class="form-check-label" for="online">Pay Online</label>
@@ -700,7 +804,7 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
 
     
       if (data.payment === "ONLINE") {
-        openRazorpayCheckout(data);
+        openRazorpayCheckout(data,selectedAddressId);
       }
 
     } catch (error) {
@@ -710,7 +814,7 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
   });
 
 
-  function openRazorpayCheckout(data) {
+  function openRazorpayCheckout(data,selectedAddressId) {
 
     const options = {
       key: "<%= razorpayKey %>",
@@ -773,13 +877,12 @@ async function applyCoupon() {
 
     const data = await res.json();
  if (data.success) {
-    document.getElementById("discount").innerText = data.discount;
+    document.getElementById("discount").innerText = data.discount||0;
     document.getElementById("grandTotal").innerText = data.finalTotal;
     document.getElementById("finalTotalText").innerText = data.finalTotal;
 
-    document.getElementById("appliedCouponText").innerText =
-      `Coupon ${data.couponCode} applied`;
-
+    document.getElementById("appliedCouponText").innerText =`Coupon ${data.couponCode} applied`;
+    document.getElementById("removeCouponBtn").style.display = "inline-block";
   } else {
     document.getElementById("couponError").innerText = data.message;
   }
@@ -790,6 +893,59 @@ async function applyCoupon() {
     errorBox.innerText = "Something went wrong. Try again.";
   }
 }
+//coupon remove.............
+async function removeCoupon() {
+  try {
+    const res = await fetch("/removeCoupon", {
+      method: "POST"
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("discount").innerText = 0;
+      document.getElementById("grandTotal").innerText = data.finalTotal;
+      document.getElementById("finalTotalText").innerText = data.finalTotal;
+
+      document.getElementById("appliedCouponText").innerText = "";
+      document.getElementById("couponCode").value = "";
+
+      // hide button 
+      document.getElementById("removeCouponBtn").style.display = "none";
+
+      Swal.fire("Removed","Coupon removed successfully","success");
+    }
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
+async function loadCartSummary() {
+  try {
+    const res = await fetch("/cart");
+    const data = await res.json();
+
+    document.getElementById("discount").innerText = data.discount || 0;
+    document.getElementById("grandTotal").innerText = data.finalTotal;
+    document.getElementById("finalTotalText").innerText = data.finalTotal;
+
+    if (data.coupon) {
+      document.getElementById("appliedCouponText").innerText =
+        `Coupon ${data.coupon} applied`;
+
+      document.getElementById("removeCouponBtn").style.display = "inline-block";
+      document.getElementById("couponCode").value = data.coupon;
+    } else {
+      document.getElementById("removeCouponBtn").style.display = "none";
+    }
+
+  } catch (err) {
+    console.error("Cart load error:", err);
+  }
+}
+document.addEventListener("DOMContentLoaded", loadCartSummary);
 </script>
 </body>
 </html>

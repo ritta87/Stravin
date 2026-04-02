@@ -73,6 +73,9 @@ grandTotal += finalPrice * item.quantity;
 }
 
 cart.grandTotal = grandTotal
+cart.coupon=undefined
+cart.discountedAmount=undefined
+cart.finalTotal=grandTotal
   await cart.save()
   
   res.json({success:true,message:"Selected product added to cart",grandTotal})

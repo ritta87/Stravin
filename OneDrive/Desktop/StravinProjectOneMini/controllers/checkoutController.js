@@ -50,7 +50,7 @@ if (cart.coupon && cart.coupon.code) {
       discount = Number(coupon.discountValue) || 0;
     }
   } else {
-    cart.coupon = null;
+    cart.coupon = undefined;
   }
 }
 
@@ -60,18 +60,20 @@ discount = isNaN(discount) ? 0 : discount;
 const finalTotal = Math.max(0, cartTotal - discount);
 
 // save safely
-cart.discountedAmount = finalTotal;
+cart.discountAmount = discount;
+cart.finalTotal = finalTotal
 
-// only update coupon if it exists
-if (cart.coupon && cart.coupon.code) {
-  cart.coupon.discount = discount;
-} else {
-  cart.coupon = null;
+
+if (!cart.coupon && !cart.coupon.code) {
+  cart.coupon = undefined;
+  cart.discountAmount = 0;
+  cart.finalTotal = cartTotal;
+  appliedCoupon=null
 }
 
 await cart.save();
 
-await cart.save(); 
+
 
 res.render("user/checkout", {
   cart,

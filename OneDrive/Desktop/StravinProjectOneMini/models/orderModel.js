@@ -64,6 +64,11 @@ paymentMethod: {
   tax: Number,
   shipping: Number,
   totalAmount: Number,
+  finalTotal:Number,
+  coupon:{
+    code:{type:String},
+    discountAmount:{type:Number,default:0}
+  },
 
 razorpayOrderId: {type: String, default: null },
 razorpayPaymentId: {type: String, default: null },

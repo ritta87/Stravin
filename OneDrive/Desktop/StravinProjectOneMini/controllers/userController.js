@@ -295,9 +295,7 @@ export const applyCoupon = async (req, res) => {
     const userId = req.session.userId;
     const { couponCode } = req.body;
 
-    console.log(req.body);
-
-    const cart = await Cart.findOne({ userId });
+      const cart = await Cart.findOne({ userId });
     if (!cart) {
       return res.status(404).json({success: false,message: "Cart not found"})
     }
@@ -346,16 +344,14 @@ export const applyCoupon = async (req, res) => {
    
     cart.coupon = {
       code: coupon.code,
-      discount,
       appliedAt: new Date()
     };
 
-    cart.discountedAmount = finalTotal;
+    cart.discountAmount = discount;
 
     await cart.save();
 
-    return res.json({success: true,
-      discount: discount,
+    return res.json({success: true,discount: discount,
       finalTotal: finalTotal,
       couponCode: coupon.code
     })
@@ -364,4 +360,41 @@ export const applyCoupon = async (req, res) => {
     console.error(err);
     return res.status(500).json({success: false,message: "Server error"})
   }
-};
+}
+
+
+export const removeCoupon = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.status(404).json({success: false,message: "Cart not found"});
+    }
+
+    // remove coupon
+    cart.coupon = undefined;
+    cart.discountAmount = 0;
+
+    await cart.save();
+
+    // recalculate total-without discount)
+    let subTotal = 0;
+    cart.items.forEach((item) => {
+      const price = Number(item.price) || 0;
+      const qty = Number(item.quantity) || 0;
+      subTotal += price * qty;
+    });
+
+    const tax = Math.round(subTotal * 0.05) || 0;
+    const shipping = 50;
+
+    const finalTotal = subTotal + tax + shipping;
+
+    return res.json({success: true,finalTotal})
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({success: false,message: "Error removing coupon"})
+  }
+}

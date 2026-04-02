@@ -8,6 +8,7 @@ const cartSchema=new mongoose.Schema({
         ref:'User',
         required:true
     },
+    isLocked: {type: Boolean, default: false },
     items:[{
         product:{
             type:mongoose.Schema.Types.ObjectId,
@@ -29,8 +30,16 @@ const cartSchema=new mongoose.Schema({
     code: String,
     appliedAt: Date,
   },
-  
-    grandTotal:{
+  discountAmount: {
+  type: Number,
+  default: 0
+},
+
+finalTotal: {
+  type: Number,
+  default: 0
+},
+grandTotal:{
         type:Number,
         default:0
     }
