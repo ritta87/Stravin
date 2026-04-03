@@ -56,7 +56,7 @@ address: {
 
 paymentMethod: {
     type:String,
-    enum:["COD","ONLINE"],
+    enum:["COD","ONLINE","WALLET"],
     required:true
   },
 
@@ -76,7 +76,7 @@ razorpaySignature: {type: String, default: null },
 
 status: {
   type: String,
-  enum: ["Pending","Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned","Partially Returned"],
+  enum: ["Pending","Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned","Partially Returned","Paid"],
   default:"Pending"
 },
 paymentStatus: {

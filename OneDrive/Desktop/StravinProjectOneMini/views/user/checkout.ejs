@@ -785,12 +785,12 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
       const res = await fetch('/placeOrder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addressId:selectedAddressId, paymentMethod }),
+        body: JSON.stringify({ addressId:selectedAddressId, paymentMethod}),
         credentials: 'include'
       });
 
       const data = await res.json();
-      console.log("PlaceOrder Response:", data);
+      
 
       if (!data.success) {
         return Swal.fire("Error", data.message || "Order not placed", "error");
@@ -801,7 +801,10 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
         window.location.href = `/orderSuccess/${data.orderId}`;
         return;
       }
-
+      if(data.payment === "WALLET"){
+        window.location.href = `/orderSuccess/${data.orderId}`;
+        return
+      }
     
       if (data.payment === "ONLINE") {
         openRazorpayCheckout(data,selectedAddressId);

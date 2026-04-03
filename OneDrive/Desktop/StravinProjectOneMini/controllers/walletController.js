@@ -62,19 +62,22 @@ export const verifyWalletPayment = async (req, res) => {
 
     if (generated_signature === razorpay_signature) {
       const user = await User.findById(req.session.userId);
+     const order = await razorpay.orders.fetch(razorpay_order_id);
+
+      const topupAmount = Number(order.amount)/100
 
       // add money
-      user.wallet += Number(amount);
+      user.wallet = (user.wallet||0)+topupAmount
 
       // add history
       user.walletHistory.push({
-        amount: Number(amount),
+        amount:topupAmount,
         type: "credit",
         reason: "Wallet Top-up"
       })
 
       await user.save();
-      return res.json({success:true})
+      return res.json({success:true,balance:user.wallet})
     }
     res.json({success:false})
 
@@ -82,4 +85,20 @@ export const verifyWalletPayment = async (req, res) => {
     console.log(error);
     res.json({success:false})
   }
+}
+
+export const getWalletNetBalance=async(req,res)=>{
+  try{
+  const userId=req.session.userId
+  const user = await User.findById(userId).select("wallet walletHistory")
+  if(!user){
+    return res.status(404).json({success:false,message:"User not found!"})
+  }
+ res.json({success:true,balance: user.wallet,
+  history:user.walletHistory
+ })
+}catch(error){
+  console.log(error)
+  res.status(500).json({success:false,message:"Error at loading Wallet balance!"})
+}
 }

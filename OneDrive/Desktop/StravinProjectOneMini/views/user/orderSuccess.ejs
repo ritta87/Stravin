@@ -130,35 +130,44 @@
     </div>
 
     <!-- payment box -->
-    <div class="payment-box">
-      <h5>Payment Information</h5>
+   <div class="payment-box">
+  <h5>Payment Information</h5>
 
-      <p><strong>Method:</strong> 
-        <%= order.paymentMethod === "COD" ? "Cash on Delivery" : "Online Payment" %>
-      </p>
+  <p><strong>Method:</strong> 
+    <% if(order.paymentMethod === "COD") { %>
+      Cash on Delivery
+    <% } else if(order.paymentMethod === "WALLET") { %>
+      Wallet Payment
+    <% } else { %>
+      Online Payment
+    <% } %>
+  </p>
 
-      <p><strong>Status:</strong> 
-        <% if(order.paymentMethod === "COD") { %>
-          <span class="status cod">Pay on Delivery</span>
-        <% } else if(order.paymentStatus === "Paid") { %>
-          <span class="status success">Paid</span>
-        <% } else { %>
-          <span class="status pending">Pending</span>
-        <% } %>
-      </p>
+  <p><strong>Status:</strong> 
+    <% if(order.paymentMethod === "COD") { %>
+      <span class="status cod">Pay on Delivery</span>
+    <% } else if(order.paymentStatus === "Paid") { %>
+      <span class="status success">Paid</span>
+    <% } else { %>
+      <span class="status pending">Pending</span>
+    <% } %>
+  </p>
 
-      <% if(order.paymentMethod === "COD") { %>
-        <p class="note warning">
-          Pay ₹<%= order.finalTotal %> on delivery
-        </p>
-      <% } else if(order.paymentStatus === "Paid") { %>
-        <p class="note success">
-          Payment received. Order processing 🚀
-        </p>
-      <% } %>
-    </div>
-  </div>
-
+  <% if(order.paymentMethod === "COD") { %>
+    <p class="note warning">
+      Pay ₹<%= order.finalTotal %> on delivery
+    </p>
+  <% } else if(order.paymentMethod === "WALLET" && order.walletInfo) { %>
+    <p class="note success">
+      Amount ₹<%= order.walletInfo.walletUsed %> paid from wallet.<br>
+      Remaining Wallet Balance: ₹<%= order.walletInfo.remainingWallet %>
+    </p>
+  <% } else if(order.paymentStatus === "Paid") { %>
+    <p class="note success">
+      Payment received. Order processing 🚀
+    </p>
+  <% } %>
+</div>
   <!-- RIGHT -->
   <div class="right-section">
     <div class="price-card">

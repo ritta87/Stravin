@@ -5,6 +5,7 @@ import Address from '../models/addressModel.js'
 import Order from '../models/orderModel.js'
 import Product from '../models/productModel.js'
 import Variant from '../models/variantModel.js'
+import User from '../models/userModel.js'
 import PDFDocument from 'pdfkit'
 import Razorpay from 'razorpay'
 import crypto from 'crypto'
@@ -36,8 +37,8 @@ const selectedAddress = await Address.findById(req.body.addressId)
       return res.json({ success: false, message: "Address not selected" })
     }
 
-    if (!["COD", "ONLINE"].includes(paymentMethod)) {
-      return res.status(400).json({ success: false, message: "Invalid payment method" });
+    if (!["COD", "ONLINE","WALLET"].includes(paymentMethod)) {
+      return res.status(400).json({ success: false,message:"Invalid payment method"})
     }
 
     const cart = await Cart.findOne({ userId });
@@ -145,9 +146,91 @@ if(cart.coupon && cart.coupon.code){
       cart.finalTotal=0
       cart.grandTotal = 0;
       await cart.save();
-
       return res.json({success: true,payment: "COD",orderId: order.orderId})
     }
+
+    if(paymentMethod==="WALLET"){
+    try {
+    const userId = req.session.userId;
+    const {addressId, paymentMethod} = req.body;
+
+    if (!userId) {
+      return res.status(401).json({success:false,message:"Please login" });
+    }
+
+const selectedAddress = await Address.findById(req.body.addressId)
+    if (!selectedAddress) {
+      return res.json({success:false,message:"Address not selected"})
+    }
+
+      const user = await User.findById(userId)
+      if(user.wallet < finalTotal){
+        return res.json({success:false,message:"Insufficient wallet balance"})
+      }
+      user.wallet-= finalTotal
+      await user.save()
+
+let couponData = {
+  code:null,
+  discountAmount:0
+}
+if(cart.coupon && cart.coupon.code){
+  couponData.code = cart.coupon.code
+  couponData.discountAmount= cart.discountAmount||0
+}
+    const order = await Order.create({
+    orderId: generateOrderId(),
+    userId,
+    items: orderItems, 
+    subTotal,
+    tax,
+    shipping,
+    coupon: couponData, 
+    discount,
+    totalAmount,
+    finalTotal,
+    paymentMethod:"WALLET",
+    paymentStatus:"Paid",
+    status:"Paid",
+    address: selectedAddress
+      })
+    // Reduce stock
+  for (const item of cart.items) {
+    const variant = await Variant.findById(item.variant);
+    variant.stockQuantity -= item.quantity;
+    await variant.save();
+  }
+
+  // Clear cart
+  cart.items = [];
+  cart.isLocked = false;
+  cart.coupon = undefined;
+  cart.discountAmount = 0;
+  cart.finalTotal = 0;
+  cart.grandTotal = 0;
+  await cart.save();
+
+  //response with wallet info
+  return res.json({success: true,
+    payment: "WALLET",
+    orderId: order.orderId,
+    walletUsed: finalTotal,
+    remainingWallet: user.wallet
+  })
+
+  }catch(error){
+    console.log(error)
+    res.status(500).json({success:false,message:"Server error at wallet payment!!"})
+  }
+
+    }
+
+
+
+
+  
+
+
 if (paymentMethod === "ONLINE") {
   cart.isLocked = true;
   await cart.save();
@@ -169,7 +252,7 @@ if (paymentMethod === "ONLINE") {
     console.error("PlaceOrder Error:", err);
     return res.status(500).json({ success: false });
   }
-};
+}
 //success page
 export const getOrderSuccess=async(req,res)=>{
     try {  

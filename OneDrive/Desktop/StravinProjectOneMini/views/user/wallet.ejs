@@ -288,9 +288,12 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <%- include('../partials/breadcrumbs') %>
 
 <body>
+<div class="wallet-balance">
+Current Balance: <span id="wallet-balance">₹0</span>
+</div>
 
 <div class="form-group">
-  <label>Enter Amount</label>
+  
   <p id="msg" style="color: green;"></p>
   <input type="number" id="amount" placeholder="Enter amount">
 
@@ -380,13 +383,16 @@ async function verifyPayment(response, amount) {
   const data = await res.json();
   const msg= document.getElementById("msg")
   if (data.success) {
-    
+    document.getElementById("wallet-balance").innerText = `₹${data.balance}`;
     msg.style.color="green"
     msg.innerText="Money Added to Wallet Successfully!"
-    
+    document.getElementById("wallet-balance").innerText = `₹${data.balance}`;
+      await loadWalletHistory();
+
   } else {
     msg.style.color="red"
     msg.innerText="Failed to add money in wallet"
+    
   }
 }
 
@@ -422,6 +428,31 @@ function validateAmount() {
 
   return true
 }
+
+
+async function loadWalletHistory() {
+  const res = await fetch("/wallet/net-balance");
+  const data = await res.json();
+
+  if (data.success) {
+    const container = document.getElementById("wallet-history");
+    container.innerHTML = data.history
+      .map(h => `<div>${new Date(h.date).toLocaleString()}: ${h.type === 'credit' ? '+' : '-'}₹${h.amount} (${h.reason})</div>`)
+      .join("");
+  }
+}
+
+//net balance..
+async function loadWallet() {
+  const res = await fetch("getWalletBalance")
+  const data = await res.json();
+  if (data.success) {
+   document.getElementById("wallet-balance").innerText = `₹${data.balance}`;
+   
+  }
+}
+window.onload = loadWallet;
+
 </script>
 </body>
 

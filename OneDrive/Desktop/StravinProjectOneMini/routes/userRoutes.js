@@ -25,7 +25,7 @@ import {getUserAddress , getAddAddress , addUserAddress,getEditAddress,postEditA
 import {placeOrder, getOrderSuccess,getOrderFailure,paymentFailed,retryPayment,getUserOrder,getOrderDetails, cancelOrder,returnItem,downloadInvoice,verifyPayment}
  from '../controllers/orderController.js'
 
-import { getWallet,createWalletPayment,verifyWalletPayment } from "../controllers/walletController.js";
+import { getWallet,createWalletPayment,verifyWalletPayment,getWalletNetBalance } from "../controllers/walletController.js";
 
 import { noCache } from "../middleware/no-cache.js";
 router.use(noCache)
@@ -92,6 +92,7 @@ router.post('/retryPayment/:orderId',userAuth,retryPayment)
 
 router.get('/wallet',userAuth,getWallet);
 router.post('/createWalletPayment',userAuth,createWalletPayment)
+router.get('/getwalletBalance',userAuth,getWalletNetBalance)
 router.post('/verifyWalletPayment',userAuth,verifyWalletPayment)
 
 
