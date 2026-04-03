@@ -843,12 +843,26 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
         if (verifyData.success) {
           window.location.href = `/orderSuccess/${verifyData.orderId}`;
         } else {
-          window.location.href = `/orderFailure`;
+        window.location.href = `/orderFailure/${data.orderId}`;
         }
       }
     };
 
-    const rzp = new Razorpay(options);
+  const rzp = new Razorpay(options);
+ rzp.on("payment.failed", async function(response) {
+
+  await fetch("/paymentFailed", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      orderId: data.orderId,
+      error: response.error
+    })
+  })
+
+  window.location.href = `/orderFailure/${data.orderId}`;
+})
+
     rzp.open();
   }
 

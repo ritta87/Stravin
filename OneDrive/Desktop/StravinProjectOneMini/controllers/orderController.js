@@ -434,3 +434,64 @@ export const verifyPayment = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error in payment verification" });
   }
 }
+
+
+
+export const getOrderFailure = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const order = await Order.findOne({orderId: orderId });
+
+    res.render("user/orderFailure", {
+      orderId: order?.orderId || null,
+      razorpayKey: process.env.razorpay_key_id
+})
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+}
+export const paymentFailed=async(req,res)=>{
+  const {orderId, error} = req.body;
+
+  await Order.findOneAndUpdate({orderId:orderId}, {status:"failed",
+    failureReason: error.description
+  })
+
+  res.json({success:true})
+}
+
+
+
+export const retryPayment = async(req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const order = await Order.findOne({orderId})
+
+    if (!order) {
+      return res.status(404).json({success: false,message: "Order not found"});
+    }
+
+    //prevent retry if already paid
+    if (order.status === "placed") {
+      return res.json({success: false,message: "Order already paid"});
+    }
+
+    //create new Razorpay order
+    const razorpayOrder = await razorpay.orders.create({
+      amount: order.totalAmount * 100, // paise
+      currency: "INR",
+      receipt: order.orderId
+    });
+
+    res.json({success: true,
+      orderId: order.orderId,
+      razorpay: razorpayOrder
+    })
+
+  } catch (error) {
+    console.log("Retry Payment Error:", error);
+    res.status(500).json({success: false,message:"Retry payment failed"})
+  }
+}
