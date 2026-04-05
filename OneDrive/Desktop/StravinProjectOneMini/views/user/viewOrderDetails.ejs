@@ -319,72 +319,190 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <body>
 
 <div class="container mt-4">
- <div class="container mt-4">
+
   <h3>Order Details - <%= order.orderId %></h3>
-  <p><strong>Order Total:</strong> ₹<%= order.totalAmount %></p>
+
+  <p>
+    <strong>Ordered On:</strong> 
+    <%= new Date(order.createdAt).toLocaleString() %>
+  </p>
+
+  <p><strong>Order Total:</strong> ₹<%= order.totalAmount-order.discount %></p>
   <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
- <p><strong>Shipping Address:</strong></p>
-<p>
-  <%= order.address.name %>, <%= order.address.mobile %><br>
-  <%= order.address.house %>, <%= order.address.address %>, <%= order.address.area %><br>
-  <%= order.address.city %> - <%= order.address.pincode %>, <%= order.address.state %><br>
-  <% if(order.address.landmark) { %>
-    Landmark: <%= order.address.landmark %>
-  <% } %>
-</p>
+  <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
+
+  <p><strong>Shipping Address:</strong></p>
+  <p>
+    <%= order.address.name %> -- Mobile : <%= order.address.mobile %><br>
+    <%= order.address.house %>, <%= order.address.address %>, <%= order.address.area %><br>
+    <%= order.address.city %> - <%= order.address.pincode %>, <%= order.address.state %><br>
+    <% if(order.address.landmark) { %>
+      Landmark: <%= order.address.landmark %>
+    <% } %>
+  </p>
 
   <hr>
 
-  <h5>Items:</h5>
-  <% order.items.forEach(item => { %>
-    <div class="card p-3 mb-3 shadow-sm">
-      <div class="row align-items-center">
-        <!-- Product Image -->
-        <div class="col-md-2">
-      <img src="<%= order.items[0]?.image || '/images/default.png' %>" 
-          style="width:90px; height:90px; object-fit:cover; border-radius:8px;"
-        />        </div>
+  
+<div class="row mt-4">
 
-        <!-- Product Info -->
-        <div class="col-md-6">
-          <h6><%= item.name %> - <%= item.color %></h6>
-          <p>Quantity: <%= item.quantity %></p>
-          <p>Price: ₹<%= item.price %></p>
-        </div>
+  <!-- ITEMS -->
+  <div class="col-md-8">
+    <h5>Items:</h5>
 
-        <!-- Status & Return -->
-        <div class="col-md-4 text-end">
-          <p><strong>Status:</strong>
-            <% if(item.itemStatus === 'Delivered') { %>
-              <span class="text-success"><%= item.itemStatus %></span>
-            <% } else if(item.itemStatus === 'Cancelled') { %>
-              <span class="text-danger"><%= item.itemStatus %></span>
-            <% } else { %>
-              <span class="text-primary"><%= item.itemStatus %></span>
+    <% order.items.forEach(item => { %>
+      <div class="card p-3 mb-3 shadow-sm">
+        <div class="row align-items-center">
+
+          <!-- Image -->
+          <div class="col-md-2">
+            <img 
+              src="<%= item.variant?.images?.[0] || '/images/default.png' %>" 
+              style="width:90px; height:90px; object-fit:cover; border-radius:8px;"
+            />
+          </div>
+
+          <!-- Info -->
+          <div class="col-md-10">
+            <h6>
+              <%= item.product?.productname || 'Product' %> 
+              -- <%= item.variant?.color || '' %>
+            </h6>
+
+            <p>Quantity: <%= item.quantity %></p>
+            <p>Price: ₹<%= item.price %></p>
+
+            <!-- item level status -->
+            <p><strong>Status:</strong>
+              <span class="badge 
+                <%= item.itemStatus === 'Delivered' ? 'bg-success' :
+                    item.itemStatus === 'Cancelled' ? 'bg-danger' :
+                    item.itemStatus === 'Returned' ? 'bg-secondary' :
+                    item.itemStatus === 'Out for Delivery' ? 'bg-warning text-dark' :
+                    item.itemStatus === 'Shipped' ? 'bg-info text-dark' :
+                    'bg-primary' %>">
+                <%= item.itemStatus %>
+              </span>
+            </p>
+<% if (item.return?.isRequested) { %>
+  <div style="margin-top:6px; font-size:13px; padding:6px; border-radius:6px; background:#fff3cd;">
+    <p>Return Requested: <strong><%= item.return.reason %></strong></p>
+    <p>Status: <%= item.return.status %></p>
+    <% if(item.return.status !== 'Pending' && item.return.approvalDate){ %>
+      <p>Processed on: <%= new Date(item.return.approvalDate).toLocaleString() %></p>
+    <% } %>
+    <% if(item.refundDetails){ %>
+      <p style="color:green;">✅ Refunded ₹<%= item.refundDetails.amount %> to Wallet</p>
+    <% } %>
+  </div>
+<% } %>
+
+            
+<!--return and cancel-->
+            <div class="mt-2">
+              <button 
+                class="btn btn-sm btn-danger"
+                onclick="cancelItem('<%= order.orderId %>', '<%= item._id %>')"
+                <%= (item.itemStatus === 'Delivered' || item.itemStatus === 'Cancelled' || item.itemStatus === 'Returned') ? 'disabled' : '' %>>
+                Cancel
+              </button>
+
+              <button 
+                class="btn btn-sm btn-secondary"
+                onclick="returnItem('<%= order.orderId %>', '<%= item._id %>')"
+                <%= (order.paymentMethod === 'COD' || item.itemStatus !== 'Delivered') ? 'disabled' : '' %>>
+                Return
+              </button>
+            </div>
+
+
+    <% if (item.isRefunded && item.refundDetails) { %>
+    <div style="margin-top:8px; padding:6px; background:#e6ffe6; border-radius:6px;">
+      <p style="color:green; font-size:13px; margin:0;">
+        ✅ Refunded ₹<%= item.refundDetails.amount %> to wallet
+      </p>
+      <p style="font-size:12px; margin:0;">
+        On: <%= new Date(item.refundDetails.date).toLocaleString() %>
+      </p>
+    </div>
+  <% } %>
+            <% if (order.paymentMethod === 'COD' && item.itemStatus === 'Delivered') { %>
+              <p style="color:red; font-size:12px; margin-top:5px;">
+                Return not available for Cash on Delivery orders
+              </p>
             <% } %>
-          </p>
 
-          <% if(item.itemStatus === 'Delivered') { %>
-            <% if(!item.return.isRequested) { %>
-              <button class="btn btn-warning btn-sm" onclick="requestItemReturn('<%= order._id %>','<%= item._id %>')">Request Return</button>
-            <% } else { %>
-              <p><strong>Return Requested:</strong></p>
-              <ul class="list-unstyled">
-                <li>Reason: <%= item.return.reason %></li>
-                <li>Date: <%= item.return.requestDate ? item.return.requestDate.toLocaleDateString() : '' %></li>
-                <li>Status: <%= item.return.status %></li>
+            
+            <% if (item.statusHistory && item.statusHistory.length > 0) { %>
+              <ul style="font-size: 13px; padding-left: 15px;">
+                <% item.statusHistory.forEach(s => { %>
+                  <li>
+                    <%= s.status %> - 
+                    <%= new Date(s.date).toLocaleString() %>
+                  </li>
+                <% }) %>
               </ul>
             <% } %>
-          <% } %>
 
+          </div>
         </div>
       </div>
+    <% }) %>
+  </div>
+
+  <!-- price details-->
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+
+      <h5>Price Details</h5>
+
+      <p>Subtotal: ₹<%= order.subTotal || 0 %></p>
+      <p>Tax (5%): ₹<%= order.tax || 0 %></p>
+      <p>Shipping: ₹<%= order.shipping || 0 %></p>
+
+      <% if(order.discount > 0) { %>
+        <p>Coupon (<%= order.coupon?.code || '' %>): -₹<%= order.discount %></p>
+      <% } %>
+
+      <% if(order.walletUsed > 0) { %>
+        <p>Wallet Used: -₹<%= order.walletUsed %></p>
+      <% } %>
+
+      <hr>
+
+      <!-- order status -->
+      <p><strong>Order Status:</strong>
+        <span class="badge 
+          <%= order.status === 'Delivered' ? 'bg-success' :
+              order.status === 'Cancelled' ? 'bg-danger' :
+              order.status === 'Returned' ? 'bg-secondary' :
+              order.status === 'Out for Delivery' ? 'bg-warning text-dark' :
+              order.status === 'Shipped' ? 'bg-info text-dark' :
+              'bg-primary' %>">
+          <%= order.status %>
+        </span>
+      </p>
+
+      <% if (order.statusHistory && order.statusHistory.length > 0) { %>
+        <ul style="font-size: 14px; padding-left: 15px;">
+          <% order.statusHistory.forEach(s => { %>
+            <li>
+              <%= s.status %> - 
+              <%= new Date(s.date).toLocaleString() %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+
+      <h5><strong>Total Paid: ₹<%= order.totalAmount-order.discount %></strong></h5>
+
     </div>
-  <% }) %>
+  </div>
+
 </div>
 
 <script>
-async function requestItemReturn(orderId, itemId) {
+async function returnItem(orderId, itemId) {
   const { value: reason } = await Swal.fire({
     title: 'Reason for Return',
     input: 'textarea',
@@ -400,10 +518,10 @@ async function requestItemReturn(orderId, itemId) {
   if(!reason) return;
 
   try {
-    const res = await fetch(`/returnItem/${orderId}/${itemId}`, {
+    const res = await fetch(`/return/${orderId}/${itemId}`, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ reason })
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({reason})
     });
 
     const data = await res.json();
@@ -417,6 +535,39 @@ async function requestItemReturn(orderId, itemId) {
   } catch (err) {
     console.error(err);
     Swal.fire('Error', 'Server error', 'error');
+  }
+}
+//cancel item..
+async function cancelItem(orderId, itemId) {
+  const confirm = await Swal.fire({
+    title: "Cancel Item?",
+    text: "Are you sure you want to cancel this item?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Cancel",
+    cancelButtonText: "No"
+  })
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const res = await fetch(`/cancel/${orderId}/item/${itemId}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"}
+    })
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Cancelled!", data.message,"success")
+        .then(() => location.reload());
+    } else {
+      Swal.fire("Error",data.message,"error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error","Something went wrong","error");
   }
 }
 </script>

@@ -165,6 +165,19 @@
 </form>
 </div>
 
+<form method="GET" action="/admin/orders" class="mb-3 d-flex align-items-center gap-2">
+  <label for="statusFilter">Filter by Status:</label>
+  <select name="status" id="statusFilter" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">All</option>
+    <option value="Placed" <%= statusFilter==='Placed'?'selected':'' %>>Placed</option>
+    <option value="Shipped" <%= statusFilter==='Shipped'?'selected':'' %>>Shipped</option>
+    <option value="Out for Delivery" <%= statusFilter==='Out for Delivery'?'selected':'' %>>Out for Delivery</option>
+    <option value="Delivered" <%= statusFilter==='Delivered'?'selected':'' %>>Delivered</option>
+    <option value="Cancelled" <%= statusFilter==='Cancelled'?'selected':'' %>>Cancelled</option>
+    <option value="Returned" <%= statusFilter==='Returned'?'selected':'' %>>Returned</option>
+  </select>
+</form>
+
     <header>
       <h1>Orders</h1>
     </header>

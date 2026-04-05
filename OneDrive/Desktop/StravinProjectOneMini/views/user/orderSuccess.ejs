@@ -10,26 +10,30 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+/* Order wrapper */
 .order-success-wrapper {
-  max-width: 1100px;   
-  margin: 40px auto;   
-  padding: 0 20px;     
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
 
   display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
+  gap: 20px;
+  flex-wrap: wrap; /* allows stacking on small screens */
 }
+
+/* Left section - items */
 .left-section {
   flex: 2;
-  min-width: 300px;
+  min-width: 300px; /* ensures it doesn’t shrink too much */
 }
 
+/* Right section - price/details */
 .right-section {
   flex: 1;
-  min-width: 280px;
+  min-width: 280px; /* ensures it doesn’t shrink too much */
 }
 
-/* cards */
+/* Cards inside sections */
 .success-box,
 .payment-box,
 .price-card {
@@ -37,10 +41,17 @@
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-/* buttons */
+/* Row inside cards */
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+/* Buttons */
 .view-orders-btn a {
   display: inline-block;
   margin-right: 10px;
@@ -56,7 +67,7 @@
   color: #333;
 }
 
-/* payment status */
+/* Payment status badges */
 .status {
   padding: 4px 10px;
   border-radius: 20px;
@@ -67,7 +78,7 @@
 .status.success { background: #d4edda; color: green; }
 .status.pending { background: #d1ecf1; }
 
-/* notes */
+/* Notes */
 .note {
   margin-top: 10px;
   font-size: 14px;
@@ -76,15 +87,9 @@
 .note.success { color: green; }
 .note.warning { color: #856404; }
 
-/* price section */
+/* Price section */
 .price-card h5 {
   margin-bottom: 15px;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  margin: 8px 0;
 }
 
 .discount {
@@ -107,6 +112,34 @@
   margin-top: 10px;
   color: green;
   font-size: 13px;
+}
+
+/* ------------------ Responsive ------------------ */
+
+/* Tablets: stack if width < 900px */
+@media (max-width: 900px) {
+  .order-success-wrapper {
+    flex-wrap: wrap;
+  }
+
+  .left-section,
+  .right-section {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+
+@media (max-width: 500px) {
+  .order-success-wrapper {
+    padding: 0 10px;
+  }
+
+  .success-box,
+  .payment-box,
+  .price-card {
+    padding: 15px;
+  }
 }
 </style></head>
 <body>

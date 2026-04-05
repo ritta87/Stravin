@@ -271,6 +271,36 @@ p {
   text-decoration: none;
   border-radius: 6px;
 }
+/* Prevent overflow issues globally */
+* {
+  box-sizing: border-box;
+}
+
+/* MAIN CONTAINER */
+.orders-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+/* FIX TABLE OVERFLOW */
+.orders-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* SCROLL if content is too wide */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+/* OPTIONAL: nicer table */
+.orders-container th,
+.orders-container td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
 </style>
 <header class="d-flex justify-content-between align-items-center px-4">
   <div class="brand">Stravin</div>
@@ -324,6 +354,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <%- include('../partials/breadcrumbs') %>
 
 <body>
+  <div class="orders-container">
 <form method="GET" action="/orders" class="search-bar">
   <input type="text" name="search" placeholder="Search by Order ID" 
   class="form-control" value="<%=search || '' %>">
@@ -341,15 +372,18 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
       <div>
         <h6 class="mb-1">Order ID: <%= order.orderId %></h6>
         <small class="text-muted">
-          <%= order.createdAt.toDateString() %>
+         Date : <%= order.createdAt.toDateString() %>
         </small>
-
+         <p class="mb-1">
+         Payment Method: 
+          <strong><%= order.paymentMethod %></strong>
+        </p>
         <p class="mb-1">
-          Status: 
+        Order Status: 
           <strong><%= order.status %></strong>
         </p>
 
-        <p class="mb-2">Total: ₹<%= order.totalAmount %></p>
+        <p class="mb-2">Total Amount: ₹<%= order.totalAmount - order.discount %></p>
 
         <a href="/viewOrder/<%= order.orderId %>" 
            class="view-link">
@@ -364,11 +398,12 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
           style="width:90px; height:90px; object-fit:cover; border-radius:8px;"
         />
       </div>
-
-    </div>
+      </div>
 
   </div>
 
 <% }) %>
+  </div>
+
 </body>
 </html>

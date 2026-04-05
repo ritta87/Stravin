@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
-  body {
+ body {
     font-family: Arial, sans-serif;
     background: #f5f7fa;
     margin: 0;
@@ -557,7 +557,6 @@ h2 {
   background-color: #f9f9f9;
   max-width: 400px;
 }
-
 </style>
 <header class="d-flex justify-content-between align-items-center px-4">
   <div class="brand">Stravin</div>
@@ -650,7 +649,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
     <!-- PRODUCTS -->
     <h3>Products</h3>
 
-    <% cart.items.forEach(item => { %>
+    <% cartItems.forEach(item => { %>
       <div class="product-row">
 
         <img src="<%= item.product.images[0] %>" width="60">
@@ -660,13 +659,15 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
           <p>Color: <%= item.variant.color %></p>
           <p>Qty: <%= item.quantity %></p>
           <p>₹ <%= item.price * item.quantity %></p>
-          
+       <p class="<%= item.isOutOfStock ? 'text-danger' : 'text-success' %>">
+      <%= item.isOutOfStock ? 'Out of Stock' : 'Available' %>
+    </p>
+  </div>
+<% }) %>
         </div>
 
       </div>
-    <% }) %>
-
-  </div>
+   
 
   <!-- RIGHT SIDE -->
   <div class="right">
@@ -753,7 +754,8 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
     <label class="form-check-label" for="online">Pay Online</label>
   </div>
 
-  <button type="submit" class="btn btn-primary mt-3">Place Order</button>
+  <button type="submit" class="btn btn-primary mt-3"  <%= outOfStockExists ?'disabled':'' %>>
+    Place Order</button>
 </form>
 
   </div>

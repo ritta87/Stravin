@@ -22,7 +22,7 @@ import {getUserAddress , getAddAddress , addUserAddress,getEditAddress,postEditA
  from '../controllers/addressController.js'
 
  import {getCheckoutPage} from '../controllers/checkoutController.js'
-import {placeOrder, getOrderSuccess,getOrderFailure,paymentFailed,retryPayment,getUserOrder,getOrderDetails, cancelOrder,returnItem,downloadInvoice,verifyPayment}
+import {placeOrder, getOrderSuccess,getOrderFailure,paymentFailed,retryPayment,getUserOrder,getOrderDetails, cancelItem,returnRequest,downloadInvoice,verifyPayment}
  from '../controllers/orderController.js'
 
 import { getWallet,createWalletPayment,verifyWalletPayment,getWalletNetBalance } from "../controllers/walletController.js";
@@ -83,8 +83,8 @@ router.get('/orderSuccess/:orderId',userAuth,getOrderSuccess)
 router.get('/orderFailure/:orderId',userAuth,getOrderFailure)
 router.get('/orders',userAuth,getUserOrder)
 router.get('/viewOrder/:orderId',userAuth,getOrderDetails)
-router.post('/cancelOrder/:orderId',userAuth,cancelOrder);
-router.post('/returnItem/:orderId/:itemId',userAuth,returnItem)
+router.post('/cancel/:orderId/item/:itemId',userAuth,cancelItem)
+router.post('/return/:orderId/:itemId',userAuth,returnRequest)
 router.get('/orders/:orderId/invoice',userAuth,downloadInvoice)
 router.post('/verifyPayment',userAuth,verifyPayment)
 router.post('/paymentFailed',userAuth,paymentFailed)

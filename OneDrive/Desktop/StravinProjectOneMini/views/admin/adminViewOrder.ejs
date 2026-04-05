@@ -160,85 +160,158 @@
       <li><a href="/admin/logout">Logout</a></li>
     </ul>
   </aside>
-
-  <!-- MAIN CONTENT -->
+<!-- MAIN CONTENT -->
 <div class="container mt-4">
+
+  <!-- ORDER INFO -->
   <h3>Order ID: <%= order.orderId %></h3>
-  <p><strong>User:</strong> <%= order.userId.name %> | <%= order.userId.email %></p>
-  <p><strong>Payment Method:</strong> <%= order.paymentMethod %> | <strong>Order Status:</strong> <%= order.status %></p>
+
+  <p>
+    <strong>User:</strong> <%= order.userId.name %> |
+    <%= order.userId.email %>
+  </p>
+
+  <p>
+    <strong>Payment Method:</strong> <%= order.paymentMethod %> |
+    <strong>Order Status:</strong> <%= order.status %>
+  </p>
+
   <p><strong>Total Amount:</strong> ₹<%= order.totalAmount %></p>
 
   <hr>
 
-  <h5>Items</h5>
-  <% order.items.forEach(item => { %>
-    <div class="card p-3 mb-3 shadow-sm">
-      <div class="row align-items-center">
-        <!-- Product Image -->
-        <div class="col-md-2">
-          <img src="<%= item.image %>" class="img-fluid rounded" alt="<%= item.name %>">
-        </div>
+  <!-- ITEMS -->
+<h5>Items</h5>
 
-        <!-- Product Info -->
-        <div class="col-md-4">
-          <h6><%= item.name %> - <%= item.color %></h6>
-          <p>Qty: <%= item.quantity %> | Price: ₹<%= item.price %></p>
-        </div>
+<% order.items.forEach(item => { %>
 
-        <!-- Item Status Dropdown -->
-        <div class="col-md-3">
-          <p><strong>Status:</strong> <%= item.itemStatus %></p>
+  <%
+    let currentStatus = item.itemStatus?.trim();
 
-          <% const allowedTransitions = {
-               Placed: ["Shipped","Cancelled"],
-               Shipped: ["Out for Delivery"],
-               "Out for Delivery": ["Delivered"],
-               Delivered: ["Returned"],
-               Cancelled: [],
-               Returned: []
-          }; 
-          let options = allowedTransitions[item.itemStatus] || [];
+    if(currentStatus === "Paid" || currentStatus === "Pending"){
+      currentStatus = "Placed";
+    }
 
-          // Show "Returned" if return is approved
-          if(item.return?.isRequested && item.return.status === "Approved"){
-            if(!options.includes("Returned")) options.push("Returned");
-          }
-          %>
+    const allowedTransitions = {
+      Placed: ["Shipped","Cancelled"],
+      Shipped: ["Out for Delivery"],
+      "Out for Delivery": ["Delivered"],
+      Delivered: [],
+      Cancelled: [],
+      Returned: []
+    };
 
-          <% if(options.length > 0){ %>
-          <select class="form-select mb-2" data-order="<%= order.orderId %>" data-item="<%= item._id %>" onchange="updateStatus(this)">
+    let options = allowedTransitions[currentStatus] || [];
+
+    // return ..
+    if(item.return?.isRequested && item.return.status === "Approved"){
+      options = ["Returned"];
+    }
+  %>
+<p><strong>Order Status:</strong> <%= order.status %></p>
+
+<% if (order.statusHistory && order.statusHistory.length > 0) { %>
+  <ul style="font-size: 14px; padding-left: 15px;">
+    <% order.statusHistory.forEach(s => { %>
+      <li>
+        <%= s.status %> - 
+        <%= new Date(s.date).toLocaleString() %>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+  <div class="card p-3 mb-3 shadow-sm">
+    <div class="row align-items-center">
+
+      <!-- IMAGE -->
+      <div class="col-md-2 text-center">
+        <img src="<%= item.image %>" 
+             class="img-fluid rounded" 
+             style="max-height:100px; object-fit:contain;">
+      </div>
+
+      <!-- PRODUCT INFO -->
+      <div class="col-md-4">
+        <h6><%= item.name %> - <%= item.color %></h6>
+        <p class="mb-0">Qty: <%= item.quantity %></p>
+        <p class="mb-0">Price: ₹<%= item.price %></p>
+      </div>
+      <p><strong>Status:</strong> <%= item.itemStatus %></p>
+<% if (item.isRefunded && item.refundDetails) { %>
+  <p style="color:green; font-size:13px;">
+    Refunded: ₹<%= item.refundDetails.amount %> <br>
+    Method: <%= item.refundDetails.method %> <br>
+    Date: <%= new Date(item.refundDetails.date).toLocaleString() %>
+  </p>
+<% } %>
+<% if (item.statusHistory && item.statusHistory.length > 0) { %>
+  <ul style="font-size: 13px; padding-left: 15px;">
+    <% item.statusHistory.forEach(s => { %>
+      <li>
+        <%= s.status %> - 
+        <%= new Date(s.date).toLocaleString() %>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+      <!-- status nd dropdown -->
+      <div class="col-md-3">
+        <p><strong>Status:</strong> <%= currentStatus %></p>
+
+        <% if(options.length > 0){ %>
+          <select class="form-select form-select-sm"
+            onchange="updateStatus(this)"
+            data-order="<%= order.orderId %>"
+            data-item="<%= item._id %>">
+
             <option selected disabled>Change Status</option>
+
             <% options.forEach(opt => { %>
               <option value="<%= opt %>"><%= opt %></option>
             <% }) %>
+
           </select>
-          <% } %>
-        </div>
-
-        <!-- Return Request Info -->
-        <div class="col-md-3">
-          <% if(item.return?.isRequested) { %>
-            <p><strong>Return Request:</strong></p>
-            <ul class="list-unstyled">
-              <li>Reason: <%= item.return.reason %></li>
-              <li>Date: <%= item.return.requestDate ? item.return.requestDate.toLocaleDateString() : '' %></li>
-              <li>Status: <%= item.return.status %></li>
-            </ul>
-
-            <% if(item.return.status === "Pending") { %>
-              <div class="d-flex gap-2">
-                <button class="btn btn-success btn-sm" onclick="handleReturn('<%= order.orderId %>','<%= item._id %>','Approved')">Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="handleReturn('<%= order.orderId %>','<%= item._id %>','Rejected')">Reject</button>
-              </div>
-            <% } %>
-          <% } %>
-        </div>
-
+        <% } else { %>
+          <span class="text-muted small">No actions available</span>
+        <% } %>
       </div>
-    </div>
-  <% }) %>
-</div>
 
+      <!-- return item -->
+      <div class="col-md-3">
+        <% if(item.return?.isRequested) { %>
+
+          <p class="mb-1"><strong>Return Request</strong></p>
+
+          <ul class="list-unstyled small">
+            <li><strong>Reason:</strong> <%= item.return.reason %></li>
+            <li>
+              <strong>Date:</strong> 
+              <%= item.return.requestDate ? item.return.requestDate.toLocaleDateString() : '' %>
+            </li>
+            <li><strong>Status:</strong> <%= item.return.status %></li>
+          </ul>
+
+          <% if(item.return.status === "Pending") { %>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success btn-sm"
+                onclick="handleReturn('<%= order.orderId %>','<%= item._id %>','Approved')">
+                Approve
+              </button>
+
+              <button class="btn btn-danger btn-sm"
+                onclick="handleReturn('<%= order.orderId %>','<%= item._id %>','Rejected')">
+                Reject
+              </button>
+            </div>
+          <% } %>
+
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+
+<% }) %>
 <script>
 async function updateStatus(select) {
   const orderId = select.dataset.order;

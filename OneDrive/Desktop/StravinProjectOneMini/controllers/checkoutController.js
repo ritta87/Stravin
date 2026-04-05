@@ -1,23 +1,42 @@
 import Address from '../models/addressModel.js'
 import Cart from '../models/cartModel.js'
 import Coupon from '../models/couponModel.js'
+import Variant from '../models/variantModel.js';
 export const getCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.userId;
 
     // fetch cart
-    const cart = await Cart.findOne({ userId })
+    const cart = await Cart.findOne({userId})
       .populate("items.product")
       .populate("items.variant");
 
-    if (!cart || cart.items.length === 0) {
+    if(!cart || cart.items.length === 0) {
       return res.redirect("/user/cart");
     }
+  let outOfStockExists=false
+  const cartItems = cart.items.map(item => {
+  const cartQty = item.quantity;
+  const variantStock = item.variant?.stockQuantity || 0;
 
+  const itemIsOutOfStock = cartQty > variantStock;
+
+  if (itemIsOutOfStock) outOfStockExists = true;
+
+  return {
+    ...item._doc,
+    productName: item.product.productname,
+    variantName: item.variant?.color || null,
+    price: item.variant?.additionalPrice || item.product.price,
+    quantity: cartQty,
+    stockQuantity: variantStock,
+    isOutOfStock: itemIsOutOfStock,
+  }
+})
     // fetch addresses
-    const addresses = await Address.find({ userId });
+    const addresses = await Address.find({userId});
 
-   // subtotal
+   // subTotal
 let appliedCoupon=null
 let subTotal = 0;
 cart.items.forEach((item) => {
@@ -77,6 +96,8 @@ await cart.save();
 
 res.render("user/checkout", {
   cart,
+  cartItems,
+  outOfStockExists,
   addresses,
   subTotal,
   tax,

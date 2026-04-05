@@ -17,7 +17,7 @@ import {addVariant , getVariantByProduct ,restoreVariant,unlistVariant,updateVar
 
 import {getAllCustomers , blockCustomer , unblockcustomer } from '../controllers/customerController.js'
 
-import { getAllOrders,viewOrderDetails,updateStatus, adminHandleReturn } from '../controllers/adminOrderController.js';
+import { getAllOrders,viewOrderDetails,updateStatus, handleReturnRequest } from '../controllers/adminOrderController.js';
 
 import { getCouponPage,addCoupon,addCouponPage } from '../controllers/couponController.js';
 
@@ -76,7 +76,7 @@ router.post('/customers/unblock/:id',adminAuth,unblockcustomer)
 router.get('/orders',adminAuth,getAllOrders);
 router.get('/orderDetails/:orderId',adminAuth,viewOrderDetails)
 router.put('/orderDetails/:orderId/item/:itemId/updateStatus',adminAuth,updateStatus)
-router.post('/return/:orderId/:itemId', adminAuth, adminHandleReturn);
+router.post('/return/:orderId/:itemId', adminAuth,handleReturnRequest);
 
 
 //coupon management..

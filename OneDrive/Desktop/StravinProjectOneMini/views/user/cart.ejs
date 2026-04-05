@@ -128,32 +128,45 @@ header nav a:hover {
 .user-btn:hover {
   background: #f1f1f1;
 }
-/* ===== DROPDOWN POSITION FIX ONLY ===== */
-/* FIX hover gap issue */
-.dropdown {
+ .dropdown {
   position: relative;
+  display: inline-block;
 }
 
-/* KEEP dropdown attached */
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .dropdown-menu {
-  position: absolute;
-  top: 100%;   /* remove extra gap */
-  right: 0;
-
   display: none;
-  z-index: 999;
+  position: absolute;
+  background: white;
+  list-style: none;
+  padding: 10px;
+  border: 1px solid #ddd;
+  right: 0;
+  min-width: 120px;
 }
 
-/* IMPORTANT: keep menu visible when hovering menu itself */
-.dropdown:hover .dropdown-menu,
-.dropdown-menu:hover {
-  display: block;
+.dropdown-menu li {
+  padding: 5px 0;
 }
-/* ===== DROPDOWN ITEM FEEL ONLY ===== */
-.dropdown-item {
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown:hover .dropdown-menu {
   display: block;
-  padding: 8px 14px;
-  transition: 0.2s ease;
+}  .wishlist-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
 }
 </style>
 </head>
@@ -221,12 +234,12 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
   <h2>Your Cart</h2>
 
-  <% if (cart && cart.items.length > 0) { %>
+  <% if (items && items.length > 0) { %>
 
     <% let subtotal = 0 %>
     <% let totalSavings = 0 %>
 
-    <% cart.items.forEach(item => { 
+    <% items.forEach(item => { 
 
       const price = item.price               // final price
       const basePrice = item.basePrice
@@ -258,7 +271,10 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
         <p class="text-muted">
           Color: <%= item.variant.color %>
         </p>
-
+         <p>Qty: <%= item.quantity %> / Stock: <%= item.stockQuantity %></p>
+        <p class="<%= item.isOutOfStock ? 'text-danger' : 'text-success' %>">
+          <%= item.isOutOfStock ? 'Out of Stock' : 'Available' %>
+        </p>
         <!-- PRICE -->
         <p>
           ₹ <strong><%= price %></strong>
@@ -324,9 +340,9 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <p class="text-muted small">
   🔄 7-day easy returns
 </p>
- <a href="/checkout" class="btn-checkout">
-        Proceed to Checkout
-      </a>
+<a href="/checkout" class="btn btn-primary <%= outOfStockExist ? 'disabled' : '' %>">
+  Proceed to Checkout
+</a>
 
     </div>
 

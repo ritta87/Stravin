@@ -74,7 +74,7 @@ grandTotal += finalPrice * item.quantity;
 
 cart.grandTotal = grandTotal
 cart.coupon=undefined
-cart.discountedAmount=undefined
+cart.discountAmount=undefined
 cart.finalTotal=grandTotal
   await cart.save()
   
@@ -91,12 +91,28 @@ cart.finalTotal=grandTotal
 export const getCartItems=async(req,res)=>{
   try{
   const userId=req.session.userId;
-  let cart = await Cart.findOne({userId}).populate("items.product").populate("items.variant")
-  if(!cart){
-    cart = {items:[]}
+  let cart = await Cart.findOne({userId}).populate("items.product")
+                                          .populate("items.variant")
+  if(!cart||cart.length===0){
+   return res.render('user/cart',{items:[],outOfStockExist:false})
   }
-  
-  res.render("user/cart",{cart})
+  let outOfStockExist=false
+  const items = cart.items.map(item=>{
+    let cartQty=item.quantity
+    let variantQuantity=item.variant?.stockQuantity||0;
+    let itemIsOutOfStock=cartQty>variantQuantity
+    if(itemIsOutOfStock) outOfStockExist=true;
+      return {
+        ...item._doc,
+        productName: item.product.productname,
+        variantName: item.variant?.color || null,
+        price: item.variant?.additionalPrice || item.product.price,
+        quantity: cartQty,
+        stockQuantity: variantQuantity,
+        isOutOfStock: itemIsOutOfStock,
+      }
+  })
+  res.render("user/cart",{items,outOfStockExist})
 
   }catch(error){
     console.log(error)

@@ -424,6 +424,8 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <a href="/" class="btn btn-light border">Clear</a>
 </div>
 <input type="hidden" name="search" value="<%= search %>">
+<input type="hidden" name="category" value="<%= category %>">
+
 </form>
 
 <!-- PRODUCTS -->
@@ -589,14 +591,14 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 }
 loadCategories()
 
-function applyCategoryfilter(){
-const selected = [];
- document.querySelectorAll(".catCheck:checked").forEach(cb => {
+function applyCategoryfilter() {
+  const selected = [];
+  document.querySelectorAll(".catCheck:checked").forEach(cb => {
     selected.push(cb.value);
-  });
- const query = selected.join(",");
- window.location.href = `/?category=${query}`;
-
+  })
+  const query = new URLSearchParams(window.location.search);
+  query.set("category", selected.join(","))
+  window.location.href = `/?${query.toString()}`;
 }
 //wishlist btn
 

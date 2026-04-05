@@ -19,6 +19,19 @@ const orderSchema = new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:"Variant"
         },
+  statusHistory:[{
+      status:String,
+      date:{ type: Date, default: Date.now }
+      }],
+isRefunded:{
+  type:Boolean,
+  default:false
+},
+refundDetails: {
+  amount:{ type: Number, default: 0 },
+  method:{ type: String,default: "Wallet" },
+  date:{ type: Date }
+},
         name:String,
         image:String,
         color:String,
@@ -31,14 +44,14 @@ const orderSchema = new mongoose.Schema({
           default:"Pending"
         },
 
-    return:{
-    isRequested: { type:Boolean,default:false},
-    reason: {type:String,default: ""},
-    requestDate:Date,
-    status: { 
-      type:String,
-     default:"Pending"} 
-  },
+  return: {
+  isRequested: { type: Boolean, default: false },
+  reason: { type: String, default: "" },           
+    requestDate: { type: Date, default: null },      
+  status: { type: String, default: "Pending" },   
+  adminNote: { type: String, default: "" },       
+  approvalDate: { type: Date, default: null }     
+}
  } 
 ],
 failureReason:{type:String},
@@ -59,7 +72,7 @@ paymentMethod: {
     enum:["COD","ONLINE","WALLET"],
     required:true
   },
-
+ 
   subTotal: Number,
   tax: Number,
   shipping: Number,
@@ -69,7 +82,10 @@ paymentMethod: {
     code:{type:String},
     discountAmount:{type:Number,default:0}
   },
-
+  discount: {
+  type: Number,
+  default: 0
+},
 razorpayOrderId: {type: String, default: null },
 razorpayPaymentId: {type: String, default: null },
 razorpaySignature: {type: String, default: null },
@@ -79,11 +95,22 @@ status: {
   enum: ["Pending","Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned","Partially Returned","Paid"],
   default:"Pending"
 },
+ statusHistory: [
+{
+  status: String,
+  date: { type: Date, default: Date.now }
+}
+  ],
 paymentStatus: {
   type: String,
-  enum: ["Pending","Success","Paid","Failed","Refunded"],
+  enum: ["Pending","Success","Paid","Failed","Cancelled","Refunded"],
   default: "Pending"
-}  ,
+},
+walletUsed:{
+  type:Number, default:0
+},
+
+
 createdAt:{
     type:Date,
     default:Date.now
