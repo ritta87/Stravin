@@ -19,7 +19,7 @@ import {getAllCustomers , blockCustomer , unblockcustomer } from '../controllers
 
 import { getAllOrders,viewOrderDetails,updateStatus, handleReturnRequest } from '../controllers/adminOrderController.js';
 
-import { getCouponPage,addCoupon,addCouponPage } from '../controllers/couponController.js';
+import { getCouponPage,addCoupon,addCouponPage,getEditCoupon,editCoupon,deleteCoupon} from '../controllers/couponController.js';
 
 import { noCache } from '../middleware/no-cache.js'
 router.use(noCache)
@@ -83,6 +83,10 @@ router.post('/return/:orderId/:itemId', adminAuth,handleReturnRequest);
 router.get('/coupons',adminAuth,getCouponPage)
 router.get('/addCoupon',adminAuth,addCouponPage)
 router.post('/addCoupon',adminAuth,addCoupon)
+router.get('/getEditCoupon/:id',adminAuth,getEditCoupon)
+router.post('/editCoupon/:id',adminAuth,editCoupon)
+router.delete('/deleteCoupon/:id',adminAuth,deleteCoupon)
+
 
 
 export default router;

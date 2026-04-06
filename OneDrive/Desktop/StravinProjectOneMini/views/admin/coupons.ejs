@@ -137,7 +137,7 @@
       <tbody>
         <% if (coupons.length > 0) { %>
           <% coupons.forEach(coupon => { %>
-            <tr>
+            <tr data-id="<%=coupon._id%>">
               <td><%= coupon.code %></td>
               <td><%= coupon.discountType %></td>
               <td><%= coupon.discountValue %></td>
@@ -147,9 +147,13 @@
                 <%= new Date(coupon.expiryDate).toLocaleDateString() %>
               </td>
 
+              
               <td>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-delete">Delete</button>
+          <a href="/admin/getEditCoupon/<%= coupon._id %>">
+          <button class="btn-edit">Edit</button>
+            </a>
+            <button class="btn-delete">Delete</button>
+            </td>                
               </td>
             </tr>
           <% }) %>
@@ -187,6 +191,47 @@
     })
   })
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  
+ const deleteButtons = document.querySelectorAll(".btn-delete");
+
+  deleteButtons.forEach(btn => {
+    btn.addEventListener("click", function() {
+      const row = this.closest("tr");
+      const id = row.dataset.id;
+ 
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This will permanently delete the coupon!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel"
+      }).then(async (result) => {
+        if (!result.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/admin/deleteCoupon/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            row.remove()
+            Swal.fire("Deleted!", data.message, "success");
+          } else {
+            Swal.fire("Error", data.message, "error");
+          }
+        } catch (err) {
+          Swal.fire("Error", "Something went wrong", "error");
+        }
+      })
+    })
+  })
+</script>
 </body>
 </html>
 

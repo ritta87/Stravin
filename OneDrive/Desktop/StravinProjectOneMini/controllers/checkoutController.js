@@ -56,7 +56,7 @@ if (cart.coupon && cart.coupon.code) {
   const coupon = await Coupon.findOne({
     code: cart.coupon.code.toUpperCase(),
     isActive: true,
-  });
+  })
 
   if (coupon) {
     appliedCoupon=coupon.code
@@ -75,13 +75,9 @@ if (cart.coupon && cart.coupon.code) {
 
 // final total
 discount = isNaN(discount) ? 0 : discount;
-
 const finalTotal = Math.max(0, cartTotal - discount);
-
-// save safely
 cart.discountAmount = discount;
 cart.finalTotal = finalTotal
-
 
 if (!cart.coupon && !cart.coupon.code) {
   cart.coupon = undefined;
@@ -102,10 +98,10 @@ res.render("user/checkout", {
   subTotal,
   tax,
   shipping,
-  discount,           // discount applied
-  finalTotal,         // total after discount
-  totalAmount: cartTotal, // original total before discount
-  appliedCoupon,      // coupon code
+  discount,           
+  finalTotal,         
+  totalAmount: cartTotal, 
+  appliedCoupon,      
   razorpayKey: process.env.RAZORPAY_KEY_ID,
     })
   } catch (error) {

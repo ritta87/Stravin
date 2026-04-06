@@ -301,6 +301,64 @@ p {
   text-align: left;
   border-bottom: 1px solid #eee;
 }
+/* Modern button style */
+.btn-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 15px;
+  background: #4CAF50;       /* green color */
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;     
+}
+
+.btn-custom:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+.btn-custom i {
+  margin-right: 6px;
+  font-size: 16px;
+}
+/* View Details button */
+.view-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 14px;
+  background: #2196F3;          /* blue color */
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.view-link:hover {
+  background: #1976D2;          /* darker blue on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* Optional icon inside link */
+.view-link i {
+  margin-right: 5px;
+  font-size: 15px;
+}
+.action-cell {
+  display: flex;
+  gap: 10px;          /* spacing between buttons */
+  align-items: center; /* vertically center buttons */
+  justify-content: flex-start; /* buttons start from left */
+}
 </style>
 <header class="d-flex justify-content-between align-items-center px-4">
   <div class="brand">Stravin</div>
@@ -385,11 +443,14 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 
         <p class="mb-2">Total Amount: ₹<%= order.totalAmount - order.discount %></p>
 
-        <a href="/viewOrder/<%= order.orderId %>" 
+    <div class="action-cell"> <a href="/viewOrder/<%= order.orderId %>" 
            class="view-link">
           View Details
         </a>
-      </div>
+      <a href="/orders/<%= order.orderId %>/invoice" class="btn-custom" target="_blank">
+        <i class="fa fa-file-pdf-o"></i> Download Invoice
+          </a> </div>     
+        </div>
 
       <!-- Right: Main Image -->
       <div>

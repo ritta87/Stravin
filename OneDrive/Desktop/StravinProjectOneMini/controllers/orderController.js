@@ -460,7 +460,7 @@ export const downloadInvoice = async (req, res) => {
   try {
     const {orderId} = req.params;
 
-    const order = await Order.findOne({ orderId }).populate('userId');
+    const order = await Order.findOne({orderId:orderId}).populate('userId').populate("items.product")
 
     if (!order) {
       return res.status(404).send("Order not found");
@@ -501,17 +501,36 @@ export const downloadInvoice = async (req, res) => {
 
     order.items.forEach((item, i) => {
       doc.moveDown(0.5);
-      doc.text(`${i + 1}. ${item.name}`);
+      doc.text(`${i + 1}. ${item.product?.productname}`);
       doc.text(`Qty: ${item.quantity}`);
       doc.text(`Price: ₹${item.price}`);
       doc.text(`Status: ${item.itemStatus}`);
-    });
+    if (item.statusHistory && item.statusHistory.length > 0) {
+    const latestStatus = item.statusHistory[item.statusHistory.length - 1];
+    doc.text(`Last Update: ${latestStatus.status} on ${new Date(latestStatus.date).toDateString()}`);
+    }
+  if(item.itemStatus === "Returned") {
+  if(item.isRefunded && order.paymentMethod !== "COD") {
+    doc.text(`Refunded: ₹${(item.refundDetails?.amount || 0).toFixed(2)}`);
+    doc.text(`Refund Method: ${item.refundDetails?.method || "Wallet"}`);
 
-    doc.moveDown();
-
+    if(item.refundDetails?.date){
+      doc.text(`Refund Date: ${new Date(item.refundDetails.date).toDateString()}`);
+    }
+  }else{
+    doc.text(`Refund Status: Pending`);
+  }
+}
+})
+doc.moveDown()
     doc.text(`Subtotal: ₹${order.subTotal}`);
     doc.text(`Tax: ₹${order.tax}`);
     doc.text(`Shipping: ₹${order.shipping}`);
+    // Coupon applied
+    if (order.coupon && order.coupon.code) {
+    doc.text(`Coupon Applied: ${order.coupon.code}`);
+    doc.text(`Discount: -₹${order.coupon.discountAmount || order.discount || 0}`);
+    }
     doc.text(`Order Status: ${order.status}`);
     doc.fontSize(14).text(`Total: ₹${order.totalAmount}`, { bold: true });
     doc.text(`Payment Method: ${order.paymentMethod}`);

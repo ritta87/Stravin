@@ -157,7 +157,7 @@
   </select></div>
 <div class="form-group">
   <input type="number" name="discountValue" id="discountValue"
-   min="1"  max="90" id="discountValue" placeholder="Discount Value" >
+   min="1" placeholder="Discount Value" >
     <span class="error" id="valueError"></span></div>
 <div class="form-group">
   <input type="number" name="minPurchase" id="minPurchase" min="0" placeholder="Min Purchase">
@@ -217,8 +217,6 @@ form.addEventListener("submit", async (e) => {
   const maxDiscount = Number(document.getElementById("maxDiscount").value || 0);
   const expiryDate = document.getElementById("expiryDate").value;
 
-
-
   if (!code) {
     document.getElementById("codeError").innerText = "Coupon code required";
     isValid = false;
@@ -233,7 +231,10 @@ form.addEventListener("submit", async (e) => {
     document.getElementById("discountError").innerText = "Max 90% allowed";
     isValid = false;
   }
-
+ if(discountType === "fixed" && discountValue > 10000) {
+    document.getElementById("discountError").innerText = "Maximum fixed discount exceeded";
+    isValid = false;
+}
   if (minPurchase < 0) {
     document.getElementById("minError").innerText = "Cannot be negative";
     isValid = false;
@@ -260,9 +261,9 @@ form.addEventListener("submit", async (e) => {
     "Content-Type": "application/json"
   },
     body:JSON.stringify({
-    code,
+   code,
     discountType,
-    discountValue,
+  discountValue,
     minPurchase,
     maxDiscount,
     expiryDate

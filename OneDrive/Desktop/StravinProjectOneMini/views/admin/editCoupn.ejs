@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/css/adminDashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+/* Container */
+form#editCouponForm {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px 25px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Form heading */
+form#editCouponForm h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Form groups */
+form#editCouponForm .form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inputs and selects */
+form#editCouponForm input,
+form#editCouponForm select {
+  padding: 12px 15px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+form#editCouponForm input:focus,
+form#editCouponForm select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+/* Error messages */
+form#editCouponForm .error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Submit button */
+form#editCouponForm .btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: #4CAF50;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+form#editCouponForm .btn-submit:hover {
+  background: #45a049;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  form#editCouponForm {
+    padding: 20px 15px;
+  }
+
+  form#editCouponForm input,
+  form#editCouponForm select,
+  form#editCouponForm .btn-submit {
+    font-size: 15px;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Stravin Admin</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <ul>
+          <li><a href="/admin/customers">Customers</a></li>
+          <li><a href="/admin/products">Products</a></li>
+          <li><a href="/admin/categories">Categories</a></li>
+          <li><a href="/admin/coupons">Coupons</a></li>
+          <li><a href="/admin/banners">Banners</a></li>
+          <li><a href="/admin/orders">Orders</a></li>
+          <li><a href="#" id="logoutbtn" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+     <main class="main-content">
+  <div class="container">
+    <h2>Edit Coupon</h2>
+
+    <form id="editCouponForm">
+      <div class="form-group">
+        <input type="text" id="code" name="code" value="<%= coupon.code %>" placeholder="Coupon Code" >
+        <span class="error" id="codeError"></span>
+      </div>
+
+      <div class="form-group">
+        <select id="discountType" name="discountType">
+          <option value="percentage" <%= coupon.discountType==='percentage'?'selected':'' %>>Percentage</option>
+          <option value="fixed" <%= coupon.discountType==='fixed'?'selected':'' %>>Fixed</option>
+        </select>
+        <span class="error" id="typeError"></span>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="discountValue" name="discountValue" value="<%= coupon.discountValue %>" min="1" placeholder="Discount Value" >
+        <span class="error" id="valueError"></span>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="minPurchase" name="minPurchase" value="<%= coupon.minPurchase || 0 %>" min="0" placeholder="Min Purchase">
+        <span class="error" id="minError"></span>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="maxDiscount" name="maxDiscount" value="<%= coupon.maxDiscount || 0 %>" min="0" placeholder="Max Discount">
+        <span class="error" id="maxError"></span>
+      </div>
+
+      <div class="form-group">
+        <input type="date" id="expiryDate" name="expiryDate" value="<%= coupon.expiryDate.toISOString().split('T')[0] %>" >
+        <span class="error" id="dateError"></span>
+      </div>
+
+      <button type="submit" class="btn-submit">Update Coupon</button>
+    </form>
+  </div>
+</main>
+<script>
+const form = document.getElementById("editCouponForm");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  // reset errors
+  document.querySelectorAll(".error").forEach(el => el.innerText = "");
+
+  const id = "<%= coupon._id %>"
+  if (!id) {
+    Swal.fire("Error", "Coupon ID missing","error")
+    return
+  }
+
+ try {
+  const res = await fetch(`/admin/editCoupon/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+    code: document.getElementById("code").value.trim(),
+    discountType: document.getElementById("discountType").value,
+    discountValue: Number(document.getElementById("discountValue").value),
+    minPurchase: Number(document.getElementById("minPurchase").value || 0),
+    maxDiscount: Number(document.getElementById("maxDiscount").value || 0),
+    expiryDate: document.getElementById("expiryDate").value
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Success", data.message, "success").then(() => {
+        window.location.href = "/admin/coupons";
+      });
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
+  } catch (err) {
+    console.log(err)
+    Swal.fire("Error", "Something went wrong", "error");
+  }
+})
+</script>
+</body>
+</html>

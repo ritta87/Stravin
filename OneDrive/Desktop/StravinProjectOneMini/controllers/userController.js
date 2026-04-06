@@ -305,7 +305,7 @@ export const applyCoupon = async (req, res) => {
     if (cart.coupon && cart.coupon.code === newCode) {
   return res.status(400).json({success: false,message: "This coupon is already applied"})
 }
-  
+ 
     const coupon = await Coupon.findOne({
       code: couponCode.toUpperCase(),
       isActive: true
@@ -314,7 +314,9 @@ export const applyCoupon = async (req, res) => {
     if (!coupon) {
       return res.status(400).json({success: false,message: "Invalid coupon"});
     }
-
+    if (coupon.expiryDate && coupon.expiryDate < Date.now()) {
+      return res.status(400).json({ success: false,message: "This coupon has expired!!"})
+}
   
     let subTotal = 0;
     cart.items.forEach((item) => {
