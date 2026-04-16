@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import User from '../models/userModel.js'
 const couponSchema = new mongoose.Schema({
     code:{
         type: String,
@@ -31,6 +31,16 @@ const couponSchema = new mongoose.Schema({
   isActive: {
     type:Boolean,
     default:true
-  }
+  },
+  assignedTo:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"UserModel",
+    default:null
+  },
+couponType: {
+  type:String,
+  enum:["admin", "referral"],
+  default:"admin"
+}
 },{timestamps:true})
 export default mongoose.model("Coupon",couponSchema)

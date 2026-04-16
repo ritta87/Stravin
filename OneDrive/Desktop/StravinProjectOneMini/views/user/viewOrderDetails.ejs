@@ -1,321 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<link rel="stylesheet" href="/css/navbar.css">
+<link rel="stylesheet" href="/css/pages/footer.css">
 
 <style>
-  /* ===== HEADER ===== */
-header {
-  background: #198754;
-  padding: 14px 30px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-/* ===== BRAND ===== */
-.brand {
-  font-size: 22px;
-  font-weight: bold;
-  color: #fff;
-}
-.invoice-btn {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 10px 18px;
-  background: #343a40;   /* dark professional */
-  color: #fff;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-/* hover effect */
-.invoice-btn:hover {
-  background: #212529;
-  transform: translateY(-1px);
-}
-/* ===== NAV ===== */
-.nav-bar {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-}
-
-.nav-bar a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  transition: 0.2s;
-}
-
-.nav-bar a:hover {
-  opacity: 0.8;
-}
-
-/* ===== RIGHT SECTION ===== */
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-/* ===== ICONS ===== */
-.cart-link,
-.wishlist-nav {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.cart-icon,
-.wishlist-nav i {
-  font-size: 20px;
-  color: #fff;
-}
-
-/* ===== BADGES ===== */
-.cart-count,
-.wishlist-badge {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  background: red;
-  color: #fff;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-weight: 600;
-}
-
-/* ===== USER BUTTON ===== */
-.user-btn,
-.dropdown-toggle {
-  background: #fff;
-  color: #198754;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-
-
-/* ===== DROPDOWN ===== */
-.dropdown {
-  position: relative;
-}
-
-/* dropdown menu */
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 42px;
-  right: 0;
-  background: #fff;
-  border-radius: 10px;
-  min-width: 150px;
-  padding: 8px 0;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  animation: fadeIn 0.2s ease;
-}
-
-.dropdown-menu li {
-  padding: 8px 15px;
-}
-
-.dropdown-menu a {
-  text-decoration: none;
-  color: #333;
-  font-size: 14px;
-  display: block;
-}
-
-.dropdown-menu li:hover {
-  background: #f3f3f3;
-}
-
-/* SHOW */
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-/* ===== WISHLIST ANIMATION ===== */
-.wishlist-btn i {
-  transition: 0.3s;
-}
-
-.wishlist-active i {
-  color: red;
-  transform: scale(1.2);
-}
+/* ===== CONTAINER ===== */
 .order-details-container {
-  margin-top: 20px;
-}
-.item-row {
-  gap: 15px;
-}
-/* Variant Images */
-.variant-img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
+  max-width: 1050px;
+  margin: 35px auto;
+  padding: 22px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
 }
 
-/* Item Details */
+/* ===== ITEM ROW ===== */
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid #f1f1f1;
+  transition: 0.2s ease;
+}
+
+.item-row:hover {
+  background: #fafafa;
+  border-radius: 8px;
+  padding-left: 8px;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+/* ===== PRODUCT IMAGE ===== */
+.variant-img {
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+/* ===== ITEM DETAILS ===== */
+.item-details {
+  flex: 1;
+}
+
 .item-details h6 {
+  font-size: 15px;
   font-weight: 600;
   margin-bottom: 5px;
+  color: #222;
 }
 
-/* General Buttons */
-.btn-lg,
-.btn-sm,
+.item-details p {
+  font-size: 13px;
+  color: #666;
+  margin: 2px 0;
+}
+
+/* ===== ACTION AREA ===== */
+.action-area {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* ===== BUTTON BASE ===== */
+.btn,
 .invoice-btn,
-.return-btn,
-.btn-outline-secondary,
-.btn-outline-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  border-radius: 0.4rem;
-  font-size: 0.85rem;
-  padding: 0.35rem 0.8rem;
-  min-width: auto;
-  transition: 0.2s all;
-}
-
-/* Large Buttons */
-.btn-lg {
-  font-size: 1rem;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.5rem;
-  gap: 5px;
-}
-
-/* Return Button */
 .return-btn {
-  min-width: 100px;
-  text-align: center;
-}
-.return-btn:hover {
-  transform: scale(1.05);
-}
-
-/* Back Button (Outline) */
-.btn-outline-secondary {
-  color: #6c757d;
-  border-color: #6c757d;
-}
-.btn-outline-secondary:hover {
-  background-color: #e2e6ea;
-  color: #343a40;
-}
-.invoice-btn {
-  padding: 0.25rem 0.5rem; /* slightly tighter padding */
-  font-size: 0.8rem;       /* small, compact text */
-  min-width: auto;          /* remove long default width */
-  border-radius: 0.35rem;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: 0.2s all;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
 }
 
-.invoice-btn i {
-  font-size: 0.85rem;       /* icon matches text height */
+/* ===== BUTTON HOVER FEEL ===== */
+.btn:hover,
+.invoice-btn:hover,
+.return-btn:hover {
+  transform: translateY(-1px);
 }
 
-/* Hover effect */
-.invoice-btn:hover {
-  background-color: #0b5ed7;
-  color: white;
-  transform: scale(1.05);
+/* ===== PRIMARY ===== */
+.btn-primary {
+  background: #0d6efd;
+  color: #fff;
 }
-/* Outline Primary Button */
+
+.btn-primary:hover {
+  background: #0b5ed7;
+}
+
+/* ===== OUTLINE PRIMARY ===== */
 .btn-outline-primary {
+  border: 1px solid #0d6efd;
   color: #0d6efd;
-  border-color: #0d6efd;
+  background: transparent;
 }
+
 .btn-outline-primary:hover {
-  background-color: #0d6efd;
-  color: white;
+  background: #0d6efd;
+  color: #fff;
 }
 
-/* Primary Small Button */
-.btn-primary.btn-sm {
-  background-color: #0d6efd;
-  color: white;
-}
-.btn-primary.btn-sm:hover {
-  background-color: #0b5ed7;
+/* ===== SECONDARY ===== */
+.btn-outline-secondary {
+  border: 1px solid #ced4da;
+  color: #555;
+  background: transparent;
 }
 
-/* Icons inside any button */
-.btn i {
-  font-size: 0.9rem;
+.btn-outline-secondary:hover {
+  background: #f1f3f5;
 }
-</style>
-<header class="d-flex justify-content-between align-items-center px-4">
-  <div class="brand">Stravin</div>
- <nav class="nav-bar">
-    <div class="nav-left">
 
-      <a href="/">Home</a>
-      <a href="/shop">Shop</a>
-    <a href="/cart" class="cart-link">
-     <i class="bi bi-cart3 cart-icon"></i>
-     <span id="cartCount" class="cart-count">0</span>
-      </a>
+/* ===== RETURN BUTTON ===== */
+.return-btn {
+  background: #fff3cd;
+  color: #856404;
+}
 
-      <% if (isLoggedIn) { %>
+.return-btn:hover {
+  background: #ffe69c;
+}
 
-        <div class="dropdown">
-          <button class="dropdown-toggle">
-            Hi, <%= user.name %>
-          </button>
+/* ===== INVOICE BUTTON ===== */
+.invoice-btn {
+  background: #e9f7ef;
+  color: #198754;
+}
 
-          <ul class="dropdown-menu">
-            <li>
-              <a href="/logout" class="dropdown-item">Logout</a>
-            </li>
-          </ul>
-        </div>
+.invoice-btn:hover {
+  background: #d1e7dd;
+}
 
-      <% } else { %>
-    <a href="/login">Login</a>
-<% } %>
-</div></nav>
-<script>
-  //cart count
-async function loadCartCount(){
-  try{
-    const res = await fetch('/cart/count')
-    const data = await res.json()
-    const cartEl = document.getElementById('cartCount')
-    if(cartEl){
-      cartEl.innerText = data.count
-    }
-  }catch(err){
-    console.log("Error fetching cart count",err)
+/* ===== ICON ===== */
+.btn i,
+.invoice-btn i {
+  font-size: 13px;
+}
+
+/* ===== STATUS (clean text style) ===== */
+.badge {
+  background: none !important;
+  padding: 0 !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* subtle colors */
+.bg-success { color: #198754 !important; }
+.bg-danger { color: #dc3545 !important; }
+.bg-secondary { color: #6c757d !important; }
+.bg-warning { color: #fd7e14 !important; }
+.bg-info { color: #0d6efd !important; }
+.bg-primary { color: #444 !important; }
+
+.text-dark { color: #fd7e14 !important; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .item-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .variant-img {
+    width: 100%;
+    max-width: 130px;
+    height: auto;
+  }
+
+  .action-area {
+    width: 100%;
   }
 }
-document.addEventListener("DOMContentLoaded", loadCartCount)
-</script>
-</header>
 
+</style>
+<%- include('../partials/navbar') %>
+<%-include ('../partials/breadcrumbs')%>
 <body>
 
 <div class="container mt-4">
@@ -500,7 +383,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   </div>
 
 </div>
-
+<%-include('../partials/footer')%>
 <script>
 async function returnItem(orderId, itemId) {
   const { value: reason } = await Swal.fire({

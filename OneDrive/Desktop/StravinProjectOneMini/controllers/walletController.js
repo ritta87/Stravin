@@ -12,6 +12,7 @@ export const getWallet=async(req,res)=>{
     if(!wallet){
         res.status(400).json({success:false,message:"No wallet found !"})
     }
+   
     res.render('user/wallet')
 }catch(error){
     res.status(500).json({success:false,message:"Server error at wallet loading.."})

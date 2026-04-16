@@ -1,59 +1,138 @@
-.navbar {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e5e7eb;
-}
-.navbar .nav-link,
-.navbar .navbar-brand {
-  color: #111827 !important;
-}
+/* ===== NAVBAR ===== */
 
-.navbar .nav-link:hover {
-  color: #e63946 !important; /* your red theme */
-}
-.header {
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.main-navbar {
+  width: 100%;
+  
+  border-bottom: 1px solid #eee;
   position: sticky;
   top: 0;
   z-index: 1000;
+   background: #1f2937;
+  padding: 14px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-.logo {
+.nav-container {
+  max-width: 1300px;
+  margin: auto;
+  padding: 14px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LOGO */
+.nav-logo a {
   font-size: 22px;
-  font-weight: bold;
+  font-weight: 700;
+  text-decoration: none;
+   color: #fff;
 }
 
-.nav-bar a {
-  margin: 0 10px;
+/* NAV RIGHT */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+   color: #fff;
+}
+
+/* LINKS */
+.nav-link {
+  text-decoration: none;
+   color: #fff;
+  font-size: 14px;
   font-weight: 500;
-}
-
-.cart-link {
   position: relative;
 }
 
-.cart-count {
+.nav-link:hover {
+   color: #fff;
+}
+
+/* ICON LINKS */
+.icon-link {
+  position: relative;
+  font-size: 20px;
+   color: #fff;
+}
+
+/* BADGE */
+.badge {
   position: absolute;
   top: -6px;
-  right: -8px;
-  background: #000;
+  right: -10px;
+  background: red;
   color: #fff;
   font-size: 10px;
   padding: 2px 6px;
-  border-radius: 10px;
-}
-
-.wishlist-nav {
-  position: relative;
-}
-
-.wishlist-badge {
-  position: absolute;
-  top: -5px;
-  left: 12px;
-  background: red;
-  color: white;
-  font-size: 10px;
-  padding: 2px 6px;
   border-radius: 50%;
+}
+
+/* USER DROPDOWN */
+/* Base */
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Dropdown hidden */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  min-width: 160px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  z-index: 1000;
+}
+
+/* Show class (for mobile click) */
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Desktop hover support */
+@media (hover: hover) {
+  .user-dropdown:hover .dropdown-menu {
+    display: block;
+  }
+}
+
+/* Links */
+.dropdown-menu a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-menu a:hover {
+  background: #f5f5f5;
+}
+
+
+@media (max-width: 576px) {
+  .dropdown-menu {
+    right: 10px;
+    left: auto;
+    min-width: 140px;
+  }
+}
+.logout {
+  color: red;
+}
+
+/* LOGIN BUTTON */
+.login-btn {
+  background: #000;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
 }

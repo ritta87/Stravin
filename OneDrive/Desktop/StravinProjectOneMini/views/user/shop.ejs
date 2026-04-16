@@ -8,365 +8,257 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/navbar.css">
+<link rel="stylesheet" href="/css/pages/footer.css">
+
+<script src="/js/navbar.js"></script>
 <style>
-
-    .nav-bar {
-  background-color: #222;
+  .top-filter-bar {
+  max-width: 1300px;
+  margin: 20px auto;
   padding: 10px 20px;
+
   display: flex;
-  align-items: center;
   justify-content: space-between;
-}
-.nav-bar {
-  background-color:#fff;
-}
-/* links inside navbar */
-.nav-bar a {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 15px;
-  font-weight: 500;
-}
-
-/* hover effect */
-.nav-bar a:hover {
-  color: #ff9800;
-}
-  .wishlist-nav {
-  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  position: relative;
+  gap: 20px;
 }
 
-.wishlist-nav i {
-  font-size: 18px;
-}
-
-.wishlist-badge {
-  position: absolute;
-  top: -4px;
-  left: 12px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 50px;
-  background: red;
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-}
-  .product-card{
-  background:#fff;
-  border-radius:10px;
-  padding:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
-  transition:0.2s;
-  height:100%;
-}
-.product-img{
-  width:100%;
-  height:200px;
-  object-fit:cover;
-  border-radius:8px;
-}
-.logout-btn{
-  display:none;
-}
-.product-details{
-  margin-top:10px;
-  text-align:center;
-}
-.product-details span{
-  display:block;
-}
-
-.discount-price{
-  font-size:18px;
-  font-weight:700;
-  color:#d32f2f;
-}
-.product-info{
-  padding:10px;
-  text-align:center;
-}
-
-.wishlist-btn{
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 8px 0;
-  cursor: pointer;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.wishlist-btn i {
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.wishlist-active i {
-  color: red;
-  transform: scale(1.2);
-}
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-toggle {
-  background: none;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background: white;
-  list-style: none;
+/* SEARCH */
+.filter-left input {
+  width: 260px;
   padding: 10px;
   border: 1px solid #ddd;
-  right: 0;
-  min-width: 120px;
+  border-radius: 6px;
 }
 
-.dropdown-menu li {
-  padding: 5px 0;
+/* RIGHT */
+.filter-right select {
+  padding: 10px 35px 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+
+  appearance: none; /* remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  transition: 0.2s;
 }
 
-.dropdown-menu a {
-  text-decoration: none;
-  color: black;
+/* Hover / Focus */
+.filter-right select:hover {
+  border-color: #000;
 }
 
-.dropdown:hover .dropdown-menu {
-  display: block;
+.filter-right select:focus {
+  outline: none;
+  border-color: #000;
 }
-.original-price{
-  font-size:14px;
-  color:#777;
-  text-decoration:line-through;
-}
-.cart-link{
+
+/* Custom arrow */
+.filter-right {
   position: relative;
-  display: inline-block;
 }
 
+.filter-right::after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  font-size: 12px;
+  color: #555;
+}
+.filter-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 
-.cart-icon{
-  font-size: 22px;
-  color: #000;   /* black icon */
+  display: flex;
+  flex-direction: column;
 }
-.cart-count{
-  position:absolute;
-  top:-6px;
-  right:-8px;
-  background:#000;
-  color:#fff;
-  font-size:10px;
-  padding:2px 6px;
-  border-radius:10px;
-  font-weight:600;
+
+/* CATEGORY LIST */
+#categories {
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 15px; /* ⬅️ space before button */
 }
-.col-md-4{
-  display:flex;
+
+/* APPLY BUTTON */
+.filter-box .btn {
+  margin-top: 10px;   
+  padding: 10px;      
+  font-weight: 600;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  border: none;
+  transition: 0.2s;
 }
-.filter-box{
-  background:#fff;
-  padding:18px;
-  border-radius:10px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+
+.filter-box .btn:hover {
+  background: #333;
 }
-.filter-box h5{
-  font-weight:600;
-  margin-bottom:12px;
-  border-bottom:1px solid #eee;
-  padding-bottom:6px;
+/* BUTTONS */
+.apply-btn {
+  background: #000;
+  color: #fff;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 6px;
 }
-.filter-bar{
+.clear-btn {
+  margin-top: 10px;
+  display: block;
+  text-align: center;
+
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+
+  text-decoration: none;
+  font-size: 14px;
+  color: #333;
+  background: #f9f9f9;
+
+  transition: 0.2s;
+}
+
+.clear-btn:hover {
+  background: #eee;
+  border-color: #bbb;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* PRODUCT COLUMN */
+.col-md-4 {
+  display: flex;
+}
+.product-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  width: 100%;
+
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* IMAGE */
+.product-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 10px;
+  padding: 10px;
+  object-fit: contain;   /* instead of cover */
+  background: #fff;
+
+}
+
+/* INFO */
+.product-info h6 {
+  font-weight: 600;
+  margin-top: 10px;
+}
+.product-card:hover .product-img {
+  transform: scale(1.05);
+}
+
+.product-img {
+  transition: 0.3s ease;
+}
+
+/* PRICE */
+.discount-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #d32f2f;
+}
+
+.original-price {
+  font-size: 14px;
+  color: #888;
+  text-decoration: line-through;
+}
+
+/* BADGE */
+.badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.filter-box {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.filter-box h5 {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+#categories {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+#categories div {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.pagination-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+  margin: 30px 0;
 }
 
-.filter-right{
+.custom-pagination {
   display: flex;
-  gap: 10px;
-  align-items: center;
-}#categories{
-  max-height:260px;
-  overflow-y:auto;
-  margin-bottom:12px;
-}
-#categories div{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:4px 0;
-  font-size:14px;
-}.catCheck{
-  width:16px;
-  height:16px;
-  cursor:pointer;
-}.filter-box .btn{
-  width:100%;
-  background:#ff9800;
-  border:none;
-  color:white;
-  font-weight:600;
-  padding:8px;
-  border-radius:6px;
+  list-style: none;
+  gap: 8px;
+  padding: 0;
 }
 
-.filter-box .btn:hover{
-  background:#e68900;
-}
-/* USER BUTTON */
-.user-btn{
-background:#222;
-color:#fff;
-border:none;
-padding:6px 12px;
-border-radius:6px;
-font-size:14px;
-cursor:pointer;
-}
-
-.user-btn:hover{
-background:#000;
-}
-
-.dropdown-item{
+.custom-pagination li a {
   display: block;
-  padding: 8px 16px;
-  font-size: 14px;
-  color: #d32f2f;
-  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  transition: background 0.2s ease;
+  text-decoration: none;
+  color: #333;
 }
 
-.dropdown-item:hover{
-  background-color: #f8f9fa;
-  color: #b71c1c;
-}
-.carousel-item img{
-    height: 450px;
-    object-fit: cover;
+.custom-pagination li.active a {
+  background: #000;
+  color: #fff;
+  border-color: #000;
 }
 
-.carousel-caption{
-    background: rgba(0,0,0,0.4);
-    padding: 15px;
-    border-radius: 10px;
-}
-
-.carousel-caption h3{
-    font-weight: bold;
-}
-
-.carousel-caption p{
-    font-size: 18px;
-}
-.carousel-item{
-  height: 450px;
-}
-
-.carousel-item img{
-  width:100%;
-  height:500px;
-  object-fit:cover;
+.custom-pagination li a:hover {
+  background: #f5f5f5;
 }
 </style>
-</head>
+<%- include('../partials/navbar') %>
 
-<body>
-
-<header class="header">
-  <div class="logo">Stravin</div>
-
-  <!-- SEARCH FORM -->
-  <form class="navbar-search d-flex" method="GET" action="/">
-    <input
-      class="form-control me-2"
-      type="search"
-      name="search"
-      placeholder="Search smartwatches..."
-      value="<%= typeof search !== 'undefined' ? search : '' %>">
-    <button class="btn btn-dark">Search</button>
-  </form>
-
- <nav class="nav-bar">
-  <div class="nav-left">
-    <a href="/">Home</a>
-    <a href="/shop">Shop</a>
-  </div>
-
-  <div class="nav-right">
-    <a href="/cart" class="cart-link">
-      <i class="bi bi-cart3 cart-icon"></i>
-      <span id="cartCount" class="cart-count">0</span>
-    </a>
-
-    <a href="/wishlist" class="wishlist-nav">
-      <i class="bi bi-heart"></i>
-    </a>
-  
-
-  
-    <a href="/wishlist" class="nav-link wishlist-nav position-relative">
-      <i class="bi bi-heart"></i>
-      <span class="ms-1"></span>
-    </a>
-  
-      <% if (isLoggedIn) { %>
-
-        <div class="dropdown">
-          <button class="dropdown-toggle">
-            Hi, <%= user.name %>
-          </button>
-
-          <ul class="dropdown-menu">
-            <li><a href="/profile" class="dropdown-item>">Profile</a></li>
-            <li><a href="/logout" class="dropdown-item">Logout</a></li>
-            <li><a href="/orders" class="dropdown-item">My Orders</a></li>
-          </ul>
-        </div>
-
-      <% } else { %>
-        <a href="/login">Login</a>
-      <% } %>
-
-    </div>
-  </nav>
-<script>
-  //cart count
-async function loadCartCount(){
-  try{
-    const res = await fetch('/cart/count')
-    const data = await res.json()
-    const cartEl = document.getElementById('cartCount')
-    if(cartEl){
-      cartEl.innerText = data.count
-    }
-  }catch(err){
-    console.log("Error fetching cart count",err)
-  }
-}
-
-document.addEventListener("DOMContentLoaded", loadCartCount)
-</script>
-
-</header>
-<%-include ('../partials/breadcrumbs')%>
   <!-- HERO -->
 <div id="stravinCarousel" class="carousel slide" data-bs-ride="carousel">
 
@@ -381,7 +273,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   <div class="carousel-inner">
 
     <div class="carousel-item active">
-      <img src="/images/runmode.jpg" class="d-block w-100" alt="Smartwatch Banner">
+      <img src="/images/large-pic.jpg" class="d-block w-100" alt="Smartwatch Banner">
       <div class="carousel-caption">
         <h3>Stravin Smartwatch</h3>
         <p>Track your fitness with style</p>
@@ -389,7 +281,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
     </div>
 
     <div class="carousel-item">
-      <img src="/images/smartwach-mainpic.jpg" class="d-block w-100" alt="Garmin Watch">
+      <img src="/images/OIP.jpeg" class="d-block w-100" alt="Garmin Watch">
       <div class="carousel-caption">
         <h3>Premium Sports Watches</h3>
         <p>Performance meets technology</p>
@@ -416,29 +308,6 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   </button>
 
 </div>
-
-
-
-<form method="GET" action="/" class="filter-bar">
-
-   <div class="filter-right">
-    <select name="sort">
-      <option value="">Sort</option>
-      <option value="priceLow" <%= sort === 'priceLow' ? 'selected' : '' %>>
-        Price: Low → High
-      </option>
-      <option value="priceHigh" <%= sort === 'priceHigh' ? 'selected' : '' %>>
-        Price: High → Low
-      </option>
-      <option value="name" <%= sort === 'name' ? 'selected' : '' %>>
-        Name A–Z
-      </option>
-    </select>
-<button type="submit">Apply</button>
-<a href="/" class="btn btn-light border">Clear</a>
-</div>
-<input type="hidden" name="search" value="<%= search %>">
-</form>
 
 <!-- PRODUCTS -->
 <!-- PRODUCTS SECTION -->
@@ -544,13 +413,7 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
   </ul>
 </div>
 
-
-
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>© 2026 Stravin Smartwatch Store</p>
-  </footer>
+<%-include('../partials/footer')%>
 
 <script>
   function swapImage(productId, thumbEl) {

@@ -4,6 +4,7 @@ import { sendOtpEmail } from "../utils/sendOtp.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Cart from '../models/cartModel.js'
+import {generatereferralCoupon ,generatereferralCode} from "../helper/referralHelper.js";
 
 // get signup page..
 export const getSignupPage = (req, res) => {
@@ -19,8 +20,9 @@ res.render('user/verifyOtp')
 //post input , user signup..to otp verification
 export const userSignup = async(req,res)=>{
   try{
-    const {name,email,mobile,password,confirmpassword} = req.body
-    if(!name||!email||!mobile||!password||!confirmpassword){
+    let {name,email,mobile,password,confirmpassword,refferalCode} = req.body||{}
+
+ if(!name||!email||!mobile||!password||!confirmpassword){
       return  res.status(400).json({success: false,
         message: "All fields are required!",
       })
@@ -40,13 +42,29 @@ export const userSignup = async(req,res)=>{
       return  res.status(400).json({
         success: false,
         message: "Mobile number already exists!",
-      });
+      })
     }
-const hashedPassword = await bcrypt.hash(password,10);
+  let referrer=null;
+ refferalCode=typeof refferalCode==="string" ? refferalCode.trim():""
+    if(refferalCode!==""){
+      referrer= await User.findOne({refferalCode:refferalCode.trim().toUpperCase()})
+    
+    if(!referrer){
+      return res.status(400).json({success:false,message:"Invalid referral Code!"})
+    }
+  }
+  const myReferralCode = generatereferralCode(name)
 
-    const user = await User.create({
-      name,email,mobile,password:hashedPassword
+console.log(referrer)
+const hashedPassword = await bcrypt.hash(password,10);
+ const user = await User.create({
+      name,email,mobile,password:hashedPassword,
+      refferalCode : myReferralCode,
+      refferedBy: referrer ? referrer._id :null,
+      createdByReferral: !!referrer,
+      referralRewardGiven:false
     })
+ console.log(user) 
     // create otp..
     const otp = Math.floor(100000+Math.random()*900000).toString()  // 6 digit otp
     user.otp = otp
@@ -57,8 +75,8 @@ const hashedPassword = await bcrypt.hash(password,10);
 
     //store userId in session,
     req.session.userId=user._id;
-    req.session.cookie.maxAge=5*60*10000
-    res.status(200).json({
+req.session.cookie.maxAge = 5 * 60 * 1000;
+   res.status(200).json({
       success: true,
       message: "Signup successful! OTP sent to your Email!",
       redirect:"/verifyOtp"
@@ -93,7 +111,14 @@ export const verifyOtp = async(req,res)=>{
     }
     user.isVerified = true
     user.otp = null
-    user.otpExpires = null
+    user.otpExpires = null;
+
+if(user.refferedBy && !user.referralRewardGiven){
+  await generatereferralCoupon(user.refferedBy)
+  user.referralRewardGiven=true;
+ 
+}
+
     await user.save()
     req.session.userId=null //user saved, clear session.
     res.json({success:true,message:"OTP verified successfully!"})
@@ -122,6 +147,7 @@ const otpExpires = Date.now()+1*60*1000 // 1min.
 
 user.otp=newOtp
 user.otpExpires=otpExpires
+
 await user.save()
 //send otp email
 await sendOtpEmail(user.email,newOtp)

@@ -1,326 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title></title>
+  <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet" href="/css/navbar.css">
+<link rel="stylesheet" href="/css/pages/footer.css">
+
+<script src="/js/navbar.js"></script>
 
 <style>
-  
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f7fa;
-  padding: 30px;
+/* ===== Wallet Page Area Only ===== */
+.wallet-page {
+  max-width: 1100px;
+  margin: 35px auto 50px;
+  padding: 0 20px;
 }
 
+.wallet-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* ===== Breadcrumb inside wallet area ===== */
+.wallet-breadcrumb {
+  margin-bottom: 18px;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.wallet-breadcrumb a {
+  color: #198754;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.wallet-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Title ===== */
+.wallet-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+/* ===== Balance Card ===== */
+.wallet-balance-box {
+  background: linear-gradient(135deg, #198754, #146c43);
+  border-radius: 18px;
+  padding: 24px 26px;
+  color: #fff;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 28px rgba(25, 135, 84, 0.2);
+}
+
+.wallet-balance-box p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.wallet-balance-box h2 {
+  margin: 8px 0 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ===== Add Money Section ===== */
+.wallet-form-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 28px;
+}
+
+.wallet-form-box h3 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  color: #1e293b;
+  font-weight: 700;
+}
 
 .form-group {
-  max-width: 350px;
-  margin-bottom: 15px;
+  max-width: 420px;
+  margin-bottom: 14px;
 }
 
-/* 🏷 Label */
 .form-group label {
   display: block;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 6px;
+  color: #334155;
 }
 
-/* 🔢 Input */
 #amount {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: 0.3s;
+  padding: 13px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 15px;
+  background: #fff;
+  transition: all 0.25s ease;
 }
 
 #amount:focus {
-  border-color: #007bff;
+  border-color: #198754;
   outline: none;
-  box-shadow: 0 0 5px rgba(0,123,255,0.3);
+  box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.12);
 }
 
-
-
-/* 🔘 Button */
-button {
-  background: linear-gradient(135deg, #007bff, #0056d2);
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: linear-gradient(135deg, #0056d2, #003f9a);
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-/* 📊 Table Title */
-h3 {
-  margin-top: 40px;
-  margin-bottom: 15px;
-}
-
-/* 📋 Table Styling */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-/* Header */
-table th {
-  background: #007bff;
-  color: white;
-  padding: 12px;
-  text-align: left;
-  font-size: 14px;
-}
-
-/* Rows */
-table td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-}
-
-/* Alternate rows */
-table tr:nth-child(even) {
-  background: #f9fbfd;
-}
-
-/* Hover effect */
-table tr:hover {
-  background: #eef4ff;
-  transition: 0.2s;
-}
-    header {
-      background-color: #198754;
-      padding: 15px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    header .brand { font-weight:700; font-size:1.7rem; color:#fff; }
-    header nav a { color:#fff; font-weight:500; margin-left:25px; transition:color 0.2s;}
-    header nav a:hover { color:#e0e0e0; }
-    header nav {gap: 28px;}
-    /* BACK LINK */
-    .back-link { display:inline-block; margin-bottom:20px; font-weight:500; color:#198754; }
-    .back-link:hover { text-decoration:underline; }
-.disabled-variant{
-  opacity:0.5;
-  pointer-events:none;
-}
-   
-
-
-    .btn-action {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-toggle {
-  background: none;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background: white;
-  list-style: none;
-  padding: 10px;
-  border: 1px solid #ddd;
-  right: 0;
-  min-width: 120px;
-}
-
-.dropdown-menu li {
-  padding: 5px 0;
-}
-
-.dropdown-menu a {
-  text-decoration: none;
-  color: black;
-}
-
-.dropdown:hover .dropdown-menu {
-  display: block;
-}  .wishlist-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-}
-
-.cart-link,
-.wishlist-nav {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.wallet-btn,
+.wallet-form-box button,
+button[type="submit"] {
+  background: linear-gradient(135deg, #198754, #157347);
   color: #fff;
-}
-
-.cart-link i,
-.wishlist-nav i {
-  font-size: 18px;
-}
-
-.cart-count,
-.wishlist-badge {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 50px;
-  background: red;
-  color: #fff;
-  font-size: 10px;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 15px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #198754;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 18px rgba(25, 135, 84, 0.18);
 }
 
-
-
-  
- 
-.logout-btn{
-  display:none;
+.wallet-btn:hover,
+.wallet-form-box button:hover,
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px rgba(25, 135, 84, 0.24);
 }
 
+.wallet-btn:active,
+.wallet-form-box button:active,
+button[type="submit"]:active {
+  transform: scale(0.98);
+}
 
+/* ===== Error ===== */
 .error-msg {
-  color: red;
-  font-size: 13px;
   display: block;
-  margin-top: 4px;
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 13px;
 }
 
 input.error {
-  border: 1px solid red;
+  border: 1px solid #dc2626 !important;
+  background: #fff7f7;
 }
-</style>
-<header class="d-flex justify-content-between align-items-center px-4">
-  <div class="brand">Stravin</div>
- <nav class="nav-bar">
-    <div class="nav-left">
 
-      <a href="/">Home</a>
-      <a href="/shop">Shop</a>
-    <a href="/cart" class="cart-link">
-     <i class="bi bi-cart3 cart-icon"></i>
-     <span id="cartCount" class="cart-count">0</span>
-      </a>
+/* ===== Wallet History ===== */
+.wallet-history-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 16px;
+}
 
-      <% if (isLoggedIn) { %>
+.wallet-table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
 
-        <div class="dropdown">
-          <button class="dropdown-toggle">
-            Hi, <%= user.name %>
-          </button>
+.wallet-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
 
-          <ul class="dropdown-menu">
-             <li>
-              <a href="/profile" class="dropdown-item">Profile</a>
-            </li>
-             <li>
-              <a href="/orders" class="dropdown-item">My Orders</a>
-            </li>
-             <li>
-              <a href="/logout" class="dropdown-item">Logout</a>
-            </li>
-          </ul>
-        </div>
+.wallet-table th {
+  background: #1e293b;
+  color: #fff;
+  padding: 15px 18px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+}
 
-      <% } else { %>
-    <a href="/login">Login</a>
-<% } %>
-</div></nav>
-<script>
-  //cart count
-async function loadCartCount(){
-  try{
-    const res = await fetch('/cart/count')
-    const data = await res.json()
-    const cartEl = document.getElementById('cartCount')
-    if(cartEl){
-      cartEl.innerText = data.count
-    }
-  }catch(err){
-    console.log("Error fetching cart count",err)
+.wallet-table td {
+  padding: 15px 18px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #334155;
+}
+
+.wallet-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.wallet-table tr:hover {
+  background: #eefbf3;
+  transition: background 0.2s ease;
+}
+
+/* ===== Empty row / empty history ===== */
+.wallet-empty {
+  text-align: center;
+  padding: 22px;
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* ===== Status badges ===== */
+.status-credit,
+.status-added,
+.status-success {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-debit,
+.status-spent,
+.status-failed {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .wallet-page {
+    margin: 24px auto 35px;
+    padding: 0 14px;
+  }
+
+  .wallet-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .wallet-title {
+    font-size: 1.6rem;
+  }
+
+  .wallet-balance-box {
+    padding: 18px;
+  }
+
+  .wallet-balance-box h2 {
+    font-size: 1.6rem;
+  }
+
+  .wallet-form-box {
+    padding: 16px;
+  }
+
+  .form-group {
+    max-width: 100%;
+  }
+
+  .wallet-history-title {
+    font-size: 1.25rem;
+  }
+
+  .wallet-table th,
+  .wallet-table td {
+    padding: 12px 14px;
+    font-size: 13px;
   }
 }
-document.addEventListener("DOMContentLoaded", loadCartCount)
-</script>
-</header>
-<%- include('../partials/breadcrumbs') %>
-
+</style>
+<%- include('../partials/navbar') %>
+<%-include ('../partials/breadcrumbs')%></head>
 <body>
-<div class="wallet-balance">
-Current Balance: <span id="wallet-balance">₹0</span>
+<div class="wallet-page">
+  <div class="wallet-card">
+    
+    <div class="wallet-balance">
+      <p>Current Balance</p>
+      <span id="wallet-balance">₹0</span>
+    </div>
+
+    <div class="wallet-form-box">
+      <h3>Add Money</h3>
+
+      <div class="form-group">
+        <p id="msg" class="wallet-msg"></p>
+
+        <input type="number" id="amount" placeholder="Enter amount">
+        <small class="error-msg" id="amountError"></small>
+      </div>
+
+      <button class="wallet-btn" onclick="addMoney()">Add Money</button>
+    </div>
+
+    <h3 class="wallet-history-title">Wallet History</h3>
+
+    <div class="wallet-table-wrapper">
+      <table class="wallet-table">
+        <thead>
+          <tr>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Reason</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (user.walletHistory.length > 0) { %>
+            <% user.walletHistory.forEach(item => { %>
+              <tr>
+                <td>₹<%= item.amount %></td>
+                <td>
+                  <span class="<%= item.type === 'credit' ? 'status-credit' : 'status-debit' %>">
+                    <%= item.type %>
+                  </span>
+                </td>
+                <td><%= item.reason %></td>
+                <td><%= item.date.toDateString() %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" class="wallet-empty">No wallet history available yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 </div>
-
-<div class="form-group">
-  
-  <p id="msg" style="color: green;"></p>
-  <input type="number" id="amount" placeholder="Enter amount">
-
-  <small class="error-msg" id="amountError"></small>
-
-<button onclick="addMoney()">Add Money</button></div>
-
-<h3>Wallet History</h3>
-
-<table border="1">
-  <tr>
-    <th>Amount</th>
-    <th>Type</th>
-    <th>Reason</th>
-    <th>Date</th>
-  </tr>
-
-  <% user.walletHistory.forEach(item => { %>
-    <tr>
-      <td>₹<%= item.amount %></td>
-      <td><%= item.type %></td>
-      <td><%= item.reason %></td>
-      <td><%= item.date.toDateString() %></td>
-    </tr>
-  <% }) %>
-</table>
-
+<%-include('../partials/footer')%>
 
 <script>
 function openRazorpay(order, amount) {

@@ -40,7 +40,11 @@ export const addVariant = async (req,res)=>{
     if(imagePaths.length===0){
       return res.json({success:false,message:"Images required"})
     }
-
+    const allowesTypes=['image/jpeg','image/png','image/jpg']
+    const isvalid=req.files.every(file=>allowesTypes.includes(file.mimetype))
+    if(!isvalid){
+      return res.json({success:false,message:"Only images are allowed!"})
+    }
     await Variant.create({
       product:product._id,
       category:product.category,

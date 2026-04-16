@@ -1,59 +1,45 @@
-<header class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
-  <div class="container">
+<header class="main-navbar">
+  <div class="nav-container">
 
     <!-- LOGO -->
-    <a class="navbar-brand fw-bold" href="/">Stravin</a>
+    <div class="nav-logo">
+      <a href="/">Stravin</a>
+    </div>
 
-    <!-- TOGGLE BUTTON (mobile) -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- NAV LINKS -->
+    <div class="nav-actions">
 
-    <!-- NAV CONTENT -->
-    <div class="collapse navbar-collapse justify-content-between" id="navBar">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/shop" class="nav-link">Shop</a>
 
-      <!-- LEFT -->
-      <div class="navbar-nav">
-        <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/shop">Shop</a>
-      </div>
+      <!-- CART -->
+      <a href="/cart" class="icon-link">
+        <i class="bi bi-cart3"></i>
+        <span id="cartCount" class="badge">0</span>
+      </a>
 
-      <!-- SEARCH -->
-      <form class="d-flex my-2 my-lg-0">
-        <input class="form-control me-2" type="search" placeholder="Search...">
-        <button class="btn btn-dark">Search</button>
-      </form>
+      <!-- WISHLIST -->
+      <a href="/wishlist" class="icon-link">
+        <i class="bi bi-heart"></i>
+      </a>
 
-      <!-- RIGHT -->
-      <div class="d-flex align-items-center gap-3">
+      <!-- USER -->
+      <% if (isLoggedIn) { %>
+        <div class="user-dropdown">
+          <span>Hi, <%= user.name %> <i class="bi bi-chevron-down"></i></span>
 
-        <a href="/cart" class="position-relative">
-          <i class="bi bi-cart3 fs-5"></i>
-          <span id="cartCount" class="badge bg-dark position-absolute top-0 start-100 translate-middle">0</span>
-        </a>
-
-        <a href="/wishlist">
-          <i class="bi bi-heart fs-5"></i>
-        </a>
-
-        <% if (isLoggedIn) { %>
-          <div class="dropdown">
-            <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
-              <%= user.name %>
-            </button>
-
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a href="/profile" class="dropdown-item">Profile</a></li>
-              <li><a href="/orders" class="dropdown-item">Orders</a></li>
-              <li><a href="/logout" class="dropdown-item text-danger">Logout</a></li>
-            </ul>
+          <div class="dropdown-menu">
+            <a href="/profile">Profile</a>
+            <a href="/orders">Orders</a>
+            <a href="/wallet">Wallet</a>
+            <a href="/logout" class="logout">Logout</a>
           </div>
-        <% } else { %>
-          <a href="/login" class="btn btn-dark">Login</a>
-        <% } %>
-
-      </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-btn">Login</a>
+      <% } %>
 
     </div>
+
   </div>
 </header>

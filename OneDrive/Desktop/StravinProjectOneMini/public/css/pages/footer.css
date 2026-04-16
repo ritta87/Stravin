@@ -1,0 +1,52 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.main-footer {
+    background: #000;
+  color: #fff;
+
+  margin: 60px 20px 0;   /* ⬅️ left & right gap added */
+  border-radius: 10px;   /* optional: nice rounded look */
+}
+
+.footer-container {
+   max-width: 1100px;   /* reduce from 1300px */
+  margin: 0 auto;      /* centers it */
+  padding: 40px 10px;  /* reduce side padding */
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px;
+}
+
+.footer-col h3,
+.footer-col h4 {
+  margin-bottom: 12px;
+}
+
+.footer-col p {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.footer-col a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.footer-col a:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #222;
+  font-size: 14px;
+  color: #aaa;
+}

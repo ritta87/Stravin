@@ -64,9 +64,27 @@ const userSchema=new mongoose.Schema({
       default: Date.now
     }
   }
-]
+],
+
+refferalCode:{
+  type:String,
+  unique:true
 },
-  { timestamps: true }
-)
+refferedBy:{
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"UserModel",
+  default:null
+},
+createdByReferral: {
+  type: Boolean,
+  default: false
+},
+referralRewardGiven:{
+  type:Boolean,
+  default:false
+}
+},
+{ timestamps: true })
+
 const User = mongoose.model('UserModel',userSchema)
 export default User;

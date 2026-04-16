@@ -135,7 +135,7 @@
                   <span id="confirmpasswordError" class="text-danger small"></span>
               </div>
 
-           
+    <input type="text" name="refferalCode" id="refferalCode" placeholder="Referral Code (optional)">
         <button type="submit" class="btn btn-primary w-100">Signup</button>
               <p class="text-center mt-3">
             Already have an account?
@@ -148,104 +148,114 @@
     </div>
   </div>
 <script>
-document.getElementById("signupForm").addEventListener("submit", async function (e) {
-    e.preventDefault(); 
 
-    clearErrors(); 
+const passwordInput = document.getElementById("password");
+const passwordMessage = document.getElementById("passwordMessage");
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const mobile = document.getElementById("mobile").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const confirmpassword = document.getElementById("confirmpassword").value.trim();
+passwordInput.addEventListener("input", () => {
+  const password = passwordInput.value;
 
-    let valid = true;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasLength = password.length >= 6;
 
-    if (!/^[A-Za-z ]+$/.test(name)) {
-        showError("nameError", "Enter a valid name!Name must contain only letters")
-        valid = false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showError("emailError", "Enter a valid email.")
-        valid = false;
-    }
-    if (!/^\d{10}$/.test(mobile)) {
-        showError("mobileError", "Mobile number must be 10 digits.")
-        valid = false;
-    }
-    if (!/^(?=.*[A-Za-z])(?=.*\d).{6,}$/.test(password) ) {
-        showError("passwordError", "Password must be at least 6 characters and contain letters & numbers.")
-        valid = false;
-    }
-    if (password !== confirmpassword) {
-        showError("confirmpasswordError", "Passwords do not match!")
-        valid = false;
-    }
-    const passwordInput = document.getElementById('password')
-    const passwordMessage=document.getElementById('passwordMessage')
-    passwordInput.addEventListener('input',()=>{
-      const password=passwordInput.value;
-
-      const hasUpper=/[A-Z]/.test(password)
-      const hasNumber=/\d/.test(password)
-      const hasLength=password.length>=6
-      if(!hasUpper||!hasLength||!hasNumber){
-        passwordMessage.classList.remove('text-success')
-        passwordMessage.classList.add('text-danger')
-        passwordMessage.innerHTML=`Password must include :
-        <br>.Minimum 6 characters
-        <br>.Atleast 1 Uppercase letter
-        <br>.Atleast 1 number
-        `;
-      }
-      else{
-        passwordMessage.classList.remove('text-danger')
-        passwordMessage.classList.remove('text-success')
-        passwordMessage.innerHTML="Strong Password ✔"
-      }
-    })
-    if (!valid) return;
-    try {
-        const response = await fetch("/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                name,
-                email,
-                mobile,
-                password,
-                confirmpassword,
-            }),
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            Swal.fire({
-                icon: "success",
-                title: "Signup Successful!",
-                text: result.message,
-            })
-            setTimeout(()=>{
-              window.location.href='/verifyOtp'
-            },1500)
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Signup Failed",
-                text: result.message,
-            });
-        }
-
-    } catch (error) {
-        Swal.fire({
-            icon: "error",
-            title: "Server Error",
-            text: "Something went wrong!",
-        });
-    }
+  if (!hasUpper || !hasLength || !hasNumber) {
+    passwordMessage.classList.remove("text-success");
+    passwordMessage.classList.add("text-danger");
+    passwordMessage.innerHTML = `Password must include :
+      <br>Minimum 6 characters
+      <br>At least 1 uppercase letter
+      <br>At least 1 number`;
+  } else {
+    passwordMessage.classList.remove("text-danger");
+    passwordMessage.classList.add("text-success");
+    passwordMessage.innerHTML = "Strong Password ✔";
+  }
 });
 
+document.getElementById("signupForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  clearErrors();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const mobile = document.getElementById("mobile").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const confirmpassword = document.getElementById("confirmpassword").value.trim();
+  const refferalCode = document.getElementById("refferalCode").value.trim();
+
+  let valid = true;
+
+  if (!/^[A-Za-z ]+$/.test(name)) {
+    showError("nameError", "Enter a valid name! Name must contain only letters");
+    valid = false;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showError("emailError", "Enter a valid email.");
+    valid = false;
+  }
+
+  if (!/^\d{10}$/.test(mobile)) {
+    showError("mobileError", "Mobile number must be 10 digits.");
+    valid = false;
+  }
+
+  if (!/^(?=.*[A-Z])(?=.*\d).{6,}$/.test(password)) {
+    showError("passwordError", "Password must be at least 6 characters and contain at least 1 uppercase letter and 1 number.");
+    valid = false;
+  }
+
+  if (password !== confirmpassword) {
+    showError("confirmpasswordError", "Passwords do not match!");
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  try {
+    const response = await fetch("/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        email,
+        mobile,
+        password,
+        confirmpassword,
+        refferalCode
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Signup Successful!",
+        text: result.message,
+      });
+
+      setTimeout(() => {
+        window.location.href = "/verifyOtp";
+      }, 1500);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Signup Failed",
+        text: result.message,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    Swal.fire({
+      icon: "error",
+      title: "Server Error",
+      text: "Something went wrong!",
+    });
+  }
+});
 
 function showError(id, msg) {
     document.getElementById(id).textContent = msg;

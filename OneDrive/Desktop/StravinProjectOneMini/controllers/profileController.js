@@ -1,17 +1,23 @@
 import User from '../models/userModel.js'
 import Address from '../models/addressModel.js'
 import { sendOtpEmail } from '../utils/sendOtp.js';
+import Coupon from '../models/couponModel.js'
 import bcrypt from 'bcrypt'
+
+
 export const getUserProfile=async(req,res)=>{
     try{
     const userId = req.session.userId;
     const user = await User.findById(userId)
     const address=await Address.findOne({userId:req.session.userId,isDefault:true})
-    
+    const referralRewards = await Coupon.find({
+      assignedTo:userId,
+      couponType:"referral"
+    })
     if(!user){
         return res.status(401).json({success:false,message:"Please Login first!"})
     }
-    res.render('user/profile',{user,address})
+    res.render('user/profile',{user,address,referralRewards})
 }catch(error){
     res.status(500).json({success:false,message:"Server crashed"})
 }
@@ -40,14 +46,12 @@ export const editprofile = async (req, res) => {
       user.profileImage = '/uploads/profilePics/' + req.file.filename;
     }
 
-    // If removePic flag set
+    
     if (removePic === 'true') {
       user.profileImage = '';
-    }
+    }s
 
-    await user.save();
-
-    // Send JSON for frontend
+    await user.save()
     res.json({ success: true, message: 'Profile updated successfully', profileImage: user.profileImage });
   } catch (err) {
     console.error(err);
