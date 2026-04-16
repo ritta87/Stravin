@@ -21,6 +21,7 @@ import { getAllOrders,viewOrderDetails,updateStatus, handleReturnRequest } from 
 
 import { getCouponPage,addCoupon,addCouponPage,getEditCoupon,editCoupon,deleteCoupon} from '../controllers/couponController.js';
 
+import { loadSalesReport } from '../controllers/salesReportController.js';
 import { noCache } from '../middleware/no-cache.js'
 router.use(noCache)
 
@@ -87,6 +88,7 @@ router.get('/getEditCoupon/:id',adminAuth,getEditCoupon)
 router.post('/editCoupon/:id',adminAuth,editCoupon)
 router.delete('/deleteCoupon/:id',adminAuth,deleteCoupon)
 
-
+//sales report managemnt......
+router.get('/salesReport',adminAuth,loadSalesReport)
 
 export default router;
