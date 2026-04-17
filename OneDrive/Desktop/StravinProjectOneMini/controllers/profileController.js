@@ -49,7 +49,7 @@ export const editprofile = async (req, res) => {
     
     if (removePic === 'true') {
       user.profileImage = '';
-    }s
+    }
 
     await user.save()
     res.json({ success: true, message: 'Profile updated successfully', profileImage: user.profileImage });

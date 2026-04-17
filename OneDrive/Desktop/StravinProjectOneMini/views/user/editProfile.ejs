@@ -1,562 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title></title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="/css/navbar.css">
+<link rel="stylesheet" href="/css/pages/footer.css">
+
+<script src="/js/navbar.js"></script>
 
 <style>
-  body {
-      background-color: #f5f5f5;
-      font-family: 'Segoe UI', sans-serif;
-      color: #333;
-    }
-
-    a { text-decoration: none; }
-
-    /* HEADER */
-    header {
-      background-color: #198754;
-      padding: 15px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    header .brand { font-weight:700; font-size:1.7rem; color:#fff; }
-    header nav a { color:#fff; font-weight:500; margin-left:25px; transition:color 0.2s;}
-    header nav a:hover { color:#e0e0e0; }
-    header nav {gap: 28px;}
-    /* BACK LINK */
-    .back-link { display:inline-block; margin-bottom:20px; font-weight:500; color:#198754; }
-    .back-link:hover { text-decoration:underline; }
-.disabled-variant{
-  opacity:0.5;
-  pointer-events:none;
+ .edit-profile-container {
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-    .profile-wrapper {
-      padding: 40px 0;
-    }
-
-    .profile-card,
-    .info-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .profile-img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 4px solid #e9ecef;
-    }
-
-.section-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    .label {
-      font-weight: 600;
-      color: #555;
-    }
-
-    .order-badge {
-      font-size: 13px;
-      padding: 6px 10px;
-      border-radius: 20px;
-    }
-
-    .btn-action {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-toggle {
-  background: none;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background: white;
-  list-style: none;
-  padding: 10px;
-  border: 1px solid #ddd;
-  right: 0;
-  min-width: 120px;
-}
-
-.dropdown-menu li {
-  padding: 5px 0;
-}
-
-.dropdown-menu a {
-  text-decoration: none;
-  color: black;
-}
-
-.dropdown:hover .dropdown-menu {
-  display: block;
-}  .wishlist-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-}
-
-.cart-icon{
-  font-size: 22px;
-  color: #000;   /* black icon */
-}
-.cart-count{
-  position:absolute;
-  top:-6px;
-  right:-8px;
-  background:#000;
-  color:#fff;
-  font-size:10px;
-  padding:2px 6px;
-  border-radius:10px;
-  font-weight:600;
-}
-.wishlist-nav i {
-  font-size: 18px;
-}
-
-.wishlist-badge {
-  position: absolute;
-  top: -4px;
-  left: 12px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 50px;
-  background: red;
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-}
- .wishlist-section {
-      padding: 50px 0;
-    }
-
-    .wishlist-title {
-      font-weight: 700;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .wishlist-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      overflow: hidden;
-      transition: 0.3s ease;
-      height: 100%;
-    }
-
-    .wishlist-card:hover {
-      transform: translateY(-4px);
-    }
-
-   .wishlist-img-box {
-  min-width: 200px;
-  width: 200px;
-  height: 200px;
-  flex-shrink: 0;
-  overflow: hidden;
-  border-radius: 12px;
-  background: #f8f8f8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wishlist-img-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-  .product-card{
-  background:#fff;
-  border-radius:10px;
-  padding:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
-  transition:0.2s;
-  height:100%;
-}
-.product-img{
-  width:100%;
-  height:200px;
-  object-fit:cover;
-  border-radius:8px;
-}
-.logout-btn{
-  display:none;
-}
-.product-details{
-  margin-top:10px;
-  text-align:center;
-}
-.product-details span{
-  display:block;
-}
-
-.discount-price{
-  font-size:18px;
-  font-weight:700;
-  color:#d32f2f;
-}
-.product-info{
-  padding:10px;
-  text-align:center;
-}
-
-.wishlist-btn{
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 8px 0;
-  cursor: pointer;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.wishlist-btn i {
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.wishlist-active i {
-  color: red;
-  transform: scale(1.2);
-}
-#profileImage {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
-}
-/* Container for edit form */
-.edit-profile-container {
-  max-width: 500px;
-  margin: 30px auto;
-  padding: 25px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Form heading */
-.edit-profile-container h2 {
+.edit-profile-container h2,
+.email-otp-container h3 {
   text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 22px;
+  color: #222;
+  font-weight: 700;
 }
 
-/* Input fields */
-.edit-profile-container input[type="text"],
-.edit-profile-container input[type="email"],
-.edit-profile-container input[type="tel"],
-.edit-profile-container input[type="file"],
-.edit-profile-container input[type="password"] {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.3s;
-}
-
-.edit-profile-container input:focus {
-  border-color: #4CAF50;
-  outline: none;
-}
-
-/* Labels */
 .edit-profile-container label {
-  font-weight: 500;
-  color: #555;
   display: block;
-  margin-bottom: 5px;
-}
-
-/* Profile image preview */
-#profilePreview {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 15px;
-  border: 2px solid #ddd;
-}
-
-/* Buttons */
-
-/* OTP section */
-#otpSection {
-  margin-top: 15px;
-  padding: 15px;
-  background-color: #f8f8f8;
-  border-radius: 8px;
-  display: none; /* Show after sending OTP */
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-}
-
-/* Small info text */
-.edit-profile-container .info-text {
-  font-size: 12px;
-  color: #777;
-  margin-bottom: 10px;
-}
-/* Update button (primary action) */
-.update-btn {
-  width: 100%;
-  padding: 10px 0;
-  background-color: #4CAF50; /* Green */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 10px;
-}
-
-.update-btn:hover {
-  background-color: #45a049;
-}
-#preview {
-  width: 120px;        /* fixed width */
-  height: 120px;       
-  border-radius: 50%;  
-  object-fit: cover;   
-  border: 2px solid #ccc;
-}
-/* Remove button (danger action) */
-.remove-btn {
-  width: 100%;
-  padding: 10px 0;
-  background-color: #f44336; /* Red */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 5px;
-}
-
-.remove-btn:hover {
-  background-color: #da190b;
-}
-.edit-profile-container {
-  max-width: 500px;
-  margin: 30px auto;
-  padding: 25px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.edit-profile-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
 }
 
 .edit-profile-container input[type="text"],
 .edit-profile-container input[type="email"],
 .edit-profile-container input[type="tel"] {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
   font-size: 14px;
+  background: #fafafa;
+  box-sizing: border-box;
+  transition: 0.25s ease;
+}
+
+.edit-profile-container input:focus,
+.email-otp-container input:focus {
+  outline: none;
+  border-color: #198754;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.12);
 }
 
 .file-input-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 20px;
-}
-
-.file-input-wrapper img#preview {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
 }
 
 .file-input-wrapper input[type="file"] {
   display: none;
 }
 
-.choose-btn {
-  padding: 8px 16px;
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+#preview {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #e5e5e5;
+  background: #f8f8f8;
 }
 
-.choose-btn:hover { background-color: #45a049; }
+.choose-btn,
+.remove-btn,
+.update-btn,
+.email-otp-container button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.choose-btn {
+  background: #198754;
+  color: #fff;
+}
+
+.choose-btn:hover {
+  background: #157347;
+}
 
 .remove-btn {
-  padding: 8px 16px;
-  background-color: #f44336;
-  color: white;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+  background: #dc3545;
+  color: #fff;
 }
 
-.remove-btn:hover { background-color: #da190b; }
+.remove-btn:hover {
+  background: #bb2d3b;
+}
 
 .update-btn {
   width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
+  margin-top: 10px;
+  background: #198754;
+  color: #fff;
 }
 
-.update-btn:hover { background-color: #45a049; }
-/* OTP section container */
-/* Container for Email Change */
+.update-btn:hover {
+  background: #157347;
+}
+
 .email-otp-container {
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  font-family: 'Segoe UI', sans-serif;
+  max-width: 650px;
+  margin: 25px auto 40px;
+  padding: 25px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Heading */
-.email-otp-container h3 {
-  margin-bottom: 10px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  text-align: center;
-}
-
-/* Input fields */
 .email-otp-container input[type="email"],
 .email-otp-container input[type="text"] {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  background: #fafafa;
   box-sizing: border-box;
-  transition: border-color 0.3s;
 }
 
-.email-otp-container input:focus {
-  border-color: #4CAF50;
-  outline: none;
-}
-
-/* Buttons */
-.email-otp-container button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-/* Send OTP button */
-.email-otp-container button.send-btn {
-  background-color: #2196F3; /* Blue */
+.email-otp-container .send-btn {
+  background: #0d6efd;
   color: #fff;
 }
 
-.email-otp-container button.send-btn:hover {
-  background-color: #0b7dda;
+.email-otp-container .send-btn:hover {
+  background: #0b5ed7;
 }
 
-/* Verify OTP button */
-.email-otp-container button.verify-btn {
-  background-color: #4CAF50; /* Green */
+.email-otp-container .verify-btn {
+  background: #198754;
   color: #fff;
 }
 
-.email-otp-container button.verify-btn:hover {
-  background-color: #45a049;
+.email-otp-container .verify-btn:hover {
+  background: #157347;
 }
 
-/* OTP Section (hidden initially) */
 #otpSection {
-  display: none; /* Show only after sending OTP */
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: #f8f8f8;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+  display: none;
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f8f9fa;
 }
 
-/* Small info text */
-.email-otp-container .info-text {
+.info-text {
   font-size: 12px;
   color: #777;
   text-align: center;
 }
 
-/* Responsive: mobile-friendly */
-@media (max-width: 600px) {
-  .email-otp-container {
-    padding: 15px;
-    gap: 10px;
-  }
-
-  .email-otp-container button {
-    width: 100%;
-  }
-}
 .error {
   color: red;
   font-size: 13px;
@@ -568,62 +187,30 @@ input.error-input {
   border: 1px solid red;
 }
 
-#preview {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid #ddd;
-}
+@media (max-width: 768px) {
+  .edit-profile-container,
+  .email-otp-container {
+    margin: 20px 15px;
+    padding: 20px;
+  }
 
-</style>
-<header class="d-flex justify-content-between align-items-center px-4">
-  <div class="brand">Stravin</div>
- <nav class="nav-bar">
-    <div class="nav-left">
+  #preview {
+    width: 110px;
+    height: 110px;
+  }
 
-      <a href="/">Home</a>
-      <a href="/shop">Shop</a>
-    <a href="/cart" class="cart-link">
-     <i class="bi bi-cart3 cart-icon"></i>
-     <span id="cartCount" class="cart-count">0</span>
-      </a>
-
-      <% if (isLoggedIn) { %>
-
-        <div class="dropdown">
-          <button class="dropdown-toggle">
-            Hi, <%= user.name %>
-          </button>
-
-          <ul class="dropdown-menu">
-            <li> <a href ='/profile' class="dropdown-item">Profile</a></li>
-            <li><a href="/logout" class="dropdown-item">Logout</a></li>
-          </ul>
-        </div>
-
-      <% } else { %>
-    <a href="/login">Login</a>
-<% } %>
-</div></nav>
-<script>
-  //cart count
-async function loadCartCount(){
-  try{
-    const res = await fetch('/cart/count')
-    const data = await res.json()
-    const cartEl = document.getElementById('cartCount')
-    if(cartEl){
-      cartEl.innerText = data.count
-    }
-  }catch(err){
-    console.log("Error fetching cart count",err)
+  .choose-btn,
+  .remove-btn,
+  .update-btn,
+  .email-otp-container button {
+    width: 100%;
   }
 }
-document.addEventListener("DOMContentLoaded", loadCartCount)
-</script>
-</header>
-<%- include('../partials/breadcrumbs') %>
+</style>
+
+ <%- include('../partials/navbar') %>
+  <%- include('../partials/breadcrumbs') %>
+</head>
 
 <body>
 <div class="edit-profile-container">
@@ -663,20 +250,28 @@ document.addEventListener("DOMContentLoaded", loadCartCount)
 <hr>
 
 <!-- Email change with OTP -->
-<h3>Change Email</h3>
-<div>
-  <input type="email" id="newEmail" placeholder="Enter new email">
-  <button type="button" onclick="sendOTP()">Send OTP</button>
-</div>
+<div class="email-otp-container">
 
-<div id="otpSection" style="display:none;">
-  <input type="text" id="emailOTP" placeholder="Enter OTP">
-  <button type="button" onclick="verifyEmailOTP()">Verify OTP</button>
-<div class="info-text">Email change requires OTP verification</div>
+  <h3>Change Email</h3>
+
+  <div class="otp-row">
+    <input type="email" id="newEmail" placeholder="Enter new email">
+    <button type="button" class="send-btn" onclick="sendOTP()">Send OTP</button>
+  </div>
+
+  <div id="otpSection">
+    <input type="text" id="emailOTP" placeholder="Enter OTP">
+    <button type="button" class="verify-btn" onclick="verifyEmailOTP()">Verify OTP</button>
+  </div>
+
+  <div class="info-text">
+    Email change requires OTP verification
+  </div>
 
 </div>
 </div>
-
+</div>
+<%-include('../partials/footer')%>
 <script>
  document.getElementById("editProfileForm").addEventListener('submit', async (e) => {
   e.preventDefault();

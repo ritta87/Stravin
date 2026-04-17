@@ -42,7 +42,7 @@ const finalPrice = Math.round(basePrice - (basePrice * finalOffer / 100))
       items:[],grandTotal:0
     })
   }
-  const existsVariant = cart.items.find(item=>item.variant.toString()===variantId)
+const existsVariant = cart.items.find(item=>item.variant.toString()===variantId)
 if(quantity > MAX_PER_USER){
   return res.json({success:false, message:`Only ${MAX_PER_USER} items allowed per user`})
 }
@@ -63,13 +63,9 @@ if(quantity > MAX_PER_USER){
         price:Math.round(finalPrice)
       })
   }
-for (const item of cart.items)
-{
- const v = await Variant.findById(item.variant);
-  if (!v) continue;
- const product = await Product.findById(v.product);
- 
-grandTotal += finalPrice * item.quantity;
+grandTotal = 0;
+for(const item of cart.items) {
+  grandTotal += item.price * item.quantity;
 }
 
 cart.grandTotal = grandTotal
@@ -102,11 +98,14 @@ export const getCartItems=async(req,res)=>{
     let variantQuantity=item.variant?.stockQuantity||0;
     let itemIsOutOfStock=cartQty>variantQuantity
     if(itemIsOutOfStock) outOfStockExist=true;
+  let basePrice =
+  item.product.price + (item.variant?.additionalPrice || 0);
       return {
         ...item._doc,
         productName: item.product.productname,
         variantName: item.variant?.color || null,
-        price: item.variant?.additionalPrice || item.product.price,
+        price: item.price,
+        basePrice:basePrice,
         quantity: cartQty,
         stockQuantity: variantQuantity,
         isOutOfStock: itemIsOutOfStock,
@@ -135,56 +134,130 @@ export const getCartCount=async(req,res)=>{
     res.status(500).json({success:false,message:"Error fetching at cart count!!"})
   }
 }
+
+
 //update + - quantity
-export const updateCartQty = async (req,res)=>{
-  const {variantId, change} = req.body
-  const userId = req.session.userId;
-let variant = await Variant.findById(variantId)
-  const cart = await Cart.findOne({userId})
-  if (!cart) {
-    return res.json({ success: false, message: "Cart not found" });
+export const updateCartQty = async (req, res) => {
+  try {
+    const { variantId, change } = req.body;
+    const userId = req.session.userId;
+
+    const variant = await Variant.findById(variantId);
+    if (!variant) {
+      return res.json({ success: false, message: "Variant not found" });
+    }
+
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.json({ success: false, message: "Cart not found" });
+    }
+
+    const item = cart.items.find(i => i.variant.toString() === variantId);
+
+    if (!item) {
+      return res.json({ success: false, message: "Item not found" });
+    }
+
+    const newQty = item.quantity + Number(change);
+
+    if (newQty > variant.stockQuantity) {
+      return res.json({
+        success: false,
+        message: `Only ${variant.stockQuantity} is Available!`
+      })
+    }
+
+    if (newQty > MAX_PER_USER) {
+      return res.json({
+        success: false,
+        message: `Maximum ${MAX_PER_USER} items allowed!`
+      });
+    }
+
+    if (newQty <= 0) {
+      cart.items = cart.items.filter(i => i.variant.toString() !== variantId);
+
+      let grandTotal = 0;
+      cart.items.forEach(i => {
+        grandTotal += i.price * i.quantity;
+      });
+
+      cart.grandTotal = grandTotal;
+      cart.finalTotal = grandTotal;
+      cart.discountAmount = 0;
+      cart.coupon = undefined;
+
+      await cart.save();
+
+      return res.json({
+        success: true,
+        removed: true,
+        quantity: 0,
+        itemTotal: 0,
+        grandTotal: cart.grandTotal,
+        message: "Item removed from cart"
+      });
+    }
+
+    item.quantity = newQty;
+
+    let grandTotal = 0;
+    cart.items.forEach(i => {
+      grandTotal += i.price * i.quantity;
+    });
+
+    cart.grandTotal = grandTotal;
+    cart.finalTotal = grandTotal;
+    cart.discountAmount = 0;
+    cart.coupon = undefined;
+
+    await cart.save();
+
+    return res.json({
+      success: true,
+      removed: false,
+      quantity: item.quantity,
+      itemTotal: item.price * item.quantity,
+      grandTotal: cart.grandTotal,
+      message: "Quantity updated"
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 }
-  const item = cart.items.find(
-    i => i.variant.toString() === variantId)
 
-  if(!item){
-    return res.json({success:false})
+export const removeCartItem = async (req, res) => {
+  try {
+    const { variantId } = req.body;
+    const userId = req.session.userId;
+
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.json({ success: false, message: "Cart not found" });
+    }
+
+    cart.items = cart.items.filter(i => i.variant.toString() !== variantId);
+
+    let grandTotal = 0;
+    cart.items.forEach(i => {
+      grandTotal += i.price * i.quantity;
+    })
+
+    cart.grandTotal = grandTotal;
+    cart.finalTotal = grandTotal;
+    cart.discountAmount = 0;
+    cart.coupon = undefined;
+
+    await cart.save();
+
+    return res.json({
+      success: true,
+      grandTotal: cart.grandTotal,
+      message: "Item removed from cart"
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Server error" })
   }
-
-  //prevent user enters exceeding minm stock vailable.
-  let newQty = item.quantity+change
-  if(newQty>variant.stockQuantity){
-    return res.json({success:false,message:`Only ${variant.stockQuantity} is Available!`})
-  }
-  if(newQty>MAX_PER_USER){
-    return res.json({success:false,message:`Maximum ${MAX_PER_USER} items allowed!`})
-  }
-  
-
-  //if quantity of item = 0,remove from cart.
-if(newQty<=0)    {
-cart.items=cart.items.filter(i=>i.variant.toString()!==variantId)
-await cart.save()
-  return res.json({success:true,message:"Item removed from cart"})
-  }
-
- //else just update qty
-item.quantity = newQty
-await cart.save()
-
-return res.json({success:true,message:"Quantity updated"})
-}
-
-//remove cart item-Remove btn
-export const removeCartItem = async (req,res)=>{
-  const {variantId} = req.body
-  const userId = req.session.userId
-
-  const cart = await Cart.findOne({userId})
-  if(!cart){
-    return res.json({success:false})
-  }
-cart.items = cart.items.filter(i => i.variant.toString() !== variantId)
-  await cart.save()
-res.json({success:true,message:"Item removed from cart"})
 }

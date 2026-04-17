@@ -84,7 +84,7 @@
 
     <% items.forEach(item => { 
 
-      const price = item.price               // final price
+      const price = item.price
       const basePrice = item.basePrice
       const qty = item.quantity
 
@@ -95,8 +95,11 @@
       totalSavings += saved
 
     %>
-
-    <div class="cart-item d-flex align-items-center mb-4 border-bottom pb-3">
+    <div id="row-<%= item.variant._id %>"
+      class="cart-item d-flex align-items-center mb-4 border-bottom pb-3"
+      data-price="<%= price %>"
+      data-stock="<%= item.stockQuantity %>"
+    >
 
       <!-- IMAGE -->
       <div class="cart-image">
@@ -106,18 +109,21 @@
       <!-- DETAILS -->
       <div class="cart-details flex-grow-1 ms-3">
 
- <h5><%= item.product.productname %></h5>
-<span class="badge bg-success">
-  ⭐ 4.5
-</span>
-<small>(120 reviews)</small>
+        <h5><%= item.product.productname %></h5>
+
+        <span class="badge bg-success">⭐ 4.5</span>
+        <small>(120 reviews)</small>
+
         <p class="text-muted">
           Color: <%= item.variant.color %>
         </p>
-         <p>Qty: <%= item.quantity %> / Stock: <%= item.stockQuantity %></p>
+
+        <p>Qty: <%= item.quantity %> / Stock: <%= item.stockQuantity %></p>
+
         <p class="<%= item.isOutOfStock ? 'text-danger' : 'text-success' %>">
           <%= item.isOutOfStock ? 'Out of Stock' : 'Available' %>
         </p>
+
         <!-- PRICE -->
         <p>
           ₹ <strong><%= price %></strong>
@@ -128,19 +134,22 @@
             </span>
           <% } %>
         </p>
-<p class="text-success">
-  🚚 Delivery in 5-7 days
-</p>
+
+        <p class="text-success">🚚 Delivery in 5-7 days</p>
+
         <!-- QUANTITY -->
         <div class="qty-control mb-2">
 
           <button class="btn btn-sm btn-outline-secondary"
             onclick="updateQty('<%= item.variant._id %>', -1)">-</button>
 
-          <span class="mx-2"><%= qty %></span>
+         
+          <span id="qty-<%= item.variant._id %>" class="mx-2">
+            <%= qty %>
+          </span>
 
           <button class="btn btn-sm btn-outline-secondary"
-            onclick="updateQty('<%= item.variant._id %>', 1, this)"
+            onclick="updateQty('<%= item.variant._id %>', 1)"
             <%= qty >= item.variant.stockQuantity ? "disabled" : "" %>>
             +
           </button>
@@ -158,7 +167,10 @@
       <!-- ITEM TOTAL -->
       <div class="text-end">
         <p>Subtotal</p>
-        <strong>₹ <%= itemTotal %></strong>
+
+        <strong id="itemTotal-<%= item.variant._id %>">
+          ₹ <%= itemTotal %>
+        </strong>
       </div>
 
     </div>
@@ -176,16 +188,14 @@
         </p>
       <% } %>
 
-      <h4>Total: ₹ <%= subtotal %></h4>
-<p class="text-muted small">
-  🔒 100% Secure Payments
-</p>
-<p class="text-muted small">
-  🔄 7-day easy returns
-</p>
-<a href="/checkout" class="btn btn-primary <%= outOfStockExist ? 'disabled' : '' %>">
-  Proceed to Checkout
-</a>
+      <h4>Total: ₹ <span id="grandTotal"><%= subtotal %></span></h4>
+
+      <p class="text-muted small">🔒 100% Secure Payments</p>
+      <p class="text-muted small">🔄 7-day easy returns</p>
+
+      <a href="/checkout" class="btn btn-primary <%= outOfStockExist ? 'disabled' : '' %>">
+        Proceed to Checkout
+      </a>
 
     </div>
 
@@ -224,7 +234,13 @@ async function updateQty(variantId, change){
     return
   }
 
-  location.reload()
+ if(data.removed){
+  document.getElementById(`row-${variantId}`)?.reomove();
+ }else{
+    document.getElementById(`qty-${variantId}`).innerText = data.quantity;
+    document.getElementById(`itemTotal-${variantId}`).innerText ="₹ " + data.itemTotal;
+    document.getElementById("grandTotal").innerText ="₹ " + data.grandTotal;
+ }
 
 }
 
@@ -236,12 +252,11 @@ const confirm = await Swal.fire({
   showCancelButton:true,
   confirmButtontext:'Yes,Remove it!'
 })
-if(!confirm.isConfirmed)return;
+if(!confirm.isConfirmed) return
 
   const res = await fetch('/cart/remove', {
     method:"POST",
-    headers:{
-      "Content-Type":"application/json"},
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({variantId }),credentials:"include"
   })
  const data = await res.json()
@@ -250,9 +265,9 @@ if(!confirm.isConfirmed)return;
       icon:"success",
       title:"Removed!",
       text:data.message
-    }).then(()=>{
-      location.reload()
     })
+    document.getElementById(`row-${variantId}`)?.remove();
+    document.getElementById("grandTotal").innerText ="₹ " + data.grandTotal;
   }
 
 }
