@@ -1,105 +1,55 @@
-import mongoose  from "mongoose";
-import User from '../models/userModel.js'
-import Razorpay from "razorpay";
-import crypto from "crypto"
+import {getWalletService,createWalletPaymentService,verifyWalletPaymentService,getWalletNetBalanceService
+} from "../services/walletService.js";
 
+export const getWallet = async (req, res) => {
+  try {
+    const userId = req.session.userId;
 
-export const getWallet=async(req,res)=>{
-    try{
-    const userId=req.session.userId;
-     const wallet = await User.findById(userId)
+    const result = await getWalletService(userId);
 
-    if(!wallet){
-        res.status(400).json({success:false,message:"No wallet found !"})
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json({ success: false, message: result.message })
     }
-   
-    res.render('user/wallet')
-}catch(error){
-    res.status(500).json({success:false,message:"Server error at wallet loading.."})
-}
-}
 
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+    return res.render("user/wallet");
+  } catch (error) {
+    return res.status(500).json({success: false,message: "Server error at wallet loading.."})
+  }
+}
 
 export const createWalletPayment = async (req, res) => {
   try {
-    const amount = Number(req.body.amount)
-    if (!amount || amount < 1) {
-  return res.json({success: false,message:"Minimum amount is ₹1"})
-}
-    const options = {
-      amount: amount * 100, // paise
-      currency: "INR",
-      receipt: "wallet_" + Date.now()
-    }
-    const order = await razorpay.orders.create(options);
-    res.json({success:true,order})
+    const result = await createWalletPaymentService(req.body.amount);
 
+    return res.status(result.statusCode || (result.success ? 200 : 400)).json(result);
   } catch (error) {
     console.log(error);
-    res.json({ success: false });
+    return res.json({ success: false });
   }
 }
-
-
 
 export const verifyWalletPayment = async (req, res) => {
   try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      amount
-    } = req.body;
+    const userId = req.session.userId;
 
-    const generated_signature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(razorpay_order_id + "|" + razorpay_payment_id)
-      .digest("hex");
+    const result = await verifyWalletPaymentService(userId, req.body);
 
-    if (generated_signature === razorpay_signature) {
-      const user = await User.findById(req.session.userId);
-     const order = await razorpay.orders.fetch(razorpay_order_id);
-
-      const topupAmount = Number(order.amount)/100
-
-      // add money
-      user.wallet = (user.wallet||0)+topupAmount
-
-      // add history
-      user.walletHistory.push({
-        amount:topupAmount,
-        type: "credit",
-        reason: "Wallet Top-up"
-      })
-
-      await user.save();
-      return res.json({success:true,balance:user.wallet})
-    }
-    res.json({success:false})
-
+    return res.status(result.statusCode || (result.success ? 200 : 400)).json(result);
   } catch (error) {
     console.log(error);
-    res.json({success:false})
+    return res.json({ success: false });
   }
 }
 
-export const getWalletNetBalance=async(req,res)=>{
-  try{
-  const userId=req.session.userId
-  const user = await User.findById(userId).select("wallet walletHistory")
-  if(!user){
-    return res.status(404).json({success:false,message:"User not found!"})
+export const getWalletNetBalance = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+
+    const result = await getWalletNetBalanceService(userId);
+
+    return res.status(result.statusCode || (result.success ? 200 : 400)).json(result)
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({success: false,message: "Error at loading Wallet balance!"})
   }
- res.json({success:true,balance: user.wallet,
-  history:user.walletHistory
- })
-}catch(error){
-  console.log(error)
-  res.status(500).json({success:false,message:"Error at loading Wallet balance!"})
-}
 }

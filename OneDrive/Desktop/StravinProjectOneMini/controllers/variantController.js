@@ -40,11 +40,7 @@ export const addVariant = async (req,res)=>{
     if(imagePaths.length===0){
       return res.json({success:false,message:"Images required"})
     }
-    const allowesTypes=['image/jpeg','image/png','image/jpg']
-    const isvalid=req.files.every(file=>allowesTypes.includes(file.mimetype))
-    if(!isvalid){
-      return res.json({success:false,message:"Only images are allowed!"})
-    }
+   
     await Variant.create({
       product:product._id,
       category:product.category,
@@ -69,36 +65,67 @@ export const addVariant = async (req,res)=>{
 }
 export const updateVariant = async (req, res) => {
   try {
+    const { variantId } = req.params;
+    const { color, additionalPrice, stockQuantity, existingImages } = req.body;
 
-    const { variantId } = req.params
-    const { color, additionalPrice, stockQuantity } = req.body
-  const variant = await Variant.findById(variantId)
-if (!variant) {
+    const variant = await Variant.findById(variantId);
+    if (!variant) {
+      return res.json({ success: false, message: "Variant not found" });
+    }
+
+    const product = await Product.findById(variant.product);
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+    variant.color = color?.trim();
+    variant.additionalPrice = Number(additionalPrice) || 0;
+    variant.stockQuantity = Number(stockQuantity) || 0;
+    variant.category = product.category;
+
+    let finalImages = [];
+
+    if (existingImages) {
+      try {
+        finalImages = JSON.parse(existingImages);
+      } catch (error) {
+        return res.json({
+          success: false,
+          message: "Invalid existing images data"
+        });
+      }
+    }
+
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map(file => `/uploads/${file.filename}`);
+      finalImages = [...finalImages, ...newImages];
+    }
+
+    if (finalImages.length === 0) {
       return res.json({
         success: false,
-        message: "Variant not found"
-      })
+        message: "At least one image is required"
+      });
     }
-    const product = await Product.findById(variant.product)
-    variant.color = color
-    variant.additionalPrice = Number(additionalPrice) || 0
-    variant.stockQuantity = Number(stockQuantity) || 0
-    variant.category = product.category
- if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => `/uploads/${file.filename}`)
-      variant.images = newImages
+
+    if (finalImages.length > 4) {
+      return res.json({
+        success: false,
+        message: "Maximum 4 images allowed"
+      });
     }
-await variant.save()
- res.json({
+
+    variant.images = finalImages;
+
+    await variant.save();
+
+    return res.json({
       success: true,
       message: "Variant updated successfully"
-    })
-
+    });
   } catch (err) {
-    res.json({
-      success: false,
-      message: err.message
-    })
+    console.error("Update variant error:", err);
+    return res.status(500).json({success: false,message: err.message})
   }
 }
 export const  unlistVariant=async(req,res)=>{

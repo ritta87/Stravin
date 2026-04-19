@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-import adminAuth from "../middleware/authMiddleware.js";
 import Category from "../models/categoryModel.js";
 
 export const AddCategories = async(req,res)=>{

@@ -145,11 +145,7 @@
 <!-- image input -->
 <div class="col-12">
   <label class="form-label">Product Images (max 4)</label>
-  <input
-    type="file"
-    id="imageInput"
-    name="images"
-    multiple
+  <input type="file"id="imageInput"name="images"multiple
     class="form-control"
     accept="image/*">
   <div id="preview" class="preview-container"></div>
@@ -172,40 +168,71 @@
 </div>
 <script>
 
-  const imageInput = document.getElementById("imageInput");
+const imageInput = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const cropModal = document.getElementById("cropModal");
 const cropImage = document.getElementById("cropImage");
 const cropConfirm = document.getElementById("cropConfirm");
 const closeModal = document.getElementById("closeModal");
 
-let allFiles = [];        // stores cropped File objects
-let tempFile = null;      // current file being cropped
+let allFiles = [];
+let tempFile = null;
 let cropper = null;
+let pendingFiles = [];
+
+function validateFiles(files) {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+  for (let file of files) {
+    if (!allowedTypes.includes(file.type)) {
+      Swal.fire("Error", "Only JPG, JPEG, PNG, and WEBP images are allowed", "error");
+      return false;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      Swal.fire("Error", "Each image must be less than 2MB", "error");
+      return false;
+    }
+  }
+
+  return true;
+}
 
 imageInput.addEventListener("change", (e) => {
   const files = Array.from(e.target.files);
 
+  if (!files.length) return;
+
   if (allFiles.length + files.length > 4) {
     Swal.fire("Image Limit Exceeded", "Max 4 images allowed", "warning");
+    imageInput.value = "";
     return;
   }
 
-  // start cropping first file
-  cropFile(files.shift(), files);
+  const isValid = validateFiles(files);
+  if (!isValid) {
+    imageInput.value = "";
+    return;
+  }
+
+  pendingFiles = [...files];
+  cropFile(pendingFiles.shift());
 });
-function cropFile(file, remainingFiles = []) {
+
+function cropFile(file) {
+  if (!file) return;
+
   tempFile = file;
-  
+
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = (e) => {
     cropImage.src = e.target.result;
     cropModal.style.display = "block";
 
-    // destroy previous cropper if exists
     if (cropper) cropper.destroy();
+
     cropper = new Cropper(cropImage, {
-      aspectRatio: 1, 
+      aspectRatio: 1,
       viewMode: 1,
       movable: true,
       zoomable: true,
@@ -214,17 +241,12 @@ function cropFile(file, remainingFiles = []) {
     });
   };
   reader.readAsDataURL(file);
-
-  // store remaining files for next cropping
-  cropModal.dataset.remaining = JSON.stringify(remainingFiles.map(f => ({name: f.name,
-     size: f.size, type: f.type, file: f})));
 }
 
-// crop confirm button
 cropConfirm.addEventListener("click", () => {
-  if (!cropper) return;
+  if (!cropper || !tempFile) return;
 
-  cropper.getCroppedCanvas({ width: 500, height: 500 }).toBlob(blob => {
+  cropper.getCroppedCanvas({ width: 500, height: 500 }).toBlob((blob) => {
     const croppedFile = new File([blob], tempFile.name, { type: tempFile.type });
     allFiles.push(croppedFile);
     renderPreview();
@@ -232,29 +254,36 @@ cropConfirm.addEventListener("click", () => {
     cropModal.style.display = "none";
     cropper.destroy();
     cropper = null;
+    tempFile = null;
 
-    // crop next file if exists
-    const remaining = JSON.parse(cropModal.dataset.remaining || "[]");
-    if (remaining.length > 0) {
-      const nextFile = remaining.shift().file;
-      cropModal.dataset.remaining = JSON.stringify(remaining);
-      cropFile(tempFile = nextFile, remaining);
+    if (pendingFiles.length > 0) {
+      cropFile(pendingFiles.shift());
+    } else {
+      imageInput.value = "";
     }
   }, tempFile.type);
 });
 
 closeModal.addEventListener("click", () => {
   cropModal.style.display = "none";
-  if (cropper) cropper.destroy();
-  cropper = null;
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  tempFile = null;
+  pendingFiles = [];
+  imageInput.value = "";
 });
 
-// render preview
 function renderPreview() {
   preview.innerHTML = "";
+
   allFiles.forEach((file, idx) => {
     const reader = new FileReader();
-    reader.onload = e => {
+
+    reader.onload = (e) => {
       const wrapper = document.createElement("div");
       wrapper.classList.add("preview-wrapper");
 
@@ -264,7 +293,7 @@ function renderPreview() {
 
       const removeBtn = document.createElement("button");
       removeBtn.type = "button";
-      removeBtn.innerHTML= "X";
+      removeBtn.innerHTML = "X";
       removeBtn.addEventListener("click", () => {
         allFiles.splice(idx, 1);
         renderPreview();
@@ -273,15 +302,14 @@ function renderPreview() {
 
       preview.appendChild(wrapper);
     };
+
     reader.readAsDataURL(file);
   });
 
-  // Update input.files for Multer
   const dt = new DataTransfer();
-  allFiles.forEach(f => dt.items.add(f));
+  allFiles.forEach((f) => dt.items.add(f));
   imageInput.files = dt.files;
 }
-
 </script>
 
 

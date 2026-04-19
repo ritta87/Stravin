@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="/css/pages/footer.css">
 
 <script src="/js/navbar.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
 /* ===== Wallet Page Area Only ===== */
 .wallet-page {
@@ -321,7 +322,7 @@ input.error {
             <th>Date</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="wallet-history-body">
           <% if (user.walletHistory.length > 0) { %>
             <% user.walletHistory.forEach(item => { %>
               <tr>
@@ -408,14 +409,10 @@ async function verifyPayment(response, amount) {
 
   const data = await res.json();
   const msg= document.getElementById("msg")
-  if (data.success) {
-    document.getElementById("wallet-balance").innerText = `₹${data.balance}`;
-    msg.style.color="green"
-    msg.innerText="Money Added to Wallet Successfully!"
-    document.getElementById("wallet-balance").innerText = `₹${data.balance}`;
-      await loadWalletHistory();
-
-  } else {
+if (data.success) {
+  loadWallet();
+  loadWalletHistory()
+} else {
     msg.style.color="red"
     msg.innerText="Failed to add money in wallet"
     
@@ -461,13 +458,38 @@ async function loadWalletHistory() {
   const data = await res.json();
 
   if (data.success) {
-    const container = document.getElementById("wallet-history");
-    container.innerHTML = data.history
-      .map(h => `<div>${new Date(h.date).toLocaleString()}: ${h.type === 'credit' ? '+' : '-'}₹${h.amount} (${h.reason})</div>`)
-      .join("");
+    const tbody = document.getElementById("wallet-history-body");
+
+    let rows = "";
+
+    if (data.history.length === 0) {
+      rows = `
+        <tr>
+          <td colspan="4" class="wallet-empty">
+            No wallet history available yet.
+          </td>
+        </tr>
+      `;
+    } else {
+      data.history.forEach(item => {
+        rows += `
+          <tr>
+            <td>₹${item.amount}</td>
+            <td>
+              <span class="${item.type === 'credit' ? 'status-credit' : 'status-debit'}">
+                ${item.type}
+              </span>
+            </td>
+            <td>${item.reason}</td>
+            <td>${new Date(item.date).toDateString()}</td>
+          </tr>
+        `;
+      });
+    }
+
+    tbody.innerHTML = rows;
   }
 }
-
 //net balance..
 async function loadWallet() {
   const res = await fetch("getWalletBalance")

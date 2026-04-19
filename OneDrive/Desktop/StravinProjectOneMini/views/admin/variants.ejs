@@ -240,9 +240,9 @@ h3,h4{
 
             <div class="mb-3">
               <label class="form-label">Variant Images</label>
-              <input type="file" id="variantImages" name="images" multiple accept="image/*" class="form-control mt-2">
+              <input type="file" id="variantImages" name="images" accept=".jpg,.jpeg,.png,.webp" multiple class="form-control mt-2">
             </div>
-
+            <input type="hidden" id="existingImages" name="existingImages">
             <div id="variantPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
 
             <button type="submit" class="btn btn-primary" id="submitBtn">Add Variant</button>
@@ -292,189 +292,272 @@ h3,h4{
       </div>
     </main>
   </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const variantForm = document.getElementById("variantForm");
+  const imageInput = document.getElementById("variantImages");
+  const preview = document.getElementById("variantPreview");
+  const existingImagesInput = document.getElementById("existingImages");
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
+  let allFiles = [];
+  let existingImages = [];
 
-      const variantForm = document.getElementById("variantForm");
-      const imageInput = document.getElementById("variantImages");
-      const preview = document.getElementById("variantPreview");
-      let allFiles = [];
+  imageInput?.addEventListener("change", (e) => {
+    const files = Array.from(e.target.files);
 
-      /* ===== IMAGE PREVIEW & REMOVE ===== */
-      imageInput?.addEventListener("change", (e) => {
-        const files = Array.from(e.target.files);
-        allFiles = [...allFiles, ...files];
-        if (allFiles.length > 4) {
-          Swal.fire("Image Limit", "Maximum 4 images allowed", "warning");
-          allFiles = allFiles.slice(0, 4);
-        }
-        renderPreview();
-      });
+    const isValid = validateImages(e.target, 4);
+    if (!isValid) {
+      e.target.value = "";
+      return;
+    }
 
-      function renderPreview() {
-        preview.innerHTML = "";
-        allFiles.forEach((file, index) => {
-          if (!file.type.startsWith("image/")) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const wrapper = document.createElement("div");
-            wrapper.style.position = "relative";
-            const img = document.createElement("img");
-            img.src = e.target.result;
-            img.style.cssText = "width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #ccc;";
-            const removeBtn = document.createElement("span");
-            removeBtn.innerHTML = "✖";
-            removeBtn.style.cssText = "position:absolute;top:2px;right:4px;color:red;font-weight:bold;cursor:pointer;";
-            removeBtn.onclick = () => { allFiles.splice(index, 1); updateInputFiles(); renderPreview(); };
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            preview.appendChild(wrapper);
-          };
-          reader.readAsDataURL(file);
-        });
-        updateInputFiles();
-      }
+    if (existingImages.length + allFiles.length + files.length > 4) {
+      Swal.fire("Image Limit", "Maximum 4 images allowed", "warning");
+      e.target.value = "";
+      return;
+    }
 
-      function updateInputFiles() {
-        const dataTransfer = new DataTransfer();
-        allFiles.forEach(f => dataTransfer.items.add(f));
-        imageInput.files = dataTransfer.files;
-      }
-
-      /* ===== FORM SUBMIT ===== */
-      variantForm?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const color = variantForm.color.value.trim();
-        const additionalPrice = Number(variantForm.additionalPrice.value);
-        const stockQuantity = Number(variantForm.stockQuantity.value);
-        const variantId = document.getElementById("variantId").value;
-
-        if (!color) return Swal.fire("Validation Error","Color is required","warning");
-        if (isNaN(additionalPrice) || additionalPrice < 0) return Swal.fire("Validation Error","Enter valid additional price","warning");
-        if (isNaN(stockQuantity) || stockQuantity < 0) return Swal.fire("Validation Error","Enter valid stock quantity","warning");
-        if (!variantId && allFiles.length === 0) return Swal.fire("Validation Error","Upload at least one image","warning");
-
-        const formData = new FormData(variantForm);
-
-        try {
-        
-          const method = variantId ? "PUT" : "POST";
-
-const res = await fetch(variantForm.action, {
-  method: method,
-  body: formData,
-  credentials: "include"
-});
-
-          const data = await res.json();
-
-          if (data.success) {
-            Swal.fire("Success", data.message, "success").then(() => location.reload());
-          } else {
-            Swal.fire("Error", data.message, "error");
-          }
-
-        } catch (err) {
-          console.error(err);
-          Swal.fire("Error","Server error","error");
-        }
-      });
-
-      /* ===== EDIT VARIANT ===== */
-      window.editVariant = function(variant) {
-        variant = JSON.parse(decodeURIComponent(variant));
-        document.getElementById("variantId").value = variant._id;
-        document.getElementById("color").value = variant.color;
-        document.getElementById("additionalPrice").value = variant.additionalPrice;
-        document.getElementById("stockQuantity").value = variant.stockQuantity;
-
-        variantForm.action = `/admin/variants/update/${variant._id}`;
-        preview.innerHTML = "";
-        allFiles = [];
-
-        if (variant.images) {
-          variant.images.forEach(img => {
-            const image = document.createElement("img");
-            image.src = img;
-            image.style.cssText = "width:90px;height:90px;object-fit:cover;margin-right:5px;";
-            preview.appendChild(image);
-          });
-        }
-
-        document.getElementById("submitBtn").innerText = "Update Variant";
-        window.scrollTo({top:0, behavior:"smooth"});
-      };
-
-      /* ===== RESET FORM ===== */
-      window.resetVariantForm = function() {
-        variantForm.reset();
-        document.getElementById("variantId").value = "";
-        variantForm.action = "/admin/products/<%= product._id %>/variants/add";
-        document.getElementById("submitBtn").innerText = "Add Variant";
-        preview.innerHTML = "";
-        allFiles = [];
-      };
-
-    });
-async function unlistVariant(variantId){
-const result = await Swal.fire({
-    title:"Are you sure?",
-    text:"This variant will be Unlisted!",
-    icon:"warning",
-    showCancelButton:true,
-    confirmButtonText:"Yes, Unlist it!"
+    allFiles = [...allFiles, ...files];
+    renderPreview();
   });
 
-  if(!result.isConfirmed) return;
+  function renderPreview() {
+    preview.innerHTML = "";
 
-  try{
+    // existing images from DB
+    existingImages.forEach((img, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+      wrapper.style.display = "inline-block";
+      wrapper.style.marginRight = "8px";
 
-    const res = await fetch(`/admin/variants/${variantId}/unlist`,{
-      method:"PATCH"
+      const image = document.createElement("img");
+      image.src = img;
+      image.style.cssText =
+        "width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #ccc;";
+
+      const removeBtn = document.createElement("span");
+      removeBtn.innerHTML = "✖";
+      removeBtn.style.cssText =
+        "position:absolute;top:2px;right:4px;color:red;font-weight:bold;cursor:pointer;background:#fff;border-radius:50%;padding:0 5px;";
+
+      removeBtn.onclick = () => {
+        existingImages.splice(index, 1);
+        existingImagesInput.value = JSON.stringify(existingImages);
+        renderPreview();
+      };
+
+      wrapper.appendChild(image);
+      wrapper.appendChild(removeBtn);
+      preview.appendChild(wrapper);
     });
 
-    const data = await res.json();
+    // new selected files
+    allFiles.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.display = "inline-block";
+        wrapper.style.marginRight = "8px";
 
-    if(data.success){
-      Swal.fire("Success",data.message,"success")
-      .then(()=>location.reload());
-    }else{
-      Swal.fire("Error",data.message,"error");
-    }
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.cssText =
+          "width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #ccc;";
 
-  }catch(err){
-    Swal.fire("Error","Server error","error");
-  }
+        const removeBtn = document.createElement("span");
+        removeBtn.innerHTML = "✖";
+        removeBtn.style.cssText =
+          "position:absolute;top:2px;right:4px;color:red;font-weight:bold;cursor:pointer;background:#fff;border-radius:50%;padding:0 5px;";
 
-}
+        removeBtn.onclick = () => {
+          allFiles.splice(index, 1);
+          updateInputFiles();
+          renderPreview();
+        };
 
-
-async function restoreVariant(variantId){
-
-  try{
-
-    const res = await fetch(`/admin/variants/${variantId}/restore`,{
-      method:"PATCH"
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        preview.appendChild(wrapper);
+      };
+      reader.readAsDataURL(file);
     });
 
-    const data = await res.json();
-
-    if(data.success){
-      Swal.fire("Success","Variant Restored!","success")
-      .then(()=>location.reload());
-    }else{
-      Swal.fire("Error",data.message,"error");
-    }
-
-  }catch(err){
-    Swal.fire("Error","Server error","error");
+    updateInputFiles();
   }
 
-}
-  </script>
-</body>
-</html>
-</body>
-</html>
+  function updateInputFiles() {
+    const dataTransfer = new DataTransfer();
+    allFiles.forEach((f) => dataTransfer.items.add(f));
+    imageInput.files = dataTransfer.files;
+  }
+
+  variantForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const color = variantForm.color.value.trim();
+    const additionalPrice = Number(variantForm.additionalPrice.value);
+    const stockQuantity = Number(variantForm.stockQuantity.value);
+    const variantId = document.getElementById("variantId").value;
+
+    if (!color) {
+      return Swal.fire("Validation Error", "Color is required", "warning");
+    }
+
+    if (isNaN(additionalPrice) || additionalPrice < 0) {
+      return Swal.fire("Validation Error", "Enter valid additional price", "warning");
+    }
+
+    if (isNaN(stockQuantity) || stockQuantity < 0) {
+      return Swal.fire("Validation Error", "Enter valid stock quantity", "warning");
+    }
+
+    const totalImages = existingImages.length + allFiles.length;
+
+    if (!variantId && totalImages === 0) {
+      return Swal.fire("Validation Error", "Upload at least one image", "warning");
+    }
+
+    if (variantId && totalImages === 0) {
+      return Swal.fire("Validation Error", "At least one image is required", "warning");
+    }
+
+    existingImagesInput.value = JSON.stringify(existingImages);
+
+    const formData = new FormData(variantForm);
+
+    try {
+      const method = variantId ? "PUT" : "POST";
+
+      const res = await fetch(variantForm.action, {
+        method,
+        body: formData,
+        credentials: "include"
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire("Success", data.message, "success").then(() => location.reload());
+      } else {
+        Swal.fire("Error", data.message, "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Server error", "error");
+    }
+  });
+
+  window.editVariant = function (variant) {
+    variant = JSON.parse(decodeURIComponent(variant));
+
+    document.getElementById("variantId").value = variant._id;
+    document.getElementById("color").value = variant.color;
+    document.getElementById("additionalPrice").value = variant.additionalPrice;
+    document.getElementById("stockQuantity").value = variant.stockQuantity;
+
+    variantForm.action = `/admin/variants/update/${variant._id}`;
+    document.getElementById("submitBtn").innerText = "Update Variant";
+
+    allFiles = [];
+    existingImages = [...(variant.images || [])];
+    existingImagesInput.value = JSON.stringify(existingImages);
+    imageInput.value = "";
+
+    renderPreview();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  window.resetVariantForm = function () {
+    variantForm.reset();
+    document.getElementById("variantId").value = "";
+    existingImagesInput.value = "";
+    variantForm.action = "/admin/products/<%= product._id %>/variants/add";
+    document.getElementById("submitBtn").innerText = "Add Variant";
+    preview.innerHTML = "";
+    allFiles = [];
+    existingImages = [];
+    imageInput.value = "";
+  };
+
+  window.unlistVariant = async function (variantId) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This variant will be Unlisted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Unlist it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch(`/admin/variants/${variantId}/unlist`, {
+        method: "PATCH",
+        credentials: "include"
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire("Success", data.message, "success").then(() => location.reload());
+      } else {
+        Swal.fire("Error", data.message, "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Server error", "error");
+    }
+  };
+
+  window.restoreVariant = async function (variantId) {
+    try {
+      const res = await fetch(`/admin/variants/${variantId}/restore`, {
+        method: "PATCH",
+        credentials: "include"
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire("Success", "Variant Restored!", "success").then(() => location.reload());
+      } else {
+        Swal.fire("Error", data.message, "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Server error", "error");
+    }
+  };
+
+  function validateImages(input, maxFiles = 4) {
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    const files = Array.from(input.files);
+
+    if (files.length > maxFiles) {
+      Swal.fire("Error", `Maximum ${maxFiles} images allowed`, "error");
+      input.value = "";
+      return false;
+    }
+
+    for (let file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        Swal.fire("Error", "Only JPG, JPEG, PNG, and WEBP images are allowed", "error");
+        input.value = "";
+        return false;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        Swal.fire("Error", "Each image must be less than 2MB", "error");
+        input.value = "";
+        return false;
+      }
+    }
+
+    return true;
+  }
+})
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body></html>

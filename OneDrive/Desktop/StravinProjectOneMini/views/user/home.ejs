@@ -297,8 +297,6 @@
     </div>
 
   </div>
-
-  <!-- Controls -->
   <button class="carousel-control-prev" type="button" data-bs-target="#stravinCarousel" data-bs-slide="prev">
     <span class="carousel-control-prev-icon"></span>
   </button>
@@ -306,146 +304,115 @@
   <button class="carousel-control-next" type="button" data-bs-target="#stravinCarousel" data-bs-slide="next">
     <span class="carousel-control-next-icon"></span>
   </button>
-
 </div>
-<form method="GET" action="/" class="top-filter-bar">
 
-  <!-- LEFT: SEARCH -->
-  <div class="filter-left">
-    <input 
-      type="text" 
-      name="search" 
-      placeholder="Search smartwatches..."
-      value="<%= search %>">
-  </div>
-
-   <div class="filter-right" onchange="this.form.submit()">
-    <select name="sort">
-      <option value="">Sort</option>
-      <option value="priceLow" <%= sort === 'priceLow' ? 'selected' : '' %>>
-        Price: Low → High
-      </option>
-      <option value="priceHigh" <%= sort === 'priceHigh' ? 'selected' : '' %>>
-        Price: High → Low
-      </option>
-      <option value="name" <%= sort === 'name' ? 'selected' : '' %>>
-        Name A–Z
-      </option>
-    </select>
-</div>
-<input type="hidden" name="category" value="<%= category %>">
-
-</form>
-
-<!-- PRODUCTS -->
-<!-- PRODUCTS SECTION -->
 <div class="container mt-4">
-
   <div class="row">
 
     <!-- LEFT SIDEBAR -->
     <div class="col-md-3">
-
       <div class="filter-box">
-
         <h5>Categories</h5>
-
         <div id="categories"></div>
 
-        <button onclick="applyCategoryfilter()" class="apply-btn">
+        <button type="button" onclick="applyCategoryfilter()" class="apply-btn">
           Apply
         </button>
-<a href="/" class="clear-btn">Clear</a>
+
+        <a href="/" class="clear-btn">Clear</a>
       </div>
-
     </div>
-
 
     <!-- RIGHT PRODUCT AREA -->
     <div class="col-md-9">
 
+      <form method="GET" action="/" class="top-filter-bar" id="filterForm">
+        <div class="filter-left">
+          <input 
+            type="text" 
+            name="search" 
+            placeholder="Search smartwatches..."
+            value="<%= search || '' %>">
+        </div>
+
+        <div class="filter-right">
+          <select name="sort" onchange="submitFilterForm()">
+            <option value="">Sort</option>
+            <option value="priceLow" <%= sort === 'priceLow' ? 'selected' : '' %>>
+              Price: Low → High
+            </option>
+            <option value="priceHigh" <%= sort === 'priceHigh' ? 'selected' : '' %>>
+              Price: High → Low
+            </option>
+            <option value="name" <%= sort === 'name' ? 'selected' : '' %>>
+              Name A–Z
+            </option>
+          </select>
+        </div>
+
+        <input type="hidden" name="category" id="selectedCategory" value="<%= category || '' %>">
+      </form>
+
       <div class="row">
-
         <% if(products && products.length > 0){ %>
-
           <% products.forEach(p => { %>
-
             <div class="col-md-4 mb-4">
-
               <div class="product-card">
 
                 <a href="/product/<%= p._id %>">
                   <img src="<%= p.images[0] %>" class="product-img">
-                </a>           
-<div class="product-info">
-  <h6><%= p.productname %></h6>
-<div class="mb-1">
+                </a>
 
-  <span style="color: gold;">★★★★☆</span>
+                <div class="product-info">
+                  <h6><%= p.productname %></h6>
 
-  <small class="text-muted">(120)</small>
+                  <div class="mb-1">
+                    <span style="color: gold;">★★★★☆</span>
+                    <small class="text-muted">(120)</small>
+                  </div>
 
-</div>
-<button class="wishlist-btn <%= wishlistProducts.includes(p._id.toString()) ? 'wishlist-active' : '' %>"
- onclick="toggleWishlist('<%= p._id %>', this)">
-<i class="bi <%= wishlistProducts.includes(p._id.toString()) ? 'bi-heart-fill' : 'bi-heart' %>">
-</i></button>
+                  <button class="wishlist-btn <%= wishlistProducts.includes(p._id.toString()) ? 'wishlist-active' : '' %>"
+                    onclick="toggleWishlist('<%= p._id %>', this)">
+                    <i class="bi <%= wishlistProducts.includes(p._id.toString()) ? 'bi-heart-fill' : 'bi-heart' %>"></i>
+                  </button>
+                </div>
 
-  
-</div>
-<div class="product-details">
+                <div class="product-details">
+                  <% if (p.finalOffer && p.finalOffer > 0) { %>
+                    <span class="original-price" style="text-decoration: line-through; color: gray;">
+                      ₹<%= p.price %>
+                    </span>
 
-  <% if (p.finalOffer && p.finalOffer > 0) { %>
+                    <span class="discount-price" style="color: red; font-weight: bold; margin-left: 5px;">
+                      ₹<%= p.finalPrice %>
+                    </span>
 
-    <span class="original-price" style="text-decoration: line-through; color: gray;">
-      ₹<%= p.price %>
-    </span>
-
-    <span class="discount-price" style="color: red; font-weight: bold; margin-left: 5px;">
-      ₹<%= p.finalPrice %>
-    </span>
-
-    <div>
-      <span class="badge bg-success">
-        <%= p.finalOffer %>% OFF
-      </span>
-    </div>
-
-  <% } else { %>
-
-    <span class="discount-price">
-      ₹<%= p.price %>
-    </span>
-
-  <% } %>
-
-</div>
+                    <div>
+                      <span class="badge bg-success"><%= p.finalOffer %>% OFF</span>
+                    </div>
+                  <% } else { %>
+                    <span class="discount-price">₹<%= p.price %></span>
+                  <% } %>
+                </div>
 
               </div>
-
             </div>
-
           <% }) %>
-
         <% } else { %>
-
           <p>No products available</p>
-
         <% } %>
-
       </div>
 
     </div>
-
   </div>
-
 </div>
-      <!-- Products pagination -->
+
+<!-- Pagination -->
 <div class="pagination-wrapper">
   <ul class="custom-pagination">
     <% for (let i = 1; i <= totalPages; i++) { %>
       <li class="<%= i === currentPage ? 'active' : '' %>">
-        <a href="/?page=<%= i %>&search=<%= search %>&sort=<%= sort %>">
+        <a href="/?page=<%= i %>&search=<%= search || '' %>&sort=<%= sort || '' %>&category=<%= category || '' %>">
           <%= i %>
         </a>
       </li>
@@ -456,81 +423,88 @@
 <%-include('../partials/footer')%>
 
 <script>
-  function swapImage(productId, thumbEl) {
-    const mainImg = document.getElementById(`main-img-${productId}`);
-    if (!mainImg) return;
+ function swapImage(productId, thumbEl) {
+  const mainImg = document.getElementById(`main-img-${productId}`);
+  if (!mainImg) return;
 
-    // Swap src values
-    const tempSrc = mainImg.src;
-    mainImg.src = thumbEl.src;
-    thumbEl.src = tempSrc;
-  }
- async function loadCategories() {
-  const res = await fetch(`/listedCategories`);
+  const tempSrc = mainImg.src;
+  mainImg.src = thumbEl.src;
+  thumbEl.src = tempSrc;
+}
+async function loadCategories() {
+  const res = await fetch("/listedCategories");
   const data = await res.json();
 
-  const container = document.getElementById('categories');
+  const container = document.getElementById("categories");
   container.innerHTML = "";
 
-  //get multiple categories from url
   const params = new URLSearchParams(window.location.search);
-  const selectedCategories = params.get('category')
-    ? params.get('category').split(',') : [];
+  const selectedCategories = params.get("category")
+    ? params.get("category").split(",")
+    : [];
 
   data.categories.forEach(cat => {
-    const isChecked =
-      selectedCategories.includes(cat._id.toString()) ? "checked" : "";
+    const isChecked = selectedCategories.includes(cat._id.toString()) ? "checked" : "";
 
     container.innerHTML += `
-      <div>
-        <input type="checkbox"
-               value="${cat._id}"
-               class="catCheck"
-               ${isChecked}>
-        ${cat.name}
-      </div>`;
+      <div class="mb-2">
+        <input type="checkbox" value="${cat._id}" class="catCheck" ${isChecked}>
+        <label>${cat.name}</label>
+      </div>
+    `;
   });
 }
-loadCategories()
+async function loadCategories() {
+  const res = await fetch("/listedCategories");
+  const data = await res.json();
 
-function applyCategoryfilter() {
+  const container = document.getElementById("categories");
+  container.innerHTML = "";
+
+  const params = new URLSearchParams(window.location.search);
+  const selectedCategories = params.get("category")
+    ? params.get("category").split(",").filter(Boolean)
+    : [];
+
+  data.categories.forEach(cat => {
+    const isChecked = selectedCategories.includes(cat._id.toString()) ? "checked" : "";
+
+    container.innerHTML += `
+      <div class="mb-2">
+        <input type="checkbox" value="${cat._id}" class="catCheck" ${isChecked}>
+        <label>${cat.name}</label>
+      </div>
+    `;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", loadCategories);
+
+function getSelectedCategories() {
   const selected = [];
   document.querySelectorAll(".catCheck:checked").forEach(cb => {
     selected.push(cb.value);
-  })
+  });
+  return selected.join(",");
+}
+
+function applyCategoryfilter() {
   const query = new URLSearchParams(window.location.search);
-  query.set("category", selected.join(","))
+  const selectedCategories = getSelectedCategories();
+
+  if (selectedCategories) {
+    query.set("category", selectedCategories);
+  } else {
+    query.delete("category");
+  }
+
   window.location.href = `/?${query.toString()}`;
 }
-//wishlist btn
 
-async function toggleWishlist(productId, btn) {
-  try {
-    const res = await fetch('/addToWishlist', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId })
-    });
-    const data = await res.json();
-
-    if (!data.success) {
-      Swal.fire("Error", data.message, "error");
-      return;
-    }
-
-    const icon = btn.querySelector("i");
-    if (data.added) {
-      icon.classList.remove("bi-heart");
-      icon.classList.add("bi-heart-fill");
-      btn.classList.add("wishlist-active");
-    } else {
-      icon.classList.remove("bi-heart-fill");
-      icon.classList.add("bi-heart");
-      btn.classList.remove("wishlist-active");
-    }
-  } catch (err) {
-    console.error(err);
-  }
+function submitFilterForm() {
+  const hiddenCategory = document.getElementById("selectedCategory");
+  hiddenCategory.value = getSelectedCategories();
+  document.getElementById("filterForm").submit();
 }
 </script>
 

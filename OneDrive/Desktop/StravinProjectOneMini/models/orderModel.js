@@ -40,7 +40,8 @@ refundDetails: {
 
         itemStatus:{
           type:String,
-          enum:[ "Pending","Placed","Shipped","Out for Delivery","Delivered","Cancelled","Returned"],
+          enum:[ "Pending","Placed","Shipped","Out for Delivery",
+            "Delivered","Cancelled","Returned"],
           default:"Pending"
         },
 
@@ -92,7 +93,8 @@ razorpaySignature: {type: String, default: null },
 
 status: {
   type: String,
-  enum: ["Pending","Placed","Shipped", "Out for Delivery","Delivered","Cancelled","Returned","Partially Returned","Paid"],
+  enum: ["Pending","Placed","Shipped", "Out for Delivery",
+    "Delivered","Cancelled","Returned","Partially Returned","Paid"],
   default:"Pending"
 },
  statusHistory: [

@@ -33,7 +33,12 @@ body {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   border: 1px solid #2c313a;
 }
-
+.error-msg {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+}
 /* ===== TITLE ===== */
 h3 {
   color: #fff;
@@ -169,19 +174,23 @@ p[style*="color:red"] {
     <h3 class="text-center mb-3">Welcome Back</h3>
     <p class="text-center text-muted">Login to continue shopping</p>
 
-    <!-- Email -->
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" id="email" class="form-control" placeholder="Enter email">
-    </div>
+    <form id="loginForm" action="/login" method="POST">
+      <!-- Email -->
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control" placeholder="Enter email" >
+        <small id="emailError" class="error-msg"></small>
+      </div>
 
-    <!-- Password -->
-    <div class="mb-3">
-      <label class="form-label">Password</label>
-      <input type="password" id="password" class="form-control" placeholder="Enter password">
-    </div>
+      <!-- Password -->
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Enter password">
+        <small id="passwordError" class="error-msg"></small>
+      </div>
 
-    <button id="loginBtn" class="btn btn-primary w-100 mb-3">Login</button>
+      <button type="submit" id="loginBtn" class="btn btn-primary w-100 mb-3">Login</button>
+    </form>
 
     <a href="/forgotPassword" class="text-decoration-none">
       <p class="text-center">Forgot Password?</p>
@@ -189,73 +198,95 @@ p[style*="color:red"] {
 
     <hr>
 
-    <!-- Google Single Sign In -->
-   <a href="/auth/google" class="google-btn">
-  <button type="button">Continue With Google</button>
-</a>
-<% if (error === "access_denied") { %>
-  <p style="color:red;">Account is Denied!</p>
-<% } %>
+    <a href="/auth/google" class="google-btn">
+      <button type="button">Continue With Google</button>
+    </a>
+
+    <% if (error === "access_denied") { %>
+      <p style="color:red;" class="text-center">Account is Denied!</p>
+    <% } %>
 
     <p class="text-center mt-3">
-      Don't have an account? 
+      Don't have an account?
       <a href="/signup">Signup</a>
     </p>
   </div>
 </div>
-
 <script>
-document.getElementById('loginBtn').addEventListener('click', async () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-
-    // Simple validation
-    if (!email || !password) {
-        return Swal.fire("Error", "All fields are required!", "error");
+const emailInput=document.getElementById('email')
+const passwordInput=document.getElementById('password')
+const emailError=document.getElementById('emailError')
+const passwordError=document.getElementById('passwordError')
+document.getElementById('loginBtn').addEventListener('click',async(e)=>{
+  e.preventDefault()
+  const email=emailInput.value.trim()
+  const password=passwordInput.value.trim()
+  clearErrors()
+  let isValid=true;
+    if(!email) {
+        emailError.innerText = "Email is required";
+        emailInput.style.borderColor = "red";
+        isValid = false;
+    }else if(!isValidEmail(email)) {
+        emailError.innerText = "Enter a valid email";
+        emailInput.style.borderColor = "red";
+        isValid = false;
+    }
+    if(!password) {
+        passwordError.innerText = "Password is required";
+        passwordInput.style.borderColor = "red";
+        isValid = false;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return Swal.fire("Error", "Enter a valid email", "error");
-    }
-
-    try {
-        const res = await fetch('/login', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await res.json()
-
-        if (res.ok && data.success) {
-            Swal.fire({
-                icon: "success",
-                title: "Logged In",
-                timer: 1500,
-                showConfirmButton: false
-            });
-
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 1500);
-        }
-        
-        //  Blocked user
+    if(!isValid) return;
+    try{
+      const res=await fetch('/login',{
+        method:"POST",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email,password})
+      })
+const data = await res.json()
+//blocked users..
   if (data.blocked) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Access Denied',
-      text: data.message
-    });
-    return;
+    passwordError.innerText = data.message;
+    passwordInput.style.borderColor = "red";
+    return
   }
-
-    } catch (err) {
-        Swal.fire("Error", "Server error occurred", "error");
-        console.error(err);
+// on success
+  if (res.ok && data.success) {
+    clearErrors()
+     Swal.fire({
+      icon: "success",
+      title: "Logged In",
+      timer: 1500,
+      showConfirmButton: false
+      }).then(() => {
+      window.location.href = "/";
+      })
+      return;
     }
-});
+passwordError.innerText = data.message || "Login failed";
+passwordInput.style.borderColor = "red";
+}
+catch(error){
+  passwordError.innerText = "Server error occurred";
+  console.error(err);
+    }
+})
+function isValidEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+function clearErrors() {
+    emailError.innerText = "";
+    passwordError.innerText = "";
+
+    emailInput.style.borderColor = "";
+    passwordInput.style.borderColor = "";
+}
+
+
+
 
 // Google login
 document.getElementById('googleLogin').addEventListener('click', () => {

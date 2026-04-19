@@ -7,84 +7,92 @@ import Wishlist from '../models/wishlistModel.js'
 //home page 
 
 export const loadHome = async (req, res) => {
-  try {
+ try {
+  const search = req.query.search || "";
+  const category = req.query.category || "";
+  const sort = req.query.sort || "";
+  const page = parseInt(req.query.page) || 1;
 
-    const search = req.query.search || '';
-    const category = req.query.category || '';
-    const sort = req.query.sort || '';
-    const page = parseInt(req.query.page) || 1;
+  const limit = 10;
 
-    const limit = 10;
-    const skip = (page - 1) * limit;
+  const listedCategories = await Category.find({ isListed: true }).select("_id");
+  const listedCategoryIds = listedCategories.map(cat => cat._id.toString());
 
-    let filter = { isDeleted: false };
-
-    if (category) {
-      const categoryArray = category.split(",");
-      filter.category = { $in: categoryArray };
-    }
-
-    if (search) {
-      filter.productname = { $regex: search, $options: "i" };
-    }
-
-    let sortOption = { createdAt: -1 };
-
-    if (sort === "priceLow") sortOption = { price: 1 };
-    if (sort === "priceHigh") sortOption = { price: -1 };
-    if (sort === "name") sortOption = { productname: 1 };
-
-    const products = await Product.find(filter)
-      .populate({
-        path: "category",
-        match: { isListed: true }
-      })
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit);
-
-    const validProducts = products.filter(p => p.category);
-    const totalProducts = await Product.countDocuments(filter);
-    const totalPages = Math.ceil(totalProducts / limit);
-  let wishlistProducts = [];
-  if (req.session.userId) 
-  {
-  let wishlist = await Wishlist.findOne({userId:req.session.userId});
-  if (wishlist) {
-    wishlistProducts = wishlist.products.map(p =>p.toString())
-  }
-  }
-const updatedProducts = validProducts.map(p => {
-  const productOffer = p.offerPercentage || 0;
-  const categoryOffer = p.category?.catOfferPercentage || 0;
-
-  const finalOffer = Math.max(productOffer, categoryOffer);
-
-  const finalPrice = Math.round(
-    p.price - (p.price * finalOffer / 100)
-  );
-
-  return {
-    ...p._doc,
-    finalPrice,
-    finalOffer
+  let filter = {
+    isDeleted: false,
+    category: { $in: listedCategoryIds }
   };
-});
-  
-    res.render("user/home", {
-      products:updatedProducts,
-      wishlistProducts,
-      search,
-      category,
-      sort,
-      currentPage: page,
-      totalPages
-    });
 
-  } catch (error) {
-    console.error("Load Home Error:", error);
-    res.status(500).send("Server Error");
+  if (category && category.trim() !== "") {
+    const categoryArray = category.split(",").filter(Boolean);
+    filter.category = { $in: categoryArray };
   }
+
+  if (search && search.trim() !== "") {
+    filter.productname = { $regex: search.trim(), $options: "i" };
+  }
+
+  let products = await Product.find(filter).populate("category");
+
+  products = products.filter(p => p.category);
+
+  let wishlistProducts = [];
+  if (req.session.userId) {
+    const wishlist = await Wishlist.findOne({ userId: req.session.userId });
+    if (wishlist) {
+      wishlistProducts = wishlist.products.map(p => p.toString());
+    }
+  }
+
+  let updatedProducts = products.map(p => {
+    const productOffer = p.offerPercentage || 0;
+    const categoryOffer = p.category?.catOfferPercentage || 0;
+
+    const finalOffer = Math.max(productOffer, categoryOffer);
+
+    const finalPrice = Math.round(
+      p.price - (p.price * finalOffer / 100)
+    );
+
+    return {
+      ...p._doc,
+      category: p.category,
+      finalPrice,
+      finalOffer
+    };
+  });
+
+  if (sort === "priceLow") {
+    updatedProducts.sort((a, b) => a.finalPrice - b.finalPrice);
+  } else if (sort === "priceHigh") {
+    updatedProducts.sort((a, b) => b.finalPrice - a.finalPrice);
+  } else if (sort === "name") {
+    updatedProducts.sort((a, b) => a.productname.localeCompare(b.productname));
+  } else {
+    updatedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  const totalProducts = updatedProducts.length;
+  const totalPages = Math.ceil(totalProducts / limit);
+
+  const startIndex = (page - 1) * limit;
+  const paginatedProducts = updatedProducts.slice(startIndex, startIndex + limit);
+
+  res.render("user/home", {
+    products: paginatedProducts,
+    wishlistProducts,
+    search,
+    category,
+    sort,
+    currentPage: page,
+    totalPages
+  });
+
+} catch (err) {
+  console.log(err);
+  res.redirect("/pageNotFound");
+}
+  
 }
 //load shop 
 export const loadShop = async (req, res) => {

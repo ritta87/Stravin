@@ -6,7 +6,7 @@ export const generatereferralCode =(name) => {
 
 export const generatereferralCoupon = async(referrerId) => {
   try {
-    console.log(referrerId)
+    //console.log(referrerId)
     const code = "REF" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
 const coupon=await Coupon.create({

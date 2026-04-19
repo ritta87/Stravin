@@ -25,7 +25,7 @@ export const adminLogin = async(req,res)=>{
             maxAge: 1 * 60 * 60 * 1000 
         })
 
-res.redirect('/admin/dashboard')
+res.status(200).json({success:true,json:"Admin LogIn success!"})
 }
 
 export const getAdminDashboard = async(req,res)=>{

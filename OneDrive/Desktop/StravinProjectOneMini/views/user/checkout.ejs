@@ -12,6 +12,9 @@
 <link rel="stylesheet" href="/css/pages/footer.css">
 
 <script src="/js/navbar.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
 /* MAIN LAYOUT */
 .container {
@@ -253,18 +256,16 @@
       </div>
 
       <p class="tax-note">(Included in total amount.)</p>
-
       <div class="price-row">
         <span>Shipping</span>
         <span><%= shipping %></span>
       </div>
 
-      <div class="coupon-box">
-        <input type="text" id="couponCode" placeholder="Enter coupon code"
-          value="<%= appliedCoupon || '' %>">
-        <button onclick="applyCoupon()" class="apply-btn">Apply</button>
-      </div>
-
+<div class="coupon-box">
+    <input type="text" id="couponCode" placeholder="Enter coupon code"
+      value="<%= appliedCoupon || '' %>">
+      <button onclick="applyCoupon()" class="apply-btn">Apply</button>
+  </div>
 <div class="coupon-section">
   <p id="appliedCouponText" class="coupon-success">
     <% if (appliedCoupon) { %>
@@ -279,27 +280,22 @@
 
   <p id="couponError" class="coupon-error"></p>
 
-  <div class="price-row coupon-discount-row"
+  <div id="couponDiscountRow" class="price-row coupon-discount-row"
        <%= discount ? '' : 'style="display:none;"' %>>
     <span>Coupon Discount</span>
-    <span class="discount-amount">- ₹ <%= discount || 0 %></span>
+    <span id="discount" class="discount-amount">- ₹ <%= discount || 0 %></span>
   </div>
-
 </div>
-
-      <hr>
-
-      <div class="price-row">
-        <span>Total</span>
-        <span>₹ <%= totalAmount %></span>
-      </div>
-
-      <div class="price-summary">
-        <span>Amount to Pay</span>
-        <span>₹ <%= finalTotal %></span>
-      </div>
-
-      <form id="checkoutForm">
+<hr>
+<div class="price-row">
+  <span>Total</span>
+  <span id="grandTotal">₹ <%= totalAmount %></span>
+</div>
+<div class="price-summary">
+  <span>Amount to Pay</span>
+  <span id="finalTotalText">₹ <%= finalTotal %></span>
+</div>
+  <form id="checkoutForm">
         <h5>Payment Method</h5>
 
         <label><input type="radio" name="paymentMethod" value="COD" checked> COD</label><br>
@@ -319,26 +315,19 @@
 <%-include('../partials/footer')%>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
   const form = document.getElementById("checkoutForm");
-
   form.addEventListener("submit", async e => {
     e.preventDefault();
-
-const selectedAddressId = document.querySelector('input[name="address"]:checked').value;
-    if (!selectedAddressId) {
-      return Swal.fire("Error", "Please select an address", "error");
+const selectedAddress = document.querySelector('input[name="address"]:checked');
+    if (!selectedAddress) {
+      return Swal.fire("Error","Please select an address","error");
     }
-
-    
-
+    let selectedAddressId = selectedAddress.value;
     const paymentInput = document.querySelector('input[name="paymentMethod"]:checked');
     if (!paymentInput) {
       return Swal.fire("Error", "Please select payment method", "error");
     }
-
-    const paymentMethod = paymentInput.value;
-
+ const paymentMethod = paymentInput.value;
     try {
       const res = await fetch('/placeOrder', {
         method: 'POST',
@@ -431,15 +420,16 @@ const selectedAddressId = document.querySelector('input[name="address"]:checked'
 //apply coupon---------------------
 
 async function applyCoupon() {
-  const code = document.getElementById("couponCode").value.trim();
+  const couponInput = document.getElementById("couponCode");
   const errorBox = document.getElementById("couponError");
   const appliedText = document.getElementById("appliedCouponText");
 
-  errorBox.innerText = "";
-  appliedText.innerText = "";
+if (errorBox) errorBox.innerText = "";
+if (appliedText) appliedText.innerText = "";
 
+  const code = couponInput?.value.trim();
   if (!code) {
-    errorBox.innerText = "Please enter a coupon code";
+    if (errorBox) errorBox.innerText = "Please enter a coupon code";
     return;
   }
 
@@ -451,21 +441,34 @@ async function applyCoupon() {
     });
 
     const data = await res.json();
- if (data.success) {
-    document.getElementById("discount").innerText = data.discount||0;
-    document.getElementById("grandTotal").innerText = data.finalTotal;
-    document.getElementById("finalTotalText").innerText = data.finalTotal;
+    console.log("coupon response:", data);
 
-    document.getElementById("appliedCouponText").innerText =`Coupon ${data.couponCode} applied`;
-    document.getElementById("removeCouponBtn").style.display = "inline-block";
-  } else {
-    document.getElementById("couponError").innerText = data.message;
-  }
+    if (data.success) {
+      const discountEl = document.getElementById("discount");
+      const grandTotalEl = document.getElementById("grandTotal");
+      const finalTotalTextEl = document.getElementById("finalTotalText");
+      const removeBtn = document.getElementById("removeCouponBtn");
 
+      console.log({
+        discountEl,
+        grandTotalEl,
+        finalTotalTextEl,
+        appliedText,
+        removeBtn
+      });
+
+      if (discountEl) discountEl.innerText = data.discount || 0;
+      if (grandTotalEl) grandTotalEl.innerText = data.finalTotal;
+      if (finalTotalTextEl) finalTotalTextEl.innerText = data.finalTotal;
+      if (appliedText) appliedText.innerText = `Coupon ${data.couponCode} applied`;
+      if (removeBtn) removeBtn.style.display = "inline-block";
+    } else {
+      if (errorBox) errorBox.innerText = data.message || "Invalid Coupon!";
+    }
 
   } catch (err) {
-    console.error(err);
-    errorBox.innerText = "Something went wrong. Try again.";
+    console.error("applyCoupon error:", err);
+    if (errorBox) errorBox.innerText = "Something went wrong. Try again.";
   }
 }
 //coupon remove.............

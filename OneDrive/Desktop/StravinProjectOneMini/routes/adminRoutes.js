@@ -23,6 +23,7 @@ import { getCouponPage,addCoupon,addCouponPage,getEditCoupon,editCoupon,deleteCo
 
 import { loadSalesReport } from '../controllers/salesReportController.js';
 import { noCache } from '../middleware/no-cache.js'
+import { handleImage } from '../middleware/handleImage.js';
 router.use(noCache)
 
 
@@ -51,19 +52,19 @@ router.put('/categories/restoreCategory/:id',adminAuth,restoreCategory)
 
 //product routes..
 router.get('/products',adminAuth,getAllProducts)
-router.post('/products',adminAuth,upload.array('images',4),addProduct)
+router.post('/products',adminAuth,handleImage,addProduct)
 router.get('/GetAddProduct',adminAuth,GetAddProduct)
 router.get('/products/edit/:id',adminAuth,getEditProduct)
-router.post('/products/edit/:id',upload.array("images",4),updateProduct)
+router.post('/products/edit/:id',handleImage,updateProduct)
 router.delete('/products/:id',adminAuth,deleteProduct)
 router.put('/products/restoreProduct/:id',adminAuth,restoreProduct)
 
 //variant route here..
 
 //creating variant for a selected product(by productId)..
-router.post('/products/:productId/variants/add',adminAuth,upload.array('images',4),addVariant)
+router.post('/products/:productId/variants/add',adminAuth,handleImage,addVariant)
 router.get('/products/:productId/variants',adminAuth,getVariantByProduct)
-router.put('/variants/update/:variantId', adminAuth, upload.array('images',4), updateVariant)
+router.put('/variants/update/:variantId', adminAuth,handleImage,updateVariant)
 router.patch('/variants/:variantId/unlist',adminAuth,unlistVariant)
 router.patch('/variants/:variantId/restore',adminAuth,restoreVariant)
 

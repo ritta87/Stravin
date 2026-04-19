@@ -33,6 +33,12 @@ body{
     position: absolute;
     border-radius: 50%;
 }
+.error-msg {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+}
 .shape:first-child{
     background: linear-gradient(
         #1845ad,
@@ -142,12 +148,13 @@ button{
     <form id="adminLoginForm">
         <h3>Admin Login </h3>
 
-        <label for="username">Email Id</label>
+        <label for="email">Email Id</label>
         <input type="text" placeholder="Email Id" id="email" name="email">
+        <small id="emailError" class="error-msg"></small>
 
         <label for="password">Password</label>
         <input type="password" name="password" placeholder="Password" id="password">
-
+        <small id="passwordError" class="error-msg"></small>
         <button>Log In</button>
       
     </form>
@@ -155,40 +162,86 @@ button{
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const form = document.getElementById("adminLoginForm")
+const form = document.getElementById("adminLoginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const emailError = document.getElementById("emailError");
+const passwordError = document.getElementById("passwordError");
 
 form.addEventListener("submit", async (e) => {
-  e.preventDefault()
+  e.preventDefault();
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
-  try {
+  clearErrors();
+
+  let isValid = true;
+
+  if(!email) {
+    emailError.innerText = "Email is required";
+    emailInput.style.borderColor = "red";
+    isValid = false;
+  } else if (!isValidEmail(email)) {
+    emailError.innerText = "Enter a valid email";
+    emailInput.style.borderColor = "red";
+    isValid = false;
+  }
+  if(!password) {
+    passwordError.innerText = "Password is required";
+    passwordInput.style.borderColor = "red";
+    isValid = false;
+  }else if(password.length < 6) {
+    passwordError.innerText = "Password must be at least 6 characters";
+    passwordInput.style.borderColor = "red";
+    isValid = false;
+  }
+
+  if (!isValid) return; 
+
+  try{
     const res = await fetch("/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
     });
 
+    const data = await res.json();
+
     if (!res.ok) {
-      const data = await res.json();
-      Swal.fire("Error", data.message, "error");
+      // show backend error inline
+      passwordError.innerText = data.message || "Invalid login credentials";
+      passwordInput.style.borderColor = "red";
       return;
     }
-
-    Swal.fire({
-      icon: "success",
-      title: "Login successful",
-      timer: 1500,
-      showConfirmButton: false
-    }).then(() => {
-      window.location.href = "/admin/dashboard";
-    });
-
-  } catch (err) {
-    Swal.fire("Error", "Something went wrong", "error");
+  // success- redirect
+else{
+  clearErrors()
+  Swal.fire({
+    icon: "success",
+    title: "Admin login successful",
+    timer: 1500,
+    showConfirmButton: false
+    }).then(()=>window.location.href="/admin/dashboard")
+  return;
+}
+  } catch (error) {
+    passwordError.innerText = "Something went wrong";
   }
-})
+});
+
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function clearErrors() {
+  emailError.innerText = "";
+  passwordError.innerText = "";
+
+  emailInput.style.borderColor = "";
+  passwordInput.style.borderColor = "";
+}
 </script>
 
 </body>
