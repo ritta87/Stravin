@@ -1,100 +1,78 @@
-import User from '../models/userModel.js'
-import Address from '../models/addressModel.js'
-import nodemailer from 'nodemailer'
-import { sendOtpEmail } from '../utils/sendOtp.js'
+import {getUserAddressService,addUserAddressService,getEditAddressService,
+  postEditAddressService,deleteAddressService,setDefaultAddressService} from "../services/addressService.js";
 
-export const getUserAddress = async(req,res)=>{
-    const userId = req.session.userId;
-    const user = await User.findById(userId)
-    const addresses = await Address.find({userId})
-    if(!user){
-        return res.status(401).json({success:false,message:"Please Login first!"})
+export const getUserAddress = async (req, res) => {
+  try {
+    const result = await getUserAddressService(req);
+
+    if (!result.success) {
+      return res.status(result.statusCode || 401).json(result);
     }
-    res.render('user/address',{addresses})
 
+    return res.render("user/address", { addresses: result.addresses });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
 }
-export const getAddAddress = async(req,res)=>{
-    res.render('user/addAddress')
+
+export const getAddAddress = async (req, res) => {
+  return res.render("user/addAddress");
 }
-export const addUserAddress=async(req,res)=>{
-try {
- const userId = req.session.userId;
- const {name,mobile,house, area, city, state,landmark,pincode,addressType}= req.body;
 
-    await Address.create({userId,name,mobile,house,landmark,area, city, state, pincode,addressType})
+export const addUserAddress = async (req, res) => {
+  try {
+    const result = await addUserAddressService(req);
 
-    res.redirect('/profile/address')// to address page
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json(result);
+    }
 
+    return res.redirect("/profile/address");
   } catch (error) {
     console.log("Add address error:", error);
-    res.status(500).send("Server Error");
-  }
-
-}
-//edit nd delete user address.
-//get edit page by id
-export const getEditAddress=async(req,res)=>{
-  try{
-    const addressId=req.params.id;
-    const address = await Address.findById(addressId)
-    res.render('user/editAddress',{address})
-  }catch(error){
-    res.status(500).json({success:false,message:"Server error!"})
-  }
-}
-//edit
-export const postEditAddress=async(req,res)=>{
-  try{
-  const addressId=req.params.id
-  const {name,mobile,address,house,city,area,state,pincode,landmark,addressType}=req.body;
-
-    if (!name || !mobile || !pincode || !city || !state || !address||!area||!landmark||!addressType) {
-      return res.json({ success: false, message: "All fields required" });
-    }
-
-    if (!/^[0-9]{10}$/.test(mobile)) {
-      return res.json({ success: false, message: "Invalid mobile number" });
-    }
-
-    if (!/^[0-9]{6}$/.test(pincode)) {
-      return res.json({ success: false, message: "Invalid pincode" });
-    }
-  await Address.findByIdAndUpdate(addressId,{name,mobile,house,area,pincode,landmark,
-    city,state,address,addressType},
-    {new:true})
-    
-  res.json({success:true,message:"Address updated successfully"})
-  }catch(error){
-    console.log(error)
-    res.status(500).json({success:false,message:"Error while editing address"})
+    return res.status(500).send("Server Error");
   }
 }
 
-//delete address
-export const deleteAddress=async(req,res)=>{
-  try{
-    const addressId=req.params.id;
-    await Address.findByIdAndDelete(addressId)
-    res.json({success:true,message:"Address deleted"})
+export const getEditAddress = async (req, res) => {
+  try {
+    const result = await getEditAddressService(req);
 
-  }catch(error){
-    console.log(error)
-    res.status(500).json({success:false,message:"error while deleting address"})
+    if (!result.success) {
+      return res.status(result.statusCode || 404).json(result);
+    }
+
+    return res.render("user/editAddress", { address: result.address });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error!" });
   }
 }
-//address default
-export const setDefaultAddress=async(req,res)=>{
-  try{
-    const addressId=req.params.id;
-    const userId = req.session.userId;
-    const user=await User.findById(userId)
-    if(!user){
-      return res.status(401).json({success:false,message:"Please Login first"})
-    }
-    await Address.updateMany({userId},{$set:{isDefault:false}})
-    await Address.findByIdAndUpdate(addressId,{isDefault:true});
-    res.json({success:true});
-  }catch(error){
-    res.json({success:false,message:"Error!"})
+
+export const postEditAddress = async (req, res) => {
+  try {
+    const result = await postEditAddressService(req);
+    return res.status(result.statusCode || 200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, message: "Error while editing address" });
+  }
+}
+
+export const deleteAddress = async (req, res) => {
+  try {
+    const result = await deleteAddressService(req);
+    return res.status(result.statusCode || 200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, message: "Error while deleting address" });
+  }
+}
+
+export const setDefaultAddress = async (req, res) => {
+  try {
+    const result = await setDefaultAddressService(req);
+    return res.status(result.statusCode || 200).json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error!" });
   }
 }
